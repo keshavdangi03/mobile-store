@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Product {
+  id            String   @id
+  title         String
+  price         Int
+  originalPrice Int
+  discount      Int
+  rating        Float
+  reviewsCount  Int
+  image         String
+  category      String
+  brand         String
+  description   String
+  inStock       Boolean
+  featured      Boolean  @default(false)
+  trending      Boolean  @default(false)
+  emiAvailable  Boolean  @default(false)
+  specs         Json
+  variants      Json?
+  addons        Json?
+}
+
+model Order {
+  id             String   @id
+  customerName   String
+  customerPhone  String
+  customerEmail  String
+  address        String
+  city           String
+  items          Json
+  totalPrice     Int
+  paymentMethod  String
+  status         String   @default("Pending")
+  createdAt      DateTime @default(now())
+}
