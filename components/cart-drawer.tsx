@@ -58,7 +58,7 @@ export default function CartDrawer() {
           </h2>
           <button
             onClick={() => setIsCartOpen(false)}
-            className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground/60 hover:text-foreground text-sm font-semibold transition-colors"
+            className="p-1.5 rounded-full hover:bg-black/5 hover:bg-white/10 text-foreground/60 hover:text-foreground text-sm font-semibold transition-colors"
           >
             ✕ Close
           </button>
@@ -104,7 +104,7 @@ export default function CartDrawer() {
               return (
                 <div
                   key={`${item.product.id}-${item.variant || ""}-${item.addon || ""}-${idx}`}
-                  className="flex gap-3 p-3 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-xl hover:shadow-sm transition-all"
+                  className="flex gap-3 p-3 bg-card-bg border border-card-border rounded-xl hover:shadow-sm transition-all"
                 >
                   {/* Thumb */}
                   <div className="w-16 h-16 rounded-lg overflow-hidden border border-card-border relative bg-white flex-shrink-0">
@@ -146,7 +146,7 @@ export default function CartDrawer() {
                       <div className="flex items-center border border-card-border rounded-lg bg-card-bg overflow-hidden">
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.variant, item.addon)}
-                          className="px-2 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-foreground/75"
+                          className="px-2 py-0.5 hover:bg-black/5 hover:bg-white/10 text-xs font-bold text-foreground/75"
                         >
                           -
                         </button>
@@ -155,7 +155,7 @@ export default function CartDrawer() {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variant, item.addon)}
-                          className="px-2 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-foreground/75"
+                          className="px-2 py-0.5 hover:bg-black/5 hover:bg-white/10 text-xs font-bold text-foreground/75"
                         >
                           +
                         </button>
@@ -182,7 +182,7 @@ export default function CartDrawer() {
 
         {/* Footer Billing summary */}
         {cart.length > 0 && (
-          <div className="p-4 border-t border-card-border bg-slate-50 dark:bg-slate-950 space-y-3">
+          <div className="p-4 border-t border-card-border bg-card-bg dark:bg-slate-950 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-foreground/60 font-semibold">Total items:</span>
               <span className="text-xs font-bold text-foreground">

@@ -83,7 +83,7 @@ function LoginForm() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full py-2.5 bg-background border border-card-border hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-2.5 bg-background border border-card-border hover:bg-card-bg dark:hover:bg-slate-900 rounded-xl text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {/* Google SVG G logo */}
             <svg className="w-4 h-4" viewBox="0 0 24 24">

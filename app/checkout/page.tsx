@@ -173,7 +173,7 @@ export default function CheckoutPage() {
                     setName(e.target.value);
                     if (errors.name) setErrors({ ...errors, name: "" });
                   }}
-                  className={`w-full text-xs px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border ${
+                  className={`w-full text-xs px-3.5 py-2.5 bg-card-bg border ${
                     errors.name ? "border-red-500" : "border-card-border"
                   } rounded-xl outline-none`}
                 />
@@ -190,7 +190,7 @@ export default function CheckoutPage() {
                     setPhone(e.target.value);
                     if (errors.phone) setErrors({ ...errors, phone: "" });
                   }}
-                  className={`w-full text-xs px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border ${
+                  className={`w-full text-xs px-3.5 py-2.5 bg-card-bg border ${
                     errors.phone ? "border-red-500" : "border-card-border"
                   } rounded-xl outline-none`}
                 />
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
                   placeholder="john@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-xl outline-none"
+                  className="w-full text-xs px-3.5 py-2.5 bg-card-bg border border-card-border rounded-xl outline-none"
                 />
               </div>
 
@@ -215,7 +215,7 @@ export default function CheckoutPage() {
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full text-xs px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-xl outline-none text-foreground font-bold"
+                  className="w-full text-xs px-3.5 py-2.5 bg-card-bg border border-card-border rounded-xl outline-none text-foreground font-bold"
                 >
                   <option value="Kathmandu">Kathmandu</option>
                   <option value="Lalitpur">Lalitpur</option>
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
                   setAddress(e.target.value);
                   if (errors.address) setErrors({ ...errors, address: "" });
                 }}
-                className={`w-full text-xs px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border ${
+                className={`w-full text-xs px-3.5 py-2.5 bg-card-bg border ${
                   errors.address ? "border-red-500" : "border-card-border"
                 } rounded-xl outline-none resize-none`}
               />
@@ -252,7 +252,7 @@ export default function CheckoutPage() {
             </h3>
 
             <div className="space-y-3">
-              <label className="flex items-center justify-between p-4 border border-card-border rounded-xl cursor-pointer bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-900">
+              <label className="flex items-center justify-between p-4 border border-card-border rounded-xl cursor-pointer bg-card-bg/50 /50 hover:bg-card-bg dark:hover:bg-slate-900">
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
@@ -269,7 +269,7 @@ export default function CheckoutPage() {
                 <span className="text-xs font-extrabold text-emerald-600">FREE</span>
               </label>
 
-              <label className="flex items-center justify-between p-4 border border-card-border rounded-xl cursor-pointer bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-900">
+              <label className="flex items-center justify-between p-4 border border-card-border rounded-xl cursor-pointer bg-card-bg/50 /50 hover:bg-card-bg dark:hover:bg-slate-900">
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                   className={`p-3 border rounded-xl flex flex-col items-center text-center justify-center gap-1.5 transition-all ${
                     paymentMethod === p.id
                       ? "border-primary bg-purple-50/45 dark:bg-purple-950/20 text-primary"
-                      : "border-card-border bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 text-foreground"
+                      : "border-card-border bg-card-bg hover:bg-black/5 text-foreground"
                   }`}
                 >
                   <span className="text-xs font-extrabold">{p.name}</span>
@@ -421,7 +421,7 @@ export default function CheckoutPage() {
                 return (
                   <div key={idx} className="flex gap-3 items-center justify-between">
                     <div className="flex gap-2.5 items-center min-w-0">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-card-border relative flex-shrink-0 bg-slate-50">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-card-border relative flex-shrink-0 bg-card-bg">
                         <img src={item.product.image} alt={item.product.title} className="object-cover w-full h-full" />
                       </div>
                       <div className="min-w-0">

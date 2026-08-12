@@ -193,7 +193,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={handleHeroAddToCart}
-                    className="px-6 py-2.5 bg-white text-emerald-900 hover:bg-black/5 font-extrabold text-sm rounded-full transition-all shadow-md active:scale-95"
+                    className="px-6 py-2.5 bg-white text-emerald-900 hover:bg-slate-100 font-extrabold text-sm rounded-full transition-all shadow-md active:scale-95"
                   >
                     Shop Now →
                   </button>
@@ -322,7 +322,7 @@ export default function Home() {
               <Link
                 key={cat.slug}
                 href={`/category/${cat.slug}`}
-                className="flex flex-col items-center p-4 bg-card-bg rounded-2xl hover:scale-105 hover:shadow-md border border-card-border hover:border-primary/20 transition-all text-center group"
+                className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl hover:scale-105 hover:shadow-md border border-card-border hover:border-primary/20 transition-all text-center group"
               >
                 <div className="w-11 h-11 rounded-full bg-primary/5 dark:bg-slate-800/80 flex items-center justify-center text-primary mb-2 transition-colors group-hover:bg-primary/10">
                   <Icon className="w-4.5 h-4.5 transition-transform group-hover:scale-110" />
@@ -346,7 +346,7 @@ export default function Home() {
           </div>
           <Link
             href="/category/all?emi=true"
-            className="px-6 py-3 bg-white text-primary hover:bg-black/5 font-extrabold text-xs uppercase rounded-full shadow-md tracking-wider flex-shrink-0 transition-colors"
+            className="px-6 py-3 bg-white text-primary hover:bg-slate-100 font-extrabold text-xs uppercase rounded-full shadow-md tracking-wider flex-shrink-0 transition-colors"
           >
             Apply for EMI
           </Link>
@@ -391,7 +391,7 @@ export default function Home() {
               )}
 
               {/* Image box */}
-              <Link href={`/product/${product.id}`} className="block h-48 w-full relative overflow-hidden bg-card-bg border-b border-card-border">
+              <Link href={`/product/${product.id}`} className="block h-48 w-full relative overflow-hidden bg-slate-50 border-b border-card-border">
                 <img
                   src={product.image}
                   alt={product.title}
@@ -403,7 +403,7 @@ export default function Home() {
               <div className="p-4 flex-grow flex flex-col justify-between space-y-4">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-wide bg-black/5  px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-wide bg-slate-100 dark:bg-slate-900 px-1.5 py-0.5 rounded">
                       {product.brand}
                     </span>
                     <span className="text-[10px] font-bold text-foreground/40">{product.category}</span>
@@ -495,7 +495,7 @@ export default function Home() {
             </div>
 
             {/* Body content */}
-            <div className="p-4 bg-white  space-y-4">
+            <div className="p-4 bg-white dark:bg-slate-900 space-y-4">
               <p className="text-xs text-foreground/75 leading-relaxed">
                 Have questions? Chat with our team directly on WhatsApp.
               </p>

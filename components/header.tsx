@@ -19,7 +19,8 @@ import {
   Grid, 
   ChevronDown, 
   Flame, 
-  CreditCard 
+  CreditCard,
+  Pencil
 } from "lucide-react";
 
 export default function Header() {
@@ -56,6 +57,18 @@ export default function Header() {
     // Listen to localstorage updates to refresh login state across routing
     window.addEventListener("storage", loadCustomerSession);
     return () => window.removeEventListener("storage", loadCustomerSession);
+  }, []);
+
+  // CMS Edit Mode Listener
+  const [isVisualEditor, setIsVisualEditor] = useState(false);
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'CMS_EDIT_MODE') {
+        setIsVisualEditor(event.data.isEditMode);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   // Search logic
@@ -110,7 +123,21 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full flex flex-col z-40 bg-card-bg border-b border-card-border sticky top-0">
+    <header className={`w-full flex flex-col z-40 bg-card-bg border-b border-card-border sticky top-0 ${isVisualEditor ? 'group relative' : ''}`}>
+      
+      {/* CMS Visual Editor Overlay */}
+      {isVisualEditor && (
+        <div className="absolute inset-0 z-[100] pointer-events-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border-2 border-transparent group-hover:border-primary/80 group-hover:bg-black/10">
+          <button 
+            onClick={() => window.parent.postMessage({ type: 'CMS_EDIT_HEADER' }, '*')}
+            className="pointer-events-auto bg-white text-black font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-2xl border border-card-border flex items-center gap-2 hover:bg-gray-50 hover:scale-105 transition-all"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            Edit Site Header
+          </button>
+        </div>
+      )}
+
       {/* 1. Announcement Bar */}
       <div className="w-full bg-gradient-to-r from-primary to-primary-hover text-white text-[11px] font-medium py-2 px-6 flex items-center justify-between">
         <span className="mx-auto flex items-center gap-1.5 animate-pulse">
@@ -142,7 +169,7 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery.trim() && setShowSearchResults(true)}
-              className="w-full px-4 py-2.5 pl-10 border border-card-border bg-slate-50 dark:bg-slate-900 rounded-full text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+              className="w-full px-4 py-2.5 pl-10 border border-card-border bg-card-bg rounded-full text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/45">
               <Search className="w-4 h-4" />
@@ -167,9 +194,9 @@ export default function Header() {
                   key={p.id}
                   href={`/product/${p.id}`}
                   onClick={() => setShowSearchResults(false)}
-                  className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all"
+                  className="flex items-center gap-3 p-2 hover:bg-card-bg hover:bg-white/10 rounded-xl transition-all"
                 >
-                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-card-border relative flex-shrink-0 bg-slate-50">
+                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-card-border relative flex-shrink-0 bg-card-bg">
                     <img src={p.image} alt={p.title} className="object-cover w-full h-full" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -202,7 +229,7 @@ export default function Header() {
         {/* Action Controls */}
         <div className="flex items-center gap-4">
           {/* Live Chat Indicator */}
-          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
+          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 bg-card-bg border border-card-border rounded-full hover:bg-black/5 hover:bg-white/10 transition-all cursor-pointer">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-green"></span>
@@ -213,7 +240,7 @@ export default function Header() {
           {/* Theme Switcher Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-card-border text-foreground transition-all flex items-center justify-center"
+            className="p-2.5 rounded-full hover:bg-black/5 hover:bg-white/10 border border-card-border text-foreground transition-all flex items-center justify-center"
             title="Toggle theme"
           >
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -222,7 +249,7 @@ export default function Header() {
           {/* Cart Icon with badge */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-card-border relative transition-all flex items-center justify-center text-foreground"
+            className="p-2.5 rounded-full hover:bg-black/5 hover:bg-white/10 border border-card-border relative transition-all flex items-center justify-center text-foreground"
           >
             <ShoppingCart className="w-4 h-4" />
             {cartCount > 0 && (
@@ -236,7 +263,7 @@ export default function Header() {
           {customer ? (
             <div 
               ref={profileRef}
-              className="relative flex items-center gap-1.5 px-3.5 py-2 border border-card-border rounded-full bg-slate-50/50 dark:bg-slate-900/40 text-xs font-bold text-foreground cursor-pointer select-none"
+              className="relative flex items-center gap-1.5 px-3.5 py-2 border border-card-border rounded-full bg-card-bg/50 /40 text-xs font-bold text-foreground cursor-pointer select-none"
               onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
             >
               <User className="w-3.5 h-3.5 text-primary" />
@@ -248,7 +275,7 @@ export default function Header() {
                 <div className="absolute right-0 top-full mt-2 w-44 bg-card-bg border border-card-border rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in duration-200 text-foreground">
                   <Link
                     href="/account"
-                    className="block px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all font-semibold text-xs mb-0.5"
+                    className="block px-3 py-2 hover:bg-black/5 hover:bg-white/10 rounded-xl transition-all font-semibold text-xs mb-0.5"
                     onClick={() => setIsProfileDropdownOpen(false)}
                   >
                     👤 My Account
@@ -272,7 +299,7 @@ export default function Header() {
           ) : (
             <Link
               href="/login"
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 border border-card-border rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-all text-foreground"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 border border-card-border rounded-full hover:bg-card-bg hover:bg-white/10 text-xs font-bold transition-all text-foreground"
             >
               <User className="w-3.5 h-3.5" /> Sign In
             </Link>
@@ -281,7 +308,7 @@ export default function Header() {
       </div>
 
       {/* 3. Category & Navigation Menu */}
-      <div className="w-full bg-slate-50 dark:bg-slate-950 border-t border-card-border py-1">
+      <div className="w-full bg-card-bg dark:bg-slate-950 border-t border-card-border py-1">
         <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between gap-4 text-sm font-semibold">
           {/* Main Category Links */}
           <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">

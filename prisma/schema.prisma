@@ -40,3 +40,38 @@ model Order {
   status         String   @default("Pending")
   createdAt      DateTime @default(now())
 }
+
+model Page {
+  id          String   @id @default(cuid())
+  title       String   // Internal name
+  slug        String   @unique
+  status      String   @default("draft") // "draft" or "published"
+  
+  // Builder JSON Data
+  content     Json     @default("{\"children\":[]}")
+  
+  // SEO Data
+  seoTitle       String?
+  seoDescription String?
+  keywords       String?
+  canonicalUrl   String?
+  ogTitle        String?
+  ogDescription  String?
+  ogImage        String?
+  indexing       Boolean @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GlobalSettings {
+  id          String   @id @default("global")
+  
+  // Global SEO defaults
+  siteTitle       String?
+  siteDescription String?
+  defaultOgImage  String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

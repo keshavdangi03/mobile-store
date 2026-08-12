@@ -181,7 +181,7 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
     >
       <div className="max-w-7xl mx-auto flex h-[480px]">
         {/* Left Side: Category list sidebar */}
-        <div className="w-64 bg-slate-50 dark:bg-slate-950/60 border-r border-card-border flex flex-col py-4 overflow-y-auto">
+        <div className="w-64 bg-card-bg dark:bg-slate-950/60 border-r border-card-border flex flex-col py-4 overflow-y-auto">
           {SIDEBAR_CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat.slug;
             const Icon = cat.icon;
@@ -195,8 +195,8 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
                 }}
                 className={`w-full px-6 py-3 flex items-center justify-between text-xs font-bold transition-all cursor-pointer border-l-4 ${
                   isActive
-                    ? "border-primary bg-white dark:bg-slate-900 text-primary"
-                    : "border-transparent text-foreground/80 hover:bg-slate-100/50 dark:hover:bg-slate-900/30"
+                    ? "border-primary bg-white  text-primary"
+                    : "border-transparent text-foreground/80 hover:bg-black/5/50 dark:hover:bg-slate-900/30"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
                         onClick={onClose}
                         className="flex flex-col items-center gap-2 group text-center"
                       >
-                        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-card-border bg-slate-50 dark:bg-slate-900 group-hover:scale-105 group-hover:shadow-md transition-all duration-200">
+                        <div className="relative w-14 h-14 rounded-full overflow-hidden border border-card-border bg-card-bg group-hover:scale-105 group-hover:shadow-md transition-all duration-200">
                           <Image
                             src={item.image}
                             alt={item.name}

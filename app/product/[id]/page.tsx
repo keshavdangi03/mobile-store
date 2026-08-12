@@ -114,7 +114,7 @@ export default function ProductDetailPage({ params }: PageProps) {
         
         {/* Left Side: Dynamic Gallery Showcase */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="w-full aspect-square rounded-3xl overflow-hidden border border-card-border bg-slate-50 dark:bg-slate-900 shadow-md relative group">
+          <div className="w-full aspect-square rounded-3xl overflow-hidden border border-card-border bg-card-bg shadow-md relative group">
             <img
               src={product.image}
               alt={product.title}
@@ -137,7 +137,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               </span>
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className={`p-2 rounded-full border border-card-border hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-base`}
+                className={`p-2 rounded-full border border-card-border hover:bg-card-bg hover:bg-white/10 transition-colors text-base`}
                 title="Add to Wishlist"
               >
                 {isFavorited ? "❤️" : "🤍"}
@@ -161,7 +161,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           </div>
 
           {/* Price Summary */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-2xl flex items-baseline gap-3">
+          <div className="p-4 bg-card-bg border border-card-border rounded-2xl flex items-baseline gap-3">
             <span className="text-2xl font-black text-foreground">
               Rs. {unitPrice.toLocaleString()}
             </span>
@@ -191,7 +191,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     className={`px-4 py-2 border rounded-xl text-xs font-bold transition-all ${
                       selectedVariant === opt
                         ? "bg-primary border-primary text-white shadow-sm"
-                        : "bg-card-bg border-card-border text-foreground hover:bg-slate-50 dark:hover:bg-slate-800"
+                        : "bg-card-bg border-card-border text-foreground hover:bg-card-bg hover:bg-white/10"
                     }`}
                   >
                     {opt}
@@ -215,7 +215,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     className={`px-4 py-3 border rounded-xl text-xs font-bold transition-all text-left flex justify-between items-center ${
                       selectedAddon === opt
                         ? "bg-purple-50 dark:bg-purple-950/20 border-primary text-primary"
-                        : "bg-card-bg border-card-border text-foreground hover:bg-slate-50 dark:hover:bg-slate-800"
+                        : "bg-card-bg border-card-border text-foreground hover:bg-card-bg hover:bg-white/10"
                     }`}
                   >
                     <span>{opt}</span>
@@ -232,10 +232,10 @@ export default function ProductDetailPage({ params }: PageProps) {
 
           {/* Quantity Controls & CTA Buttons */}
           <div className="flex flex-wrap gap-4 items-center pt-2">
-            <div className="flex items-center border border-card-border rounded-xl bg-slate-50 dark:bg-slate-900 overflow-hidden h-11">
+            <div className="flex items-center border border-card-border rounded-xl bg-card-bg overflow-hidden h-11">
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-foreground"
+                className="px-3 hover:bg-black/5 hover:bg-white/10 font-extrabold text-foreground"
               >
                 -
               </button>
@@ -244,7 +244,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               </span>
               <button
                 onClick={() => setQuantity((q) => q + 1)}
-                className="px-3 hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-foreground"
+                className="px-3 hover:bg-black/5 hover:bg-white/10 font-extrabold text-foreground"
               >
                 +
               </button>
@@ -347,7 +347,7 @@ export default function ProductDetailPage({ params }: PageProps) {
           <h3 className="text-lg font-bold text-foreground tracking-tight border-b border-card-border pb-2">
             Technical Specifications
           </h3>
-          <div className="border border-card-border rounded-2xl overflow-hidden divide-y divide-card-border bg-slate-50 dark:bg-slate-900/50">
+          <div className="border border-card-border rounded-2xl overflow-hidden divide-y divide-card-border bg-card-bg">
             {Object.entries(product.specs).map(([key, val]) => (
               <div key={key} className="grid grid-cols-3 p-3.5 text-xs">
                 <div className="col-span-1 font-bold text-foreground/60 capitalize">{key}</div>

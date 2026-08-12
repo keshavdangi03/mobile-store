@@ -116,7 +116,7 @@ export default function AccountPage() {
                   className={`flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     activeTab === "orders"
                       ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                      : "text-foreground/70 hover:bg-card-bg dark:hover:bg-slate-900/30"
                   }`}
                 >
                   <ShoppingBag className="w-4 h-4" /> Orders
@@ -126,7 +126,7 @@ export default function AccountPage() {
                   className={`flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     activeTab === "history"
                       ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                      : "text-foreground/70 hover:bg-card-bg dark:hover:bg-slate-900/30"
                   }`}
                 >
                   <History className="w-4 h-4" /> Purchase History
@@ -143,7 +143,7 @@ export default function AccountPage() {
                   className={`flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     activeTab === "profile"
                       ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                      : "text-foreground/70 hover:bg-card-bg dark:hover:bg-slate-900/30"
                   }`}
                 >
                   <User className="w-4 h-4" /> Profile Details
@@ -153,7 +153,7 @@ export default function AccountPage() {
                   className={`flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     activeTab === "address"
                       ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                      : "text-foreground/70 hover:bg-card-bg dark:hover:bg-slate-900/30"
                   }`}
                 >
                   <MapPin className="w-4 h-4" /> Address Book
@@ -163,7 +163,7 @@ export default function AccountPage() {
                   className={`flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     activeTab === "password"
                       ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                      : "text-foreground/70 hover:bg-card-bg dark:hover:bg-slate-900/30"
                   }`}
                 >
                   <Lock className="w-4 h-4" /> Change Password
@@ -218,7 +218,7 @@ export default function AccountPage() {
                         <div className="divide-y divide-card-border/60">
                           {order.items.map((item, idx) => (
                             <div key={idx} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
-                              <div className="w-12 h-12 rounded-lg overflow-hidden border border-card-border relative bg-slate-50 flex-shrink-0">
+                              <div className="w-12 h-12 rounded-lg overflow-hidden border border-card-border relative bg-card-bg flex-shrink-0">
                                 <img src={item.image} alt={item.productTitle} className="object-cover w-full h-full" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -248,7 +248,7 @@ export default function AccountPage() {
                 ) : (
                   /* Empty state exactly matching screenshot layout */
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6">
-                    <div className="relative w-36 h-36 flex items-center justify-center text-slate-300 dark:text-slate-700 bg-slate-50 dark:bg-slate-900/50 rounded-full">
+                    <div className="relative w-36 h-36 flex items-center justify-center text-slate-300 dark:text-slate-700 bg-card-bg rounded-full">
                       {/* Shopping cart empty icon vector wrapper */}
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16">
                         <circle cx="9" cy="21" r="1" />
@@ -306,7 +306,7 @@ export default function AccountPage() {
                       type="text"
                       disabled
                       value={customer?.email || ""}
-                      className="w-full text-xs px-3.5 py-2.5 bg-slate-100 dark:bg-slate-900 border border-card-border text-foreground/50 rounded-xl outline-none"
+                      className="w-full text-xs px-3.5 py-2.5 bg-black/5  border border-card-border text-foreground/50 rounded-xl outline-none"
                     />
                   </div>
                   <div className="space-y-1.5">

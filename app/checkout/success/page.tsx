@@ -81,7 +81,7 @@ export default function OrderSuccessPage({ searchParams }: PageProps) {
         <p className="text-xs text-foreground/60 max-w-md mx-auto">
           Your order has been placed successfully. Below is your reference id and tracking progression.
         </p>
-        <div className="inline-block px-4 py-1.5 bg-slate-50 dark:bg-slate-900 border border-card-border rounded-xl font-mono text-xs font-bold text-foreground">
+        <div className="inline-block px-4 py-1.5 bg-card-bg border border-card-border rounded-xl font-mono text-xs font-bold text-foreground">
           Order ID: <span className="text-primary">{orderId}</span>
         </div>
       </div>
@@ -143,7 +143,7 @@ export default function OrderSuccessPage({ searchParams }: PageProps) {
         </div>
 
         {/* Text Details for currently active step */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-card-border flex gap-3.5 items-center">
+        <div className="p-4 bg-card-bg rounded-2xl border border-card-border flex gap-3.5 items-center">
           <span className="text-2xl">{steps[trackingStep - 1].icon}</span>
           <div>
             <div className="text-xs font-bold text-foreground">
@@ -187,7 +187,7 @@ export default function OrderSuccessPage({ searchParams }: PageProps) {
             {order.items.map((item, idx) => (
               <div key={idx} className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg overflow-hidden border border-card-border relative bg-slate-50 flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg overflow-hidden border border-card-border relative bg-card-bg flex-shrink-0">
                     <img src={item.image} alt={item.productTitle} className="object-cover w-full h-full" />
                   </div>
                   <div>
@@ -223,7 +223,7 @@ export default function OrderSuccessPage({ searchParams }: PageProps) {
         {/* Customer account order tracker */}
         <Link
           href="/account"
-          className="px-6 py-2.5 border border-card-border hover:bg-slate-50 dark:hover:bg-slate-800 text-foreground text-xs font-bold rounded-xl transition-all"
+          className="px-6 py-2.5 border border-card-border hover:bg-card-bg hover:bg-white/10 text-foreground text-xs font-bold rounded-xl transition-all"
         >
           Track Order Status &rarr;
         </Link>

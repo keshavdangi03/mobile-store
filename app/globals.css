@@ -13,6 +13,10 @@
   --card-border: #e2e8f0;
   --sidebar-bg: #f8fafc;
   --accent-green: #25d366; /* WhatsApp green */
+  
+  --font-sans-theme: var(--font-geist-sans);
+  --font-serif-theme: Georgia, serif;
+  --radius-theme: 0.5rem;
 }
 
 .dark {
@@ -40,8 +44,15 @@
   --color-sidebar-bg: var(--sidebar-bg);
   --color-accent-green: var(--accent-green);
   
-  --font-sans: var(--font-geist-sans), Arial, sans-serif;
+  --font-sans: var(--font-sans-theme), Arial, sans-serif;
+  --font-serif: var(--font-serif-theme), Georgia, serif;
   --font-mono: var(--font-geist-mono), monospace;
+  
+  --radius-sm: calc(var(--radius-theme) - 4px);
+  --radius-md: var(--radius-theme);
+  --radius-lg: calc(var(--radius-theme) + 4px);
+  --radius-xl: calc(var(--radius-theme) + 8px);
+  --radius-full: 9999px;
 }
 
 body {
@@ -68,5 +79,197 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
+}
+
+/* ------------------------------------------------------------------
+   CMS Design Themes 
+   ------------------------------------------------------------------ */
+
+/* PROFESSIONAL */
+.theme-professional-1 {
+  --background: #f8f9fa;
+  --foreground: #1e1e24;
+  --primary: #111827;
+  --primary-hover: #374151;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --font-sans-theme: var(--font-inter), sans-serif;
+  --font-serif-theme: Georgia, serif;
+  --radius-theme: 0px; 
+}
+.theme-professional-2 {
+  --background: #e5e3d9;
+  --foreground: #1f2937;
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --card-bg: #f3f0e6;
+  --card-border: #d1d5db;
+  --font-sans-theme: var(--font-inter), sans-serif;
+  --font-serif-theme: var(--font-playfair), serif;
+  --radius-theme: 0px; 
+}
+
+/* PLAYFUL */
+.theme-playful-1 {
+  --background: #d0c4f5;
+  --foreground: #4a152e;
+  --primary: #4a152e;
+  --primary-hover: #3b1125;
+  --card-bg: #e1d8fa;
+  --card-border: #b8adff;
+  --font-sans-theme: var(--font-chewy), "Comic Sans MS", sans-serif;
+  --font-serif-theme: "Cooper Black", serif;
+  --radius-theme: 9999px;
+}
+.theme-playful-2 {
+  --background: #eecb74;
+  --foreground: #134e4a;
+  --primary: #1f2937;
+  --primary-hover: #111827;
+  --card-bg: #f4d993;
+  --card-border: #d9b85c;
+  --font-sans-theme: var(--font-inter), sans-serif;
+  --font-serif-theme: var(--font-playfair), serif;
+  --radius-theme: 9999px;
+}
+
+/* SOPHISTICATED */
+.theme-sophisticated-1 {
+  --background: #e8decb;
+  --foreground: #453123;
+  --primary: #292524;
+  --primary-hover: #1c1917;
+  --card-bg: #f2eadb;
+  --card-border: #d4c8af;
+  --font-sans-theme: var(--font-inter), sans-serif;
+  --font-serif-theme: var(--font-cormorant), serif;
+  --radius-theme: 0.25rem;
+}
+.theme-sophisticated-2 {
+  --background: #ece4d6;
+  --foreground: #1e293b;
+  --primary: #dca68d;
+  --primary-hover: #b88a75;
+  --card-bg: #f5eedf;
+  --card-border: #d4c8af;
+  --font-sans-theme: var(--font-syne), sans-serif;
+  --font-serif-theme: var(--font-playfair), serif;
+  --radius-theme: 0.25rem;
+}
+
+/* FRIENDLY */
+.theme-friendly-1 {
+  --background: #76939e;
+  --foreground: #ffffff;
+  --primary: #475569;
+  --primary-hover: #334155;
+  --card-bg: #8ba7b3;
+  --card-border: #62828e;
+  --font-sans-theme: var(--font-nunito), sans-serif;
+  --font-serif-theme: Georgia, serif;
+  --radius-theme: 9999px;
+}
+.theme-friendly-2 {
+  --background: #e6e2d1;
+  --foreground: #14532d;
+  --primary: #14532d;
+  --primary-hover: #064e3b;
+  --card-bg: #efece1;
+  --card-border: #c9c3ad;
+  --font-sans-theme: var(--font-nunito), sans-serif;
+  --font-serif-theme: var(--font-dm-serif), serif;
+  --radius-theme: 9999px;
+}
+
+/* QUIRKY */
+.theme-quirky-1 {
+  --background: #eef37b;
+  --foreground: #064e3b;
+  --primary: #064e3b;
+  --primary-hover: #022c22;
+  --card-bg: #f5f8a3;
+  --card-border: #d4dc4b;
+  --font-sans-theme: var(--font-space), "Courier New", monospace;
+  --font-serif-theme: "Brush Script MT", cursive;
+  --radius-theme: 9999px;
+}
+.theme-quirky-2 {
+  --background: #fbbd42;
+  --foreground: #000000;
+  --primary: #000000;
+  --primary-hover: #111827;
+  --card-bg: #fcd581;
+  --card-border: #e6a72e;
+  --font-sans-theme: var(--font-syne), sans-serif;
+  --font-serif-theme: var(--font-playfair), serif;
+  --radius-theme: 0px;
+}
+
+/* BOLD */
+.theme-bold-1 {
+  --background: #fdb57b;
+  --foreground: #000000;
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --card-bg: #fcc79c;
+  --card-border: #e39a5f;
+  --font-sans-theme: var(--font-anton), Impact, sans-serif;
+  --font-serif-theme: var(--font-inter), sans-serif;
+  --radius-theme: 0px;
+}
+.theme-bold-2 {
+  --background: #dfdfdf;
+  --foreground: #111827;
+  --primary: #111827;
+  --primary-hover: #000000;
+  --card-bg: #eeeeee;
+  --card-border: #c0c0c0;
+  --font-sans-theme: var(--font-archivo), Arial, sans-serif;
+  --font-serif-theme: Arial, sans-serif;
+  --radius-theme: 9999px;
+}
+
+/* INNOVATIVE */
+.theme-innovative-1 {
+  --background: #f4f4f5;
+  --foreground: #000000;
+  --primary: #f05a28;
+  --primary-hover: #d1461a;
+  --card-bg: #ffffff;
+  --card-border: #d4d4d8;
+  --font-sans-theme: var(--font-space), sans-serif;
+  --font-serif-theme: var(--font-playfair), serif;
+  --radius-theme: 0px;
+}
+.theme-innovative-2 {
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #000000;
+  --primary-hover: #334155;
+  --card-bg: #f8fafc;
+  --card-border: #e2e8f0;
+  --font-sans-theme: var(--font-syne), sans-serif;
+  --font-serif-theme: var(--font-inter), sans-serif;
+  --radius-theme: 0px;
+}
+
+/* ------------------------------------------------------------------
+   Global Dark Mode Override
+   ------------------------------------------------------------------ */
+html.dark {
+  --background: #0f172a !important; /* Dark slate */
+  --foreground: #f8fafc !important; /* Light text */
+  --card-bg: #1e293b !important;
+  --card-border: #334155 !important;
+  --sidebar-bg: #0b0f19 !important;
+  
+  /* Ensure deeply black theme buttons remain visible by turning them white or gray */
+  /* This prevents black buttons from disappearing on black backgrounds */
+}
+html.dark.theme-quirky-2,
+html.dark.theme-innovative-2,
+html.dark.theme-bold-2 {
+  --primary: #ffffff !important;
+  --primary-hover: #e2e8f0 !important;
 }
 

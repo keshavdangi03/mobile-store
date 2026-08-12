@@ -265,7 +265,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                     </span>
                   )}
 
-                  <Link href={`/product/${product.id}`} className="block h-48 w-full relative overflow-hidden bg-slate-50 border-b border-card-border">
+                  <Link href={`/product/${product.id}`} className="block h-48 w-full relative overflow-hidden bg-card-bg border-b border-card-border">
                     <img
                       src={product.image}
                       alt={product.title}
@@ -329,7 +329,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               ))}
             </div>
           ) : (
-            <div className="p-12 text-center bg-slate-50 dark:bg-slate-900 border border-card-border rounded-3xl space-y-4">
+            <div className="p-12 text-center bg-card-bg border border-card-border rounded-3xl space-y-4">
               <span className="text-5xl block">🔍</span>
               <h3 className="text-lg font-bold text-foreground">No products found</h3>
               <p className="text-xs text-foreground/60 max-w-sm mx-auto">

@@ -10,6 +10,7 @@ import {
   Home, 
   LogOut 
 } from "lucide-react";
+import { useCmsStore } from "@/lib/cms-store";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,6 +21,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const pathname = usePathname();
   const router = useRouter();
+  
+  const { isEditMode } = useCmsStore();
+
+  const isWebsiteActive = pathname.startsWith("/admin/cms");
+  const [isWebsiteMenuOpen, setIsWebsiteMenuOpen] = useState(isWebsiteActive);
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem("admin_auth") === "true";
@@ -111,9 +117,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // 2. Authenticated Admin layout shell
   return (
     <div className="min-h-screen flex bg-[#0b0b0f] text-slate-100 font-sans">
-      {/* Sidebar Panel */}
-      <aside className="w-64 bg-[#0f0f14] border-r border-slate-800 flex flex-col justify-between flex-shrink-0">
-        <div className="p-6 space-y-8">
+      {/* Sidebar Panel - Hidden in CMS Edit Mode */}
+      {!isEditMode && (
+        <aside className="w-64 bg-[#0f0f14] border-r border-slate-800 flex flex-col justify-between flex-shrink-0">
+          <div className="p-6 space-y-8">
           <div className="flex items-center gap-2 border-b border-slate-800/80 pb-4">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-base">
               M
@@ -155,6 +162,70 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <ClipboardList className="w-4 h-4" /> Manage Orders
             </Link>
+            
+            {/* Website Group (Accordion) */}
+            <div className="pt-2">
+              <button 
+                onClick={() => {
+                  setIsWebsiteMenuOpen(true);
+                  if (pathname !== "/admin/cms") router.push("/admin/cms");
+                  else setIsWebsiteMenuOpen(!isWebsiteMenuOpen); // Allow toggling if already there
+                }}
+                className="w-full flex items-center justify-between px-4 py-2 text-left transition-colors hover:bg-slate-900/40 rounded-xl"
+              >
+                <span className={`text-sm font-bold transition-colors ${isWebsiteActive ? "text-white underline decoration-primary underline-offset-4" : "text-slate-300"}`}>
+                  Website
+                </span>
+                <span className="text-slate-500 text-[10px]">
+                  {isWebsiteMenuOpen ? "▼" : "▶"}
+                </span>
+              </button>
+
+              {isWebsiteMenuOpen && (
+                <div className="flex flex-col gap-1 mt-2 pl-4 border-l border-slate-800 ml-6">
+                  <Link
+                    href="/admin/cms/pages"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      pathname.startsWith("/admin/cms/pages")
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    Pages
+                  </Link>
+                  <Link
+                    href="/admin/cms/styles"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      pathname.startsWith("/admin/cms/styles")
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    Styles
+                  </Link>
+                  <Link
+                    href="/admin/cms/assets"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      pathname.startsWith("/admin/cms/assets")
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    Assets
+                  </Link>
+                  <Link
+                    href="/admin/cms/seo"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      pathname.startsWith("/admin/cms/seo")
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    SEO
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
@@ -173,9 +244,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
       </aside>
+      )}
 
       {/* Main Panel Content */}
-      <main className="flex-1 overflow-y-auto p-8 max-w-7xl">
+      <main className={`flex-1 overflow-y-auto ${pathname.startsWith("/admin/cms") ? "w-full" : "p-8 max-w-7xl"}`}>
         {children}
       </main>
     </div>
