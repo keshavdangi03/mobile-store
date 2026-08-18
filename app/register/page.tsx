@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isTrader, setIsTrader] = useState(false);
 
   // States
   const [loading, setLoading] = useState(false);
@@ -47,17 +48,33 @@ export default function RegisterPage() {
 
     setTimeout(() => {
       // Simulate registering
-      setLoading(false);
-      setSuccess("Account created successfully! Redirecting to login...");
       
-      // Save details to mock store
-      const mockRegisteredUser = {
+      const newUser = {
         name,
         email,
         phone,
-        password
+        password,
+        isTrader
       };
-      localStorage.setItem("mock_registered_user", JSON.stringify(mockRegisteredUser));
+
+      if (typeof window !== "undefined") {
+        const existingUsersRaw = localStorage.getItem("zolpa_users");
+        const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+        
+        // Check if user already exists
+        const userExists = existingUsers.some((u: any) => u.email === email || u.phone === phone);
+        if (userExists) {
+          setLoading(false);
+          setError("An account with this email or phone number already exists.");
+          return;
+        }
+
+        existingUsers.push(newUser);
+        localStorage.setItem("zolpa_users", JSON.stringify(existingUsers));
+      }
+
+      setLoading(false);
+      setSuccess("Account created successfully! Redirecting to login...");
 
       setTimeout(() => {
         router.push("/login");
@@ -141,6 +158,19 @@ export default function RegisterPage() {
 
           {error && <p className="text-[10px] text-red-500 font-bold text-center">{error}</p>}
           {success && <p className="text-[10px] text-emerald-500 font-bold text-center">{success}</p>}
+
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="isTrader"
+              checked={isTrader}
+              onChange={(e) => setIsTrader(e.target.checked)}
+              className="rounded border-card-border text-primary focus:ring-primary w-4 h-4 mt-0.5"
+            />
+            <label htmlFor="isTrader" className="text-[10px] text-foreground/80 cursor-pointer leading-tight font-bold">
+              Register as Trader Account (I want to display and sell my own products on this website)
+            </label>
+          </div>
 
           <div className="flex items-start gap-2">
             <input

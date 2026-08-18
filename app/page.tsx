@@ -16,7 +16,10 @@ import {
   Compass, 
   Clock, 
   Check,
-  X
+  X,
+  Wrench,
+  GraduationCap,
+  Store
 } from "lucide-react";
 
 const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -103,6 +106,30 @@ export default function Home() {
         "165Hz ROG Nebula Display System",
       ],
     },
+    {
+      id: "mobile-training-slide",
+      bgGradient: "from-teal-900 via-emerald-900 to-green-800",
+      videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      subtitle: "Training Academy",
+      title: "Hardware Repair Masterclass",
+      specs: [
+        "Hands-on Micro Soldering & IC Reballing",
+        "Physical Labs at New Road or Online Video Course",
+        "10+ Years Experienced Expert Mentors",
+      ],
+    },
+    {
+      id: "mobile-repair-slide",
+      bgGradient: "from-blue-950 via-indigo-900 to-slate-900",
+      videoUrl: "https://www.w3schools.com/html/movie.mp4",
+      subtitle: "Repair Services",
+      title: "Fast Certified Repairs",
+      specs: [
+        "Diagnostics, Display, & Battery Fixes",
+        "Secure Online Submission & Quick Invoice Cost",
+        "Real-Time Step-by-Step Status Tracking",
+      ],
+    },
   ];
 
   // Helper to calculate active hero price based on interactive configurations
@@ -131,7 +158,7 @@ export default function Home() {
         
         {/* Dynamic Carousel Slide Box */}
         <div className="lg:col-span-2 relative rounded-3xl overflow-hidden shadow-xl min-h-[440px] flex flex-col bg-slate-900 text-white">
-          {activeSlide === 0 ? (
+          {activeSlide === 0 && (
             // Slide 1: Interactive Xiaomi Pad 8
             <div className={`flex-1 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between bg-gradient-to-tr ${carouselSlides[0].bgGradient}`}>
               <div className="flex-1 space-y-6">
@@ -209,7 +236,9 @@ export default function Home() {
                 />
               </div>
             </div>
-          ) : (
+          )}
+
+          {activeSlide === 1 && (
             // Slide 2: ASUS ROG
             <div className={`flex-1 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between bg-gradient-to-tr ${carouselSlides[1].bgGradient}`}>
               <div className="flex-1 space-y-6">
@@ -247,6 +276,84 @@ export default function Home() {
                   alt="Asus ROG"
                   className="object-contain w-full h-full drop-shadow-2xl rounded-2xl"
                 />
+              </div>
+            </div>
+          )}
+
+          {activeSlide === 2 && (
+            // Slide 3: Mobile Training Academy
+            <div className={`flex-1 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between bg-gradient-to-tr ${carouselSlides[2].bgGradient} relative overflow-hidden`}>
+              <video 
+                src={carouselSlides[2].videoUrl} 
+                autoPlay loop muted playsInline 
+                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-overlay" 
+              />
+              <div className="flex-1 space-y-6 z-10">
+                <div>
+                  <span className="text-secondary font-bold text-xs uppercase tracking-widest bg-white/10 px-2.5 py-1 rounded-full">{carouselSlides[2].subtitle}</span>
+                  <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[2].title}</h2>
+                </div>
+                
+                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                  {carouselSlides[2].specs.map((spec, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-secondary flex-shrink-0" /> {spec}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-4 flex items-center gap-4">
+                  <Link
+                    href="/training"
+                    className="px-6 py-2.5 bg-secondary hover:bg-emerald-500 text-white font-extrabold text-xs uppercase rounded-full transition-all"
+                  >
+                    Join Academy &rarr;
+                  </Link>
+                </div>
+              </div>
+
+              {/* Decorative Vector */}
+              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/10 rounded-full z-10 blur-0">
+                <GraduationCap className="w-20 h-20 text-emerald-400 animate-pulse" />
+              </div>
+            </div>
+          )}
+
+          {activeSlide === 3 && (
+            // Slide 4: Mobile Repair
+            <div className={`flex-1 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between bg-gradient-to-tr ${carouselSlides[3].bgGradient} relative overflow-hidden`}>
+              <video 
+                src={carouselSlides[3].videoUrl} 
+                autoPlay loop muted playsInline 
+                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-overlay" 
+              />
+              <div className="flex-1 space-y-6 z-10">
+                <div>
+                  <span className="text-primary bg-white/25 text-white font-bold text-xs uppercase tracking-widest px-2.5 py-1 rounded-full">{carouselSlides[3].subtitle}</span>
+                  <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[3].title}</h2>
+                </div>
+                
+                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                  {carouselSlides[3].specs.map((spec, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" /> {spec}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-4 flex items-center gap-4">
+                  <Link
+                    href="/repair"
+                    className="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white font-extrabold text-xs uppercase rounded-full transition-all"
+                  >
+                    Request Repair &rarr;
+                  </Link>
+                </div>
+              </div>
+
+              {/* Decorative Vector */}
+              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/10 rounded-full z-10 blur-0">
+                <Wrench className="w-20 h-20 text-blue-400 animate-pulse" />
               </div>
             </div>
           )}
@@ -333,6 +440,75 @@ export default function Home() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      {/* 2.5 Core Services Grid Section */}
+      <section className="max-w-7xl mx-auto px-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-card-border pb-4 mb-2">
+          <h2 className="text-2xl font-black text-foreground tracking-tight">Our Core Services</h2>
+          <span className="text-[10px] uppercase font-bold text-slate-400">All-in-one Mobile Solutions</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Card 1: Mobile Repair Services */}
+          <div className="p-6 bg-card-bg border border-card-border rounded-3xl space-y-4 hover:shadow-xl transition-all flex flex-col justify-between group hover:border-blue-500/20">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-105 transition-transform">
+                <Wrench className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-foreground group-hover:text-primary transition-colors">Professional Mobile Repairing</h3>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Cracked display? Fast battery drainage? Software brick? Submit mobile details online, get price diagnostic estimates, drop off or mail your device, and track repairs step-by-step.
+              </p>
+            </div>
+            <Link
+              href="/repair"
+              className="mt-4 w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-bold text-xs uppercase text-white rounded-xl text-center shadow-md active:scale-95 transition-all block"
+            >
+              Request Repair Desk &rarr;
+            </Link>
+          </div>
+
+          {/* Card 2: Mobile Training Academy */}
+          <div className="p-6 bg-card-bg border border-card-border rounded-3xl space-y-4 hover:shadow-xl transition-all flex flex-col justify-between group hover:border-emerald-500/20">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-105 transition-transform">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-foreground group-hover:text-primary transition-colors">Mobile Repair Training</h3>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Learn chip-level soldering and schematics from industry experts. Choose hands-on physical classroom lab training at New Road or study online via pre-recorded videos and study guide PDFs.
+              </p>
+            </div>
+            <Link
+              href="/training"
+              className="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs uppercase text-white rounded-xl text-center shadow-md active:scale-95 transition-all block"
+            >
+              Explore Training Courses &rarr;
+            </Link>
+          </div>
+
+          {/* Card 3: Trader Listing Hub */}
+          <div className="p-6 bg-card-bg border border-card-border rounded-3xl space-y-4 hover:shadow-xl transition-all flex flex-col justify-between group hover:border-purple-500/20">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:scale-105 transition-transform">
+                <Store className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-foreground group-hover:text-primary transition-colors">Seller & Trader Platform</h3>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Are you a trader or retailer? Create a trader profile, list your smart devices to sell live on our storefront, pay a low 10% platform commission fee, and check quick review statuses.
+              </p>
+            </div>
+            <Link
+              href="/register"
+              className="mt-4 w-full py-2.5 bg-purple-600 hover:bg-purple-500 font-bold text-xs uppercase text-white rounded-xl text-center shadow-md active:scale-95 transition-all block"
+            >
+              Register Trader Account &rarr;
+            </Link>
+          </div>
+
         </div>
       </section>
 
@@ -461,7 +637,7 @@ export default function Home() {
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
         {/* Welcome Bubble */}
         {showWelcomeBubble && !isChatBoxOpen && (
-          <div className="bg-gradient-to-r from-orange-600 via-pink-700 to-purple-800 text-white p-4 rounded-2xl shadow-xl mb-4 max-w-xs relative animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="bg-gradient-to-r from-teal-700 via-primary to-teal-900 text-white p-4 rounded-2xl shadow-xl mb-4 max-w-xs relative animate-in fade-in slide-in-from-bottom-2 duration-200">
             <button 
               onClick={(e) => {
                 e.stopPropagation();

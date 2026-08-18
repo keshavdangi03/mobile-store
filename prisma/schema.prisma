@@ -7,24 +7,32 @@ generator client {
 }
 
 model Product {
-  id            String   @id
-  title         String
-  price         Int
-  originalPrice Int
-  discount      Int
-  rating        Float
-  reviewsCount  Int
-  image         String
-  category      String
-  brand         String
-  description   String
-  inStock       Boolean
-  featured      Boolean  @default(false)
-  trending      Boolean  @default(false)
-  emiAvailable  Boolean  @default(false)
-  specs         Json
-  variants      Json?
-  addons        Json?
+  id                 String   @id
+  title              String
+  price              Int
+  originalPrice      Int
+  discount           Int
+  rating             Float
+  reviewsCount       Int
+  image              String
+  category           String
+  brand              String
+  description        String
+  inStock            Boolean
+  featured           Boolean  @default(false)
+  trending           Boolean  @default(false)
+  emiAvailable       Boolean  @default(false)
+  specs              Json
+  variants           Json?
+  addons             Json?
+  
+  // Trader Fields
+  isApproved         Boolean  @default(true)
+  isTraderProduct    Boolean  @default(false)
+  traderEmail        String?
+  status             String?  @default("Approved")
+  feedback           String?
+  commissionPercent  Int?     @default(10)
 }
 
 model Order {
@@ -39,6 +47,54 @@ model Order {
   paymentMethod  String
   status         String   @default("Pending")
   createdAt      DateTime @default(now())
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  type         String   // physical or online
+  price        Int
+  duration     String
+  location     String?
+  schedule     String?
+  image        String?  // cover photo URL
+  videos       Json?    // [{ title: string, duration: string, url: string }]
+  notes        Json?    // [{ title: string, downloadUrl: string }]
+  createdAt    DateTime @default(now())
+}
+
+model CourseEnrollment {
+  id             String   @id @default(cuid())
+  courseId       String
+  courseTitle    String
+  courseType     String
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  amountPaid     Int
+  paymentMethod  String
+  status         String   @default("Completed")
+  createdAt      DateTime @default(now())
+}
+
+model RepairRequest {
+  id             String   @id @default(cuid())
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  brand          String
+  modelName      String
+  problemType    String
+  description    String
+  status         String   @default("Pending") // Pending, Approved, Received, Repairing, Fixed, Returned, Rejected, Cancelled
+  adminFeedback  String?
+  estimateCost   Int?
+  paymentMethod  String?
+  paymentStatus  String   @default("Unpaid")
+  cancelReason   String?  // reason for cancellation
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Page {

@@ -25,6 +25,12 @@ export interface Product {
     options: string[];
     priceModifiers: number[];
   };
+  isApproved?: boolean;
+  isTraderProduct?: boolean;
+  traderEmail?: string;
+  status?: string;
+  feedback?: string;
+  commissionPercent?: number;
 }
 
 export interface Order {

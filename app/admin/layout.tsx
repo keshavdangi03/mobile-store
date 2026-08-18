@@ -8,7 +8,10 @@ import {
   Package, 
   ClipboardList, 
   Home, 
-  LogOut 
+  LogOut,
+  Store,
+  Wrench,
+  GraduationCap
 } from "lucide-react";
 import { useCmsStore } from "@/lib/cms-store";
 
@@ -26,6 +29,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isWebsiteActive = pathname.startsWith("/admin/cms");
   const [isWebsiteMenuOpen, setIsWebsiteMenuOpen] = useState(isWebsiteActive);
+
+  const isCoursesActive = pathname.startsWith("/admin/courses");
+  const [isCoursesMenuOpen, setIsCoursesMenuOpen] = useState(isCoursesActive);
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem("admin_auth") === "true";
@@ -162,6 +168,75 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <ClipboardList className="w-4 h-4" /> Manage Orders
             </Link>
+            <Link
+              href="/admin/traders"
+              className={`flex items-center gap-3 px-4 py-2.5 text-xs font-bold rounded-xl transition-all ${
+                pathname.startsWith("/admin/traders")
+                  ? "bg-primary text-white"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+              }`}
+            >
+              <Store className="w-4 h-4" /> Trader Listings
+            </Link>
+            <Link
+              href="/admin/repairs"
+              className={`flex items-center gap-3 px-4 py-2.5 text-xs font-bold rounded-xl transition-all ${
+                pathname.startsWith("/admin/repairs")
+                  ? "bg-primary text-white"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+              }`}
+            >
+              <Wrench className="w-4 h-4" /> Manage Repairs
+            </Link>
+            {/* Course Enrollments Group (Accordion) */}
+            <div className="w-full">
+              <button 
+                onClick={() => {
+                  setIsCoursesMenuOpen(true);
+                  if (!pathname.startsWith("/admin/courses")) {
+                    router.push("/admin/courses?tab=enrollments");
+                  } else {
+                    setIsCoursesMenuOpen(!isCoursesMenuOpen);
+                  }
+                }}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-slate-900/40 rounded-xl cursor-pointer"
+              >
+                <div className="flex items-center gap-3 text-xs font-bold text-slate-400">
+                  <GraduationCap className="w-4 h-4 shrink-0" />
+                  <span className={`${isCoursesActive ? "text-white underline decoration-primary underline-offset-4" : "text-slate-400 hover:text-slate-200"}`}>
+                    Course Enrollments
+                  </span>
+                </div>
+                <span className="text-slate-500 text-[10px] select-none">
+                  {isCoursesMenuOpen ? "▼" : "▶"}
+                </span>
+              </button>
+
+              {isCoursesMenuOpen && (
+                <div className="flex flex-col gap-1 mt-1.5 pl-4 border-l border-slate-850 ml-6">
+                  <Link
+                    href="/admin/courses?tab=enrollments"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      isCoursesActive && (typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("tab") !== "manager") : true)
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    Enrollment Logs
+                  </Link>
+                  <Link
+                    href="/admin/courses?tab=manager"
+                    className={`flex items-center gap-3 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      isCoursesActive && (typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("tab") === "manager") : false)
+                        ? "bg-primary text-white"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    Manage Courses
+                  </Link>
+                </div>
+              )}
+            </div>
             
             {/* Website Group (Accordion) */}
             <div className="pt-2">

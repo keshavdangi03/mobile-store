@@ -20,7 +20,9 @@ import {
   ChevronDown, 
   Flame, 
   CreditCard,
-  Pencil
+  Pencil,
+  GraduationCap,
+  Wrench
 } from "lucide-react";
 
 export default function Header() {
@@ -343,8 +345,20 @@ export default function Header() {
             ))}
           </div>
 
-          {/* Clearance & EMI Quick Links */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Clearance & EMI & Services Quick Links */}
+          <div className="hidden xl:flex items-center gap-3">
+            <Link
+              href="/training"
+              className="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 text-[11px] font-bold rounded-lg border border-emerald-200/50 dark:border-emerald-900/30 flex items-center gap-1"
+            >
+              <GraduationCap className="w-3.5 h-3.5" /> Mobile Training
+            </Link>
+            <Link
+              href="/repair"
+              className="px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-950/80 text-blue-600 dark:text-blue-300 text-[11px] font-bold rounded-lg border border-blue-200/50 dark:border-blue-900/30 flex items-center gap-1"
+            >
+              <Wrench className="w-3.5 h-3.5" /> Repair Services
+            </Link>
             <Link
               href="/category/all?clearance=true"
               className="px-3 py-1 bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/40 dark:hover:bg-orange-950/80 text-secondary text-[11px] font-bold rounded-lg border border-orange-200/50 dark:border-orange-900/30 flex items-center gap-1"

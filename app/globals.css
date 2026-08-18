@@ -3,15 +3,15 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #1e1e24;
-  --primary: #5c2483; /* Zolpa rich purple */
-  --primary-hover: #471a67;
-  --secondary: #f37021; /* Zolpa bright orange */
-  --secondary-hover: #d35a12;
+  --background: #f2f8f8;
+  --foreground: #0c2323;
+  --primary: #ff7a00; /* Orange primary */
+  --primary-hover: #e06c00;
+  --secondary: #2bfbcd; /* Vibrant Cyan secondary */
+  --secondary-hover: #1cb5c2;
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
-  --sidebar-bg: #f8fafc;
+  --card-border: #cfe1e1;
+  --sidebar-bg: #e6f1f1;
   --accent-green: #25d366; /* WhatsApp green */
   
   --font-sans-theme: var(--font-geist-sans);
@@ -20,15 +20,15 @@
 }
 
 .dark {
-  --background: #0b0b0f;
-  --foreground: #f1f1f6;
-  --primary: #a362db;
-  --primary-hover: #b67be5;
-  --secondary: #f5843f;
-  --secondary-hover: #f7985c;
-  --card-bg: #14141b;
-  --card-border: #232330;
-  --sidebar-bg: #0f0f14;
+  --background: #081717; /* Deep Dark Cyan */
+  --foreground: #e3f7f7; /* High-visibility light cyan text */
+  --primary: #ffa000; /* Amber primary */
+  --primary-hover: #ff8f00;
+  --secondary: #2bfbcd; /* Vibrant Cyan secondary */
+  --secondary-hover: #4dfdeb;
+  --card-bg: #0e2525; /* Dark cyan card */
+  --card-border: #1c4545; /* Clean visible borders */
+  --sidebar-bg: #0b1e1e;
   --accent-green: #20ba56;
 }
 
@@ -257,14 +257,15 @@ body {
    Global Dark Mode Override
    ------------------------------------------------------------------ */
 html.dark {
-  --background: #0f172a !important; /* Dark slate */
-  --foreground: #f8fafc !important; /* Light text */
-  --card-bg: #1e293b !important;
-  --card-border: #334155 !important;
-  --sidebar-bg: #0b0f19 !important;
-  
-  /* Ensure deeply black theme buttons remain visible by turning them white or gray */
-  /* This prevents black buttons from disappearing on black backgrounds */
+  --background: #081717 !important; /* Deep Dark Cyan */
+  --foreground: #e3f7f7 !important; /* High-visibility light cyan text */
+  --primary: #ffa000 !important; /* Amber primary */
+  --primary-hover: #ff8f00 !important;
+  --secondary: #2bfbcd !important; /* Vibrant Cyan secondary */
+  --secondary-hover: #4dfdeb !important;
+  --card-bg: #0e2525 !important; /* Dark cyan card */
+  --card-border: #1c4545 !important; /* Clean visible borders */
+  --sidebar-bg: #0b1e1e !important;
 }
 html.dark.theme-quirky-2,
 html.dark.theme-innovative-2,
