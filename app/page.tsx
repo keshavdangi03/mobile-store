@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useCmsStore } from "@/lib/cms-store";
+import SectionEditorWrapper from "@/components/section-editor-wrapper";
+import BlockEditorWrapper from "@/components/block-editor-wrapper";
+import EditableImage from "@/components/editable-image";
 import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
 import { useCart } from "@/components/cart-context";
 import { getDbProducts } from "@/app/actions";
@@ -43,6 +47,7 @@ const categoryIcons: { [key: string]: React.ComponentType<any> } = {
 
 export default function Home() {
   const { addToCart } = useCart();
+  const { isEditMode, pageSections } = useCmsStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(true);
@@ -150,10 +155,13 @@ export default function Home() {
 
   const padLeft = (num: number) => String(num).padStart(2, "0");
 
-  return (
-    <div className="w-full min-h-screen bg-background text-foreground space-y-12 pb-16">
-      
-      {/* 1. Hero Promo Grid (Carousel + Side Banners) */}
+  
+  const renderSection = (sectionId: string, index: number) => {
+    const baseId = sectionId.split('-')[0];
+    switch (baseId) {
+      case 'hero_section': return (
+      <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+
       <section className="max-w-7xl mx-auto px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Dynamic Carousel Slide Box */}
@@ -229,8 +237,7 @@ export default function Home() {
 
               {/* Pad Image */}
               <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0">
-                <img
-                  src={carouselSlides[0].image}
+                <EditableImage imageId="dynamic-img-1" defaultSrc={carouselSlides[0].image}
                   alt="Xiaomi Pad 8"
                   className="object-contain w-full h-full drop-shadow-2xl rounded-2xl hover:scale-105 transition-transform duration-300"
                 />
@@ -271,8 +278,7 @@ export default function Home() {
 
               {/* Asus Image */}
               <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0">
-                <img
-                  src={carouselSlides[1].image}
+                <EditableImage imageId="dynamic-img-2" defaultSrc={carouselSlides[1].image}
                   alt="Asus ROG"
                   className="object-contain w-full h-full drop-shadow-2xl rounded-2xl"
                 />
@@ -377,7 +383,7 @@ export default function Home() {
           {/* Side Promo 1: Projectors */}
           <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-emerald-950 p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-32 h-full opacity-30 select-none">
-              <img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=200" className="object-cover w-full h-full" />
+              <EditableImage imageId="static-img-4" defaultSrc="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=200" className="object-cover w-full h-full" />
             </div>
             <div className="z-10 text-white space-y-2">
               <span className="text-[10px] font-bold text-accent-green bg-emerald-900/60 px-2 py-0.5 rounded uppercase tracking-wider">Projectors & Screens</span>
@@ -395,7 +401,7 @@ export default function Home() {
           {/* Side Promo 2: Smartphones */}
           <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-orange-950 p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-32 h-full opacity-35 select-none">
-              <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" className="object-cover w-full h-full" />
+              <EditableImage imageId="static-img-5" defaultSrc="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" className="object-cover w-full h-full" />
             </div>
             <div className="z-10 text-white space-y-2">
               <span className="text-[10px] font-bold text-orange-400 bg-orange-900/60 px-2 py-0.5 rounded uppercase tracking-wider">Best Deals</span>
@@ -413,7 +419,11 @@ export default function Home() {
 
       </section>
 
-      {/* 2. Shop By Categories */}
+            </SectionEditorWrapper>
+);
+      case 'categories_section': return (
+      <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+
       <section className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between border-b border-card-border pb-4 mb-6">
           <h2 className="text-2xl font-black text-foreground tracking-tight">Shop By Categories</h2>
@@ -443,7 +453,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2.5 Core Services Grid Section */}
+            </SectionEditorWrapper>
+);
+      case 'services_section': return (
+      <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+
       <section className="max-w-7xl mx-auto px-6 space-y-6">
         <div className="flex items-center justify-between border-b border-card-border pb-4 mb-2">
           <h2 className="text-2xl font-black text-foreground tracking-tight">Our Core Services</h2>
@@ -512,7 +526,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Promotional banner full-width */}
+            </SectionEditorWrapper>
+);
+      case 'promo_banner_section': return (
+      <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+
       <section className="max-w-7xl mx-auto px-6">
         <div className="w-full rounded-3xl bg-gradient-to-r from-purple-900 via-primary to-indigo-900 text-white p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
           <div className="space-y-2 text-center md:text-left">
@@ -529,7 +547,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Limited Time Deals with Countdown */}
+            </SectionEditorWrapper>
+);
+      case 'limited_deals_section': return (
+      <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+
       <section className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-card-border pb-4 mb-6 gap-4">
           <div className="flex items-center gap-3">
@@ -568,8 +590,7 @@ export default function Home() {
 
               {/* Image box */}
               <Link href={`/product/${product.id}`} className="block h-48 w-full relative overflow-hidden bg-card-bg border-b border-card-border">
-                <img
-                  src={product.image}
+                <EditableImage imageId="dynamic-img-3" defaultSrc={product.image}
                   alt={product.title}
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                 />
@@ -632,6 +653,18 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+            </SectionEditorWrapper>
+);
+      default: return null;
+    }
+  };
+
+return (
+    <div className="w-full min-h-screen bg-background text-foreground space-y-12 pb-16">
+      
+      
+      {pageSections.map(renderSection)}
 
       {/* 5. Floating WhatsApp Assist Button */}
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">

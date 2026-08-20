@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "./theme-provider";
 import { useCart } from "./cart-context";
+import { useCmsStore } from "@/lib/cms-store";
 import { getProducts, Product } from "@/lib/db-simulation";
 import MegaMenu from "./mega-menu";
 import { 
@@ -237,22 +238,123 @@ export default function Header() {
   const [headerLinkSpacing, setHeaderLinkSpacing] = useState(1);
   const [headerElementSpacing, setHeaderElementSpacing] = useState(1.5);
 
+  const [headerDesignTab, setHeaderDesignTab] = useState<'main' | 'dropShadow' | 'border'>('main');
+
+  const [headerDropShadowEnabled, setHeaderDropShadowEnabled] = useState(false);
+  const [headerDropShadowMode, setHeaderDropShadowMode] = useState<'soft' | 'strong'>('soft');
+  const [headerDropShadowColor, setHeaderDropShadowColor] = useState('#000000');
+  const [headerDropShadowSpread, setHeaderDropShadowSpread] = useState(0);
+  const [headerDropShadowDistance, setHeaderDropShadowDistance] = useState(12);
+  const [headerDropShadowBlur, setHeaderDropShadowBlur] = useState(12);
+
+  const [headerBorderEnabled, setHeaderBorderEnabled] = useState(false);
+  const [headerBorderColor, setHeaderBorderColor] = useState('#000000');
+  const [headerBorderThickness, setHeaderBorderThickness] = useState<'S' | 'M' | 'L'>('S');
+  const [headerBorderPosition, setHeaderBorderPosition] = useState<'all' | 'horizontal' | 'vertical' | 'custom'>('all');
+
+  const [headerHeight, setHeaderHeight] = useState(2); // vw
+  const [headerFixedPosition, setHeaderFixedPosition] = useState(true);
+
+  // Keep a ref of all settings for the save handler to access latest values
+  const currentSettingsRef = useRef({
+    headerLayout, headerLinkSpacing, headerElementSpacing,
+    headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
+    headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
+    headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
+    headerHeight, headerFixedPosition
+  });
+
+  useEffect(() => {
+    currentSettingsRef.current = {
+      headerLayout, headerLinkSpacing, headerElementSpacing,
+      headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
+      headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
+      headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
+      headerHeight, headerFixedPosition
+    };
+  }, [
+    headerLayout, headerLinkSpacing, headerElementSpacing,
+    headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
+    headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
+    headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
+    headerHeight, headerFixedPosition
+  ]);
+
+  const loadSavedSettings = React.useCallback(() => {
+    try {
+      const saved = localStorage.getItem('cms_header_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.headerLayout !== undefined) setHeaderLayout(parsed.headerLayout);
+        if (parsed.headerLinkSpacing !== undefined) setHeaderLinkSpacing(parsed.headerLinkSpacing);
+        if (parsed.headerElementSpacing !== undefined) setHeaderElementSpacing(parsed.headerElementSpacing);
+        if (parsed.headerDropShadowEnabled !== undefined) setHeaderDropShadowEnabled(parsed.headerDropShadowEnabled);
+        if (parsed.headerDropShadowMode !== undefined) setHeaderDropShadowMode(parsed.headerDropShadowMode);
+        if (parsed.headerDropShadowColor !== undefined) setHeaderDropShadowColor(parsed.headerDropShadowColor);
+        if (parsed.headerDropShadowSpread !== undefined) setHeaderDropShadowSpread(parsed.headerDropShadowSpread);
+        if (parsed.headerDropShadowDistance !== undefined) setHeaderDropShadowDistance(parsed.headerDropShadowDistance);
+        if (parsed.headerDropShadowBlur !== undefined) setHeaderDropShadowBlur(parsed.headerDropShadowBlur);
+        if (parsed.headerBorderEnabled !== undefined) setHeaderBorderEnabled(parsed.headerBorderEnabled);
+        if (parsed.headerBorderColor !== undefined) setHeaderBorderColor(parsed.headerBorderColor);
+        if (parsed.headerBorderThickness !== undefined) setHeaderBorderThickness(parsed.headerBorderThickness);
+        if (parsed.headerBorderPosition !== undefined) setHeaderBorderPosition(parsed.headerBorderPosition);
+        if (parsed.headerHeight !== undefined) setHeaderHeight(parsed.headerHeight);
+        if (parsed.headerFixedPosition !== undefined) setHeaderFixedPosition(parsed.headerFixedPosition);
+      }
+    } catch (e) {
+      console.error('Failed to load header settings', e);
+    }
+  }, []);
+
+  // Load initially
+  useEffect(() => {
+    loadSavedSettings();
+  }, [loadSavedSettings]);
+
+  // Track if style changes occur during edit mode
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    // send message if we are in edit mode
+    if (isVisualEditor) {
+      window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
+    }
+  }, [
+    headerLayout, headerLinkSpacing, headerElementSpacing,
+    headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor, 
+    headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
+    headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
+    headerHeight, headerFixedPosition
+  ]);
+
   const headerRef = useRef<HTMLElement>(null);
+  
+  const setActiveEditorId = useCmsStore((state) => state.setActiveEditorId);
+  const setIsEditMode = useCmsStore((state) => state.setIsEditMode);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'CMS_EDIT_MODE') {
         setIsVisualEditor(event.data.isEditMode);
+        setIsEditMode(event.data.isEditMode); // Sync iframe store
         if (!event.data.isEditMode) {
           setIsEditorActive(false);
           setActiveSection(null);
           setEditingSection(null);
+          setActiveEditorId(null);
         }
+      } else if (event.data?.type === 'CMS_SAVE_CHANGES') {
+        localStorage.setItem('cms_header_settings', JSON.stringify(currentSettingsRef.current));
+      } else if (event.data?.type === 'CMS_DISCARD_CHANGES') {
+        loadSavedSettings();
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [setActiveEditorId, setIsEditMode, loadSavedSettings]);
 
   // Click outside to deselect header in visual editor
   useEffect(() => {
@@ -261,11 +363,12 @@ export default function Header() {
         setIsEditorActive(false);
         setActiveSection(null);
         setEditingSection(null);
+        setActiveEditorId(null);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isEditorActive]);
+  }, [isEditorActive, setActiveEditorId]);
 
   // Search logic
   useEffect(() => {
@@ -307,8 +410,45 @@ export default function Header() {
     }
   };
 
+  // Compute Header Styles
+  const headerStyles: React.CSSProperties = {};
+  
+  if (headerDropShadowEnabled) {
+    let color = headerDropShadowColor;
+    if (headerDropShadowMode === 'soft') {
+      color = headerDropShadowColor + '40'; // 25% opacity
+    } else {
+      color = headerDropShadowColor + '80'; // 50% opacity
+    }
+    headerStyles.boxShadow = `0px ${headerDropShadowDistance}px ${headerDropShadowBlur}px ${headerDropShadowSpread}px ${color}`;
+  }
+
+  if (headerBorderEnabled) {
+    const borderWidth = headerBorderThickness === 'S' ? '1px' : headerBorderThickness === 'M' ? '2px' : '4px';
+    const borderStyle = `${borderWidth} solid ${headerBorderColor}`;
+    
+    if (headerBorderPosition === 'all') {
+      headerStyles.border = borderStyle;
+    } else if (headerBorderPosition === 'horizontal') {
+      headerStyles.borderTop = borderStyle;
+      headerStyles.borderBottom = borderStyle;
+    } else if (headerBorderPosition === 'vertical') {
+      headerStyles.borderLeft = borderStyle;
+      headerStyles.borderRight = borderStyle;
+    } else if (headerBorderPosition === 'custom') {
+      headerStyles.borderBottom = borderStyle;
+    }
+  }
+
+  headerStyles.paddingTop = `${headerHeight}vw`;
+  headerStyles.paddingBottom = `${headerHeight}vw`;
+
   return (
-    <header ref={headerRef} className={`w-full flex flex-col z-40 bg-card-bg border-b border-card-border sticky top-0 ${isVisualEditor ? 'group relative' : ''}`}>
+    <header 
+      ref={headerRef} 
+      style={headerStyles}
+      className={`w-full flex flex-col z-40 bg-card-bg ${headerFixedPosition ? 'sticky top-0' : 'relative'} ${!headerBorderEnabled ? 'border-b border-card-border' : ''} ${isVisualEditor ? 'group relative' : ''}`}
+    >
       
       {/* CMS Visual Editor Overlay */}
       {isVisualEditor && (
@@ -317,6 +457,7 @@ export default function Header() {
           onClick={() => {
             if (!isEditorActive) {
               setIsEditorActive(true);
+              setActiveEditorId('header');
             }
             setActiveSection(null);
             setEditingSection(null);
@@ -353,54 +494,240 @@ export default function Header() {
               {/* Design Popup */}
               {editingSection === "HEADER_DESIGN" && (
                 <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                  <div className="flex border-b border-gray-200">
-                    <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
-                    <button className="px-4 py-3 text-xs font-bold text-gray-500 hover:text-black">Color</button>
-                  </div>
-                  <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Layout</label>
-                      <div className="bg-gray-100 p-4 rounded-lg flex justify-center items-center">
-                        <select 
-                           value={headerLayout}
-                           onChange={(e) => setHeaderLayout(e.target.value)}
-                           className="bg-[#2a2a2a] text-white text-xs font-bold rounded px-3 py-2 outline-none w-full flex items-center justify-between"
-                        >
-                           <option value="default">LOGO ... [SEARCH] ... ACTIONS</option>
-                           <option value="centered-logo">[SEARCH] ... LOGO ... ACTIONS</option>
-                           <option value="actions-left">ACTIONS ... [SEARCH] ... LOGO</option>
-                        </select>
+                  {headerDesignTab === 'main' && (
+                    <>
+                      <div className="flex border-b border-gray-200">
+                        <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
+                        <button className="px-4 py-3 text-xs font-bold text-gray-500 hover:text-black">Color</button>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-4 pt-4 border-t border-gray-100">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Spacing</label>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-medium">Link Spacing</span>
-                          <span className="text-xs text-gray-500">{headerLinkSpacing}vw</span>
+                      <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Layout</label>
+                          <div className="bg-gray-100 p-4 rounded-lg flex justify-center items-center">
+                            <select 
+                               value={headerLayout}
+                               onChange={(e) => setHeaderLayout(e.target.value)}
+                               className="bg-[#2a2a2a] text-white text-xs font-bold rounded px-3 py-2 outline-none w-full flex items-center justify-between"
+                            >
+                               <option value="default">LOGO ... [SEARCH] ... ACTIONS</option>
+                               <option value="centered-logo">[SEARCH] ... LOGO ... ACTIONS</option>
+                               <option value="actions-left">ACTIONS ... [SEARCH] ... LOGO</option>
+                            </select>
+                          </div>
                         </div>
-                        <input 
-                          type="range" min="0" max="5" step="0.25" 
-                          value={headerLinkSpacing} onChange={e => setHeaderLinkSpacing(parseFloat(e.target.value))}
-                          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
-                        />
-                      </div>
+                        
+                        <div className="space-y-4 pt-4 border-t border-gray-100">
+                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Spacing</label>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-medium">Link Spacing</span>
+                              <span className="text-xs text-gray-500">{headerLinkSpacing}vw</span>
+                            </div>
+                            <input 
+                              type="range" min="0" max="5" step="0.25" 
+                              value={headerLinkSpacing} onChange={e => setHeaderLinkSpacing(parseFloat(e.target.value))}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
 
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-medium">Element Spacing</span>
-                          <span className="text-xs text-gray-500">{headerElementSpacing}vw</span>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-medium">Element Spacing</span>
+                              <span className="text-xs text-gray-500">{headerElementSpacing}vw</span>
+                            </div>
+                            <input 
+                              type="range" min="0" max="5" step="0.25" 
+                              value={headerElementSpacing} onChange={e => setHeaderElementSpacing(parseFloat(e.target.value))}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
                         </div>
-                        <input 
-                          type="range" min="0" max="5" step="0.25" 
-                          value={headerElementSpacing} onChange={e => setHeaderElementSpacing(parseFloat(e.target.value))}
-                          className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
-                        />
+
+                        {/* Effects & Size */}
+                        <div className="space-y-4 pt-4 border-t border-gray-100">
+                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Effects</label>
+                          <div className="space-y-1">
+                            <div 
+                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 px-2 -mx-2 rounded transition-colors"
+                              onClick={() => setHeaderDesignTab('dropShadow')}
+                            >
+                              <span className="text-sm">Drop shadow</span>
+                              <ChevronDown className="w-4 h-4 -rotate-90 text-gray-400" />
+                            </div>
+                            <div 
+                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 px-2 -mx-2 rounded transition-colors"
+                              onClick={() => setHeaderDesignTab('border')}
+                            >
+                              <span className="text-sm">Border</span>
+                              <ChevronDown className="w-4 h-4 -rotate-90 text-gray-400" />
+                            </div>
+                            <div className="flex items-center justify-between py-2">
+                              <span className="text-sm">Fixed position</span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" className="sr-only peer" checked={headerFixedPosition} onChange={e => setHeaderFixedPosition(e.target.checked)} />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-700"></div>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-gray-100">
+                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Size</label>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Height</span>
+                              <span className="text-sm">{headerHeight}vw</span>
+                            </div>
+                            <input 
+                              type="range" min="0" max="10" step="0.5" 
+                              value={headerHeight} onChange={e => setHeaderHeight(parseFloat(e.target.value))}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
+
+                  {headerDesignTab === 'dropShadow' && (
+                    <>
+                      <div className="flex items-center gap-2 p-3 border-b border-gray-200">
+                        <button onClick={() => setHeaderDesignTab('main')} className="p-1 hover:bg-gray-100 rounded">
+                          <ChevronDown className="w-4 h-4 rotate-90" />
+                        </button>
+                        <span className="text-sm font-semibold flex-1 text-center pr-6">Drop shadow</span>
+                      </div>
+                      <div className="p-4 space-y-6">
+                        <div className="flex bg-gray-100 p-1 rounded border border-gray-200">
+                          <button 
+                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'soft' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`}
+                            onClick={() => { setHeaderDropShadowMode('soft'); setHeaderDropShadowEnabled(true); }}
+                          >
+                            Soft
+                          </button>
+                          <button 
+                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'strong' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`}
+                            onClick={() => { setHeaderDropShadowMode('strong'); setHeaderDropShadowEnabled(true); }}
+                          >
+                            Strong
+                          </button>
+                          <button className="px-2 text-gray-400 hover:text-black">
+                            ...
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-6 pt-2">
+                          <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                            <span className="text-sm">Color</span>
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="color" 
+                                value={headerDropShadowColor} 
+                                onChange={e => { setHeaderDropShadowColor(e.target.value); setHeaderDropShadowEnabled(true); }}
+                                className="w-6 h-6 rounded-full border border-gray-300 p-0 overflow-hidden cursor-pointer" 
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 border-b border-gray-100 pb-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Spread</span>
+                              <span className="text-sm">{headerDropShadowSpread}px</span>
+                            </div>
+                            <input 
+                              type="range" min="-50" max="50" 
+                              value={headerDropShadowSpread} onChange={e => { setHeaderDropShadowSpread(parseInt(e.target.value)); setHeaderDropShadowEnabled(true); }}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
+
+                          <div className="space-y-2 border-b border-gray-100 pb-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Distance</span>
+                              <span className="text-sm">{headerDropShadowDistance}px</span>
+                            </div>
+                            <input 
+                              type="range" min="0" max="100" 
+                              value={headerDropShadowDistance} onChange={e => { setHeaderDropShadowDistance(parseInt(e.target.value)); setHeaderDropShadowEnabled(true); }}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
+
+                          <div className="space-y-2 pb-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Blur</span>
+                              <span className="text-sm">{headerDropShadowBlur}px</span>
+                            </div>
+                            <input 
+                              type="range" min="0" max="100" 
+                              value={headerDropShadowBlur} onChange={e => { setHeaderDropShadowBlur(parseInt(e.target.value)); setHeaderDropShadowEnabled(true); }}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {headerDesignTab === 'border' && (
+                    <>
+                      <div className="flex items-center gap-2 p-3 border-b border-gray-200">
+                        <button onClick={() => setHeaderDesignTab('main')} className="p-1 hover:bg-gray-100 rounded">
+                          <ChevronDown className="w-4 h-4 rotate-90" />
+                        </button>
+                        <span className="text-sm font-semibold flex-1 text-center pr-6">Border</span>
+                      </div>
+                      <div className="p-4 space-y-6">
+                        <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                          <span className="text-sm">Color</span>
+                          <input 
+                            type="color" 
+                            value={headerBorderColor} 
+                            onChange={e => { setHeaderBorderColor(e.target.value); setHeaderBorderEnabled(true); }}
+                            className="w-6 h-6 rounded-full border border-gray-300 p-0 overflow-hidden cursor-pointer" 
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
+                          <span className="text-sm w-20">Thickness</span>
+                          <div className="flex bg-gray-100 rounded border border-gray-200 flex-1">
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'S' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('S'); setHeaderBorderEnabled(true); }}>S</button>
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'M' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('M'); setHeaderBorderEnabled(true); }}>M</button>
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'L' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('L'); setHeaderBorderEnabled(true); }}>L</button>
+                            <button className="px-2 text-gray-400">...</button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
+                          <span className="text-sm w-20">Position</span>
+                          <div className="flex gap-1 flex-1 justify-between">
+                            <button className={`p-1.5 rounded border ${headerBorderPosition === 'all' ? 'bg-gray-200 border-gray-300' : 'border-transparent hover:bg-gray-100'}`} onClick={() => { setHeaderBorderPosition('all'); setHeaderBorderEnabled(true); }}>
+                              <div className="w-4 h-4 border-2 border-black" />
+                            </button>
+                            <button className={`p-1.5 rounded border ${headerBorderPosition === 'horizontal' ? 'bg-gray-200 border-gray-300' : 'border-transparent hover:bg-gray-100'}`} onClick={() => { setHeaderBorderPosition('horizontal'); setHeaderBorderEnabled(true); }}>
+                              <div className="w-4 h-4 border-t-2 border-b-2 border-black" />
+                            </button>
+                            <button className={`p-1.5 rounded border ${headerBorderPosition === 'vertical' ? 'bg-gray-200 border-gray-300' : 'border-transparent hover:bg-gray-100'}`} onClick={() => { setHeaderBorderPosition('vertical'); setHeaderBorderEnabled(true); }}>
+                              <div className="w-4 h-4 border-l-2 border-r-2 border-black border-dashed" />
+                            </button>
+                            <button className={`p-1.5 rounded border ${headerBorderPosition === 'custom' ? 'bg-gray-200 border-gray-300' : 'border-transparent hover:bg-gray-100'}`} onClick={() => { setHeaderBorderPosition('custom'); setHeaderBorderEnabled(true); }}>
+                              <div className="w-4 h-4 border-2 border-black border-dashed" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 text-center">
+                          <button 
+                            onClick={() => setHeaderBorderEnabled(false)}
+                            className="text-xs font-bold tracking-widest text-black hover:text-gray-600 uppercase"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

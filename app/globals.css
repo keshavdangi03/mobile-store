@@ -17,6 +17,17 @@
   --font-sans-theme: var(--font-geist-sans);
   --font-serif-theme: Georgia, serif;
   --radius-theme: 0.5rem;
+  
+  --btn-bg: var(--primary);
+  --btn-text: var(--background);
+  --btn-border: transparent;
+  --btn-shadow: none;
+  --btn-border-b: none;
+  
+  --form-bg: var(--card-bg);
+  --form-border: #cfe1e1;
+  --form-border-b: none;
+  --form-radius: var(--radius-theme);
 }
 
 .dark {
@@ -60,6 +71,34 @@ body {
   color: var(--foreground);
   transition: background-color 0.2s ease, color 0.2s ease;
   font-family: var(--font-sans);
+}
+
+/* ------------------------------------------------------------------
+   Dynamic Site UI Overrides from CMS 
+   ------------------------------------------------------------------ */
+button.bg-primary, a.bg-primary {
+  background-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+  border: 1px solid var(--btn-border) !important;
+  border-radius: var(--radius-theme) !important;
+  box-shadow: var(--btn-shadow) !important;
+  border-bottom: var(--btn-border-b) !important;
+  transition: all 0.2s ease;
+}
+
+/* If button is outline, fix hover state */
+button.bg-primary:hover, a.bg-primary:hover {
+  opacity: 0.9;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), 
+select, 
+textarea {
+  background-color: var(--form-bg) !important;
+  border: 1px solid var(--form-border) !important;
+  border-radius: var(--form-radius) !important;
+  border-bottom: var(--form-border-b) !important;
+  transition: all 0.2s ease;
 }
 
 /* Custom premium scrollbar styling */

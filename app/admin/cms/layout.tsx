@@ -16,8 +16,9 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
   const [iframeUrl, setIframeUrl] = useState("/");
   const [currentPageTitle, setCurrentPageTitle] = useState("Home");
   const [currentPageStatus, setCurrentPageStatus] = useState("Page - Published");
+  const [showSaveModal, setShowSaveModal] = useState(false);
   
-  const { isEditMode, setIsEditMode } = useCmsStore();
+  const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useCmsStore();
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pathname = usePathname();
@@ -49,13 +50,41 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
     }
   };
 
-  const handleEditClick = () => {
-    const newEditMode = !isEditMode;
-    setIsEditMode(newEditMode);
-    sendEditModeToIframe(newEditMode);
-    
-    if (!newEditMode && pathname !== "/admin/cms") {
+  const dispatchToIframe = (type: string) => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type }, '*');
+    }
+  };
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'CMS_UNSAVED_CHANGES') {
+         setHasUnsavedChanges(true);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [setHasUnsavedChanges]);
+
+  const executeExit = () => {
+    setIsEditMode(false);
+    sendEditModeToIframe(false);
+    setHasUnsavedChanges(false);
+    if (pathname !== "/admin/cms") {
        router.push("/admin/cms");
+    }
+  };
+
+  const handleEditClick = () => {
+    if (isEditMode) {
+      if (hasUnsavedChanges) {
+        setShowSaveModal(true);
+      } else {
+        executeExit();
+      }
+    } else {
+      setIsEditMode(true);
+      sendEditModeToIframe(true);
     }
   };
 
@@ -79,9 +108,16 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
           ) : (
             <>
               <button 
-                className="px-3 py-1.5 text-[10px] font-bold rounded tracking-widest transition-colors bg-gray-200 text-black hover:bg-gray-300 uppercase"
+                onClick={() => {
+                  setHasUnsavedChanges(false);
+                  dispatchToIframe('CMS_SAVE_CHANGES');
+                }}
+                className="px-3 py-1.5 text-[10px] font-bold rounded tracking-widest transition-colors bg-gray-200 text-black hover:bg-gray-300 uppercase relative"
               >
                 Save
+                {hasUnsavedChanges && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                )}
               </button>
               <button 
                 onClick={handleEditClick}
@@ -213,6 +249,50 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
         </div>
 
       </div>
+
+      {/* Unsaved Changes Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-[400px] overflow-hidden text-black animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-2">Unsaved Changes</h3>
+              <p className="text-sm text-gray-600">
+                You have unsaved changes. Do you want to save current changes before closing?
+              </p>
+            </div>
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button 
+                onClick={() => setShowSaveModal(false)}
+                className="px-4 py-2 text-sm font-bold text-gray-600 hover:text-black transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setShowSaveModal(false);
+                  dispatchToIframe('CMS_DISCARD_CHANGES');
+                  executeExit();
+                }}
+                className="px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+              >
+                Discard
+              </button>
+              <button 
+                onClick={() => {
+                  setHasUnsavedChanges(false);
+                  setShowSaveModal(false);
+                  dispatchToIframe('CMS_SAVE_CHANGES');
+                  executeExit();
+                }}
+                className="px-4 py-2 text-sm font-bold text-white bg-black hover:bg-gray-800 rounded-lg shadow-sm transition-colors"
+              >
+                Save & Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
