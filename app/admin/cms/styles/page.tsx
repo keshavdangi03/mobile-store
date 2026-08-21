@@ -27,13 +27,13 @@ const COLOR_PACKS = [
 ];
 
 const BUTTON_PACKS = [
-  { bg: 'bg-[#d2cfd1]', shape: 'rounded-full', style: 'solid', radius: '9999px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '9999px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-full', style: 'outline', radius: '9999px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '9999px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-md', style: 'solid', radius: '6px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '6px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-md', style: 'outline', radius: '6px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '6px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-none', style: 'solid', radius: '0px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '0px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-none', style: 'outline', radius: '0px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '0px', '--btn-shadow': 'none' } },
-  { bg: 'bg-[#f5f5f5]', shape: 'rounded-[100px]', style: 'solid', radius: '100px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '100px', '--btn-shadow': '0 4px 6px -1px rgb(0 0 0 / 0.1)' } },
+  { bg: 'bg-[#d2cfd1]', shape: 'rounded-full', style: 'solid', radius: '9999px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '9999px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-full', style: 'outline', radius: '9999px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '9999px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-md', style: 'solid', radius: '6px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '6px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-md', style: 'outline', radius: '6px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '6px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-none', style: 'solid', radius: '0px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '0px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-none', style: 'outline', radius: '0px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'var(--primary)', '--btn-radius': '0px', '--btn-shadow': 'none', '--btn-border-b': 'none' } },
+  { bg: 'bg-[#f5f5f5]', shape: 'rounded-[100px]', style: 'solid', radius: '100px', cssProps: { '--btn-bg': 'var(--primary)', '--btn-text': 'var(--background)', '--btn-border': 'transparent', '--btn-radius': '100px', '--btn-shadow': '0 4px 6px -1px rgb(0 0 0 / 0.1)', '--btn-border-b': 'none' } },
   { bg: 'bg-[#f5f5f5]', shape: 'rounded-none', style: 'text', radius: '0px', cssProps: { '--btn-bg': 'transparent', '--btn-text': 'var(--primary)', '--btn-border': 'transparent', '--btn-radius': '0px', '--btn-shadow': 'none', '--btn-border-b': '2px solid var(--primary)' } },
 ];
 

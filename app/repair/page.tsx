@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createRepairRequest } from "@/app/actions";
+import BlockEditorWrapper from "@/components/block-editor-wrapper";
 import { 
   Smartphone, 
   Wrench, 
@@ -112,7 +113,9 @@ export default function RepairPage() {
             Repair Services
           </span>
           <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-tight">
-            <BlockEditorWrapper blockId="repair-heading" defaultText="Fix Your Device in 5 Easy Steps" />
+            <BlockEditorWrapper blockType="TEXT">
+              <span>Fix Your Device in 5 Easy Steps</span>
+            </BlockEditorWrapper>
           </h1>
           <p className="text-xs text-foreground/60 leading-relaxed">
             Professional multi-brand repair service with certified OEM parts. Track every milestone live from your customer profile page.

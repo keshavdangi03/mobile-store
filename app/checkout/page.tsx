@@ -464,11 +464,15 @@ export default function CheckoutPage() {
             <button
               onClick={handlePlaceOrder}
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/10 transition-all duration-300 disabled:opacity-75 disabled:cursor-not-allowed"
+              className="w-full py-3.5 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/10 transition-all duration-300 disabled:opacity-75 disabled:cursor-not-allowed"
+              style={{ color: 'var(--btn-text)' }}
             >
               {loading ? (
                 <>
-                  <span className="h-4 w-4 border-2 border-white border-t-transparent animate-spin rounded-full inline-block"></span>
+                  <span 
+                    className="h-4 w-4 border-2 border-t-transparent animate-spin rounded-full inline-block"
+                    style={{ borderColor: 'var(--btn-text)', borderTopColor: 'transparent' }}
+                  ></span>
                   Placing Order Securely...
                 </>
               ) : (

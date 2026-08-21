@@ -238,7 +238,7 @@ export default function Home() {
 
               {/* Pad Image */}
               <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0">
-                <EditableImage imageId="dynamic-img-1" defaultSrc={carouselSlides[0].image}
+                <EditableImage imageId="dynamic-img-1" defaultSrc={carouselSlides[0].image!}
                   alt="Xiaomi Pad 8"
                   className="object-contain w-full h-full drop-shadow-2xl rounded-2xl hover:scale-105 transition-transform duration-300"
                 />
@@ -279,7 +279,7 @@ export default function Home() {
 
               {/* Asus Image */}
               <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0">
-                <EditableImage imageId="dynamic-img-2" defaultSrc={carouselSlides[1].image}
+                <EditableImage imageId="dynamic-img-2" defaultSrc={carouselSlides[1].image!}
                   alt="Asus ROG"
                   className="object-contain w-full h-full drop-shadow-2xl rounded-2xl"
                 />
@@ -661,7 +661,9 @@ export default function Home() {
         <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
           <section className="max-w-7xl mx-auto px-6 py-12">
             <div className="bg-card-bg border border-card-border rounded-3xl p-8 min-h-[200px] flex items-center justify-center">
-              <BlockEditorWrapper blockId={`${sectionId}-text`} defaultText="Empty Section. Click to edit." />
+              <BlockEditorWrapper blockType="TEXT">
+                <p>Empty Section. Click to edit.</p>
+              </BlockEditorWrapper>
             </div>
           </section>
         </SectionEditorWrapper>
@@ -680,7 +682,7 @@ return (
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
         {/* Welcome Bubble */}
         {showWelcomeBubble && !isChatBoxOpen && (
-          <div className="bg-gradient-to-r from-teal-700 via-primary to-teal-900 text-white p-4 rounded-2xl shadow-xl mb-4 max-w-xs relative animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="bg-gradient-to-br from-[#1c302d] via-[#203633] to-[#1a2b29] border border-[#2e4c49]/40 text-white p-4 rounded-2xl shadow-xl mb-4 max-w-xs relative animate-in fade-in slide-in-from-bottom-2 duration-200">
             <button 
               onClick={(e) => {
                 e.stopPropagation();

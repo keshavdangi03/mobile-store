@@ -199,7 +199,8 @@ export default function CartDrawer() {
             <Link
               href="/checkout"
               onClick={() => setIsCartOpen(false)}
-              className="w-full py-3 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all duration-300"
+              className="w-full py-3 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-sm font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all duration-300"
+              style={{ color: 'var(--btn-text)' }}
             >
               🔒 Proceed to Checkout
             </Link>

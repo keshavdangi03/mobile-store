@@ -744,7 +744,10 @@ export default function Header() {
         onSelect={() => setActiveSection("ANNOUNCEMENT BAR")}
         wrapperClassName="w-full"
       >
-      <div className="w-full bg-gradient-to-r from-primary to-primary-hover text-white text-[11px] font-medium py-2 px-6 flex items-center justify-between">
+      <div 
+        className="w-full bg-gradient-to-r from-primary to-primary-hover text-[11px] font-medium py-2 px-6 flex items-center justify-between"
+        style={{ color: 'var(--btn-text)' }}
+      >
         <span className="mx-auto flex items-center gap-1.5 animate-pulse">
           <Sparkles className="w-3.5 h-3.5" /> Shrawan Sale is LIVE! Massive Discounts on Premium Gear
         </span>

@@ -3,15 +3,15 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f2f8f8;
-  --foreground: #0c2323;
-  --primary: #ff7a00; /* Orange primary */
-  --primary-hover: #e06c00;
-  --secondary: #2bfbcd; /* Vibrant Cyan secondary */
-  --secondary-hover: #1cb5c2;
+  --background: #f4faf8;
+  --foreground: #081a17;
+  --primary: #2bfbc9; /* Vibrant Teal/Mint primary */
+  --primary-hover: #1cdcb0;
+  --secondary: #7c3aed; /* Sophisticated Violet secondary */
+  --secondary-hover: #6d28d9;
   --card-bg: #ffffff;
-  --card-border: #cfe1e1;
-  --sidebar-bg: #e6f1f1;
+  --card-border: #cfe5e1;
+  --sidebar-bg: #ebf5f3;
   --accent-green: #25d366; /* WhatsApp green */
   
   --font-sans-theme: var(--font-geist-sans);
@@ -19,27 +19,28 @@
   --radius-theme: 0.5rem;
   
   --btn-bg: var(--primary);
-  --btn-text: var(--background);
+  --btn-text: var(--foreground);
   --btn-border: transparent;
   --btn-shadow: none;
   --btn-border-b: none;
   
   --form-bg: var(--card-bg);
-  --form-border: #cfe1e1;
+  --form-border: #cfe5e1;
   --form-border-b: none;
   --form-radius: var(--radius-theme);
 }
 
 .dark {
-  --background: #081717; /* Deep Dark Cyan */
-  --foreground: #e3f7f7; /* High-visibility light cyan text */
-  --primary: #ffa000; /* Amber primary */
-  --primary-hover: #ff8f00;
-  --secondary: #2bfbcd; /* Vibrant Cyan secondary */
-  --secondary-hover: #4dfdeb;
-  --card-bg: #0e2525; /* Dark cyan card */
-  --card-border: #1c4545; /* Clean visible borders */
-  --sidebar-bg: #0b1e1e;
+  --background: #162624; /* Softer, lighter charcoal-mint */
+  --foreground: #eafaf7; /* Bright, high-visibility text */
+  --primary: #2bfbc9; /* Glowing Teal primary */
+  --primary-hover: #61ffed;
+  --secondary: #a78bfa; /* Vibrant Lavender secondary */
+  --secondary-hover: #c4b5fd;
+  --card-bg: #203633; /* Lighter slate-mint card background */
+  --card-border: #2e4c49; /* Softer visible borders */
+  --sidebar-bg: #1a2b29;
+  --btn-text: var(--background);
   --accent-green: #20ba56;
 }
 
@@ -95,10 +96,28 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
 select, 
 textarea {
   background-color: var(--form-bg) !important;
+  color: var(--foreground) !important;
   border: 1px solid var(--form-border) !important;
   border-radius: var(--form-radius) !important;
   border-bottom: var(--form-border-b) !important;
   transition: all 0.2s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="color"])::placeholder, 
+textarea::placeholder {
+  color: var(--foreground) !important;
+  opacity: 0.5 !important;
+}
+
+/* Ensure inputs inside dark footer remain dark with white text */
+footer input:not([type="checkbox"]):not([type="radio"]):not([type="color"]) {
+  background-color: #1e293b !important; /* bg-slate-800 */
+  color: #f1f5f9 !important; /* text-slate-100 */
+  border-color: #334155 !important; /* border-slate-700 */
+}
+footer input:not([type="checkbox"]):not([type="radio"]):not([type="color"])::placeholder {
+  color: #cbd5e1 !important; /* text-slate-300 */
+  opacity: 0.6 !important;
 }
 
 /* Custom premium scrollbar styling */
@@ -130,6 +149,7 @@ textarea {
   --foreground: #1e1e24;
   --primary: #111827;
   --primary-hover: #374151;
+  --btn-text: #ffffff;
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
   --font-sans-theme: var(--font-inter), sans-serif;
@@ -141,6 +161,7 @@ textarea {
   --foreground: #1f2937;
   --primary: #16a34a;
   --primary-hover: #15803d;
+  --btn-text: #ffffff;
   --card-bg: #f3f0e6;
   --card-border: #d1d5db;
   --font-sans-theme: var(--font-inter), sans-serif;
@@ -154,6 +175,7 @@ textarea {
   --foreground: #4a152e;
   --primary: #4a152e;
   --primary-hover: #3b1125;
+  --btn-text: #ffffff;
   --card-bg: #e1d8fa;
   --card-border: #b8adff;
   --font-sans-theme: var(--font-chewy), "Comic Sans MS", sans-serif;
@@ -165,6 +187,7 @@ textarea {
   --foreground: #134e4a;
   --primary: #1f2937;
   --primary-hover: #111827;
+  --btn-text: #ffffff;
   --card-bg: #f4d993;
   --card-border: #d9b85c;
   --font-sans-theme: var(--font-inter), sans-serif;
@@ -178,6 +201,7 @@ textarea {
   --foreground: #453123;
   --primary: #292524;
   --primary-hover: #1c1917;
+  --btn-text: #ffffff;
   --card-bg: #f2eadb;
   --card-border: #d4c8af;
   --font-sans-theme: var(--font-inter), sans-serif;
@@ -189,6 +213,7 @@ textarea {
   --foreground: #1e293b;
   --primary: #dca68d;
   --primary-hover: #b88a75;
+  --btn-text: #1e293b;
   --card-bg: #f5eedf;
   --card-border: #d4c8af;
   --font-sans-theme: var(--font-syne), sans-serif;
@@ -202,6 +227,7 @@ textarea {
   --foreground: #ffffff;
   --primary: #475569;
   --primary-hover: #334155;
+  --btn-text: #ffffff;
   --card-bg: #8ba7b3;
   --card-border: #62828e;
   --font-sans-theme: var(--font-nunito), sans-serif;
@@ -213,6 +239,7 @@ textarea {
   --foreground: #14532d;
   --primary: #14532d;
   --primary-hover: #064e3b;
+  --btn-text: #ffffff;
   --card-bg: #efece1;
   --card-border: #c9c3ad;
   --font-sans-theme: var(--font-nunito), sans-serif;
@@ -226,6 +253,7 @@ textarea {
   --foreground: #064e3b;
   --primary: #064e3b;
   --primary-hover: #022c22;
+  --btn-text: #ffffff;
   --card-bg: #f5f8a3;
   --card-border: #d4dc4b;
   --font-sans-theme: var(--font-space), "Courier New", monospace;
@@ -237,6 +265,7 @@ textarea {
   --foreground: #000000;
   --primary: #000000;
   --primary-hover: #111827;
+  --btn-text: #ffffff;
   --card-bg: #fcd581;
   --card-border: #e6a72e;
   --font-sans-theme: var(--font-syne), sans-serif;
@@ -250,6 +279,7 @@ textarea {
   --foreground: #000000;
   --primary: #f97316;
   --primary-hover: #ea580c;
+  --btn-text: #ffffff;
   --card-bg: #fcc79c;
   --card-border: #e39a5f;
   --font-sans-theme: var(--font-anton), Impact, sans-serif;
@@ -261,6 +291,7 @@ textarea {
   --foreground: #111827;
   --primary: #111827;
   --primary-hover: #000000;
+  --btn-text: #ffffff;
   --card-bg: #eeeeee;
   --card-border: #c0c0c0;
   --font-sans-theme: var(--font-archivo), Arial, sans-serif;
@@ -274,6 +305,7 @@ textarea {
   --foreground: #000000;
   --primary: #f05a28;
   --primary-hover: #d1461a;
+  --btn-text: #ffffff;
   --card-bg: #ffffff;
   --card-border: #d4d4d8;
   --font-sans-theme: var(--font-space), sans-serif;
@@ -285,6 +317,7 @@ textarea {
   --foreground: #000000;
   --primary: #000000;
   --primary-hover: #334155;
+  --btn-text: #ffffff;
   --card-bg: #f8fafc;
   --card-border: #e2e8f0;
   --font-sans-theme: var(--font-syne), sans-serif;
@@ -296,20 +329,42 @@ textarea {
    Global Dark Mode Override
    ------------------------------------------------------------------ */
 html.dark {
-  --background: #081717 !important; /* Deep Dark Cyan */
-  --foreground: #e3f7f7 !important; /* High-visibility light cyan text */
-  --primary: #ffa000 !important; /* Amber primary */
-  --primary-hover: #ff8f00 !important;
-  --secondary: #2bfbcd !important; /* Vibrant Cyan secondary */
-  --secondary-hover: #4dfdeb !important;
-  --card-bg: #0e2525 !important; /* Dark cyan card */
-  --card-border: #1c4545 !important; /* Clean visible borders */
-  --sidebar-bg: #0b1e1e !important;
+  --background: #162624 !important; /* Softer, lighter charcoal-mint */
+  --foreground: #eafaf7 !important; /* Bright, high-visibility text */
+  --primary: #2bfbc9 !important; /* Glowing Teal primary */
+  --primary-hover: #61ffed !important;
+  --secondary: #a78bfa !important; /* Vibrant Lavender secondary */
+  --secondary-hover: #c4b5fd !important;
+  --card-bg: #203633 !important; /* Lighter slate-mint card background */
+  --card-border: #2e4c49 !important; /* Softer visible borders */
+  --sidebar-bg: #1a2b29 !important;
+  --btn-text: var(--background) !important;
 }
 html.dark.theme-quirky-2,
 html.dark.theme-innovative-2,
 html.dark.theme-bold-2 {
   --primary: #ffffff !important;
   --primary-hover: #e2e8f0 !important;
+  --btn-text: #000000 !important;
 }
+
+/* ------------------------------------------------------------------
+   Text Readability Overrides for Muted Text (Light/Dark themes)
+   ------------------------------------------------------------------ */
+.text-foreground\/50 {
+  color: color-mix(in srgb, var(--foreground) 75%, transparent) !important;
+}
+.text-foreground\/60 {
+  color: color-mix(in srgb, var(--foreground) 85%, transparent) !important;
+}
+.text-foreground\/70 {
+  color: color-mix(in srgb, var(--foreground) 90%, transparent) !important;
+}
+.text-foreground\/75 {
+  color: color-mix(in srgb, var(--foreground) 92%, transparent) !important;
+}
+.text-foreground\/80 {
+  color: color-mix(in srgb, var(--foreground) 95%, transparent) !important;
+}
+
 
