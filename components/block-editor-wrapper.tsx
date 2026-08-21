@@ -233,7 +233,7 @@ export default function BlockEditorWrapper({
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={`flex items-center gap-1 px-2 py-1.5 rounded text-[13px] font-medium transition-colors border whitespace-nowrap ${isDropdownOpen ? 'bg-gray-100 border-gray-300' : 'hover:bg-gray-100 border-transparent text-gray-700'}`}
           >
-            {textStyle} <ChevronDown className="w-3 h-3 text-gray-500 flex-shrink-0" />
+            {textStyle} <ChevronDown className="w-3 h-3 text-foreground/60 flex-shrink-0" />
           </button>
           
           {isDropdownOpen && (
@@ -260,7 +260,7 @@ export default function BlockEditorWrapper({
                     </span>
                     <span className="text-[13px] text-gray-700">{style.name}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] text-gray-400 font-medium">
+                  <div className="flex items-center gap-1 text-[9px] text-foreground/50 font-medium">
                     {style.shortcut.split(' ').map((key, i) => (
                       <span key={i} className="bg-gray-100 px-1 py-0.5 rounded border border-gray-200">{key}</span>
                     ))}
@@ -297,7 +297,7 @@ export default function BlockEditorWrapper({
           />
           <div className="w-3.5 h-3.5 bg-black rounded-full pointer-events-none"></div>
         </label>
-        <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 transition-colors"><Type className="w-4 h-4" /></button>
+        <button className="p-1.5 hover:bg-gray-100 rounded text-foreground/75 transition-colors"><Type className="w-4 h-4" /></button>
         <label className="p-1.5 hover:bg-gray-100 rounded flex items-center justify-center transition-colors cursor-pointer relative overflow-hidden">
           <input 
             type="color" 
@@ -320,9 +320,9 @@ export default function BlockEditorWrapper({
               window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
             }}
           />
-          <Highlighter className="w-4 h-4 pointer-events-none text-gray-400" />
+          <Highlighter className="w-4 h-4 pointer-events-none text-foreground/50" />
         </label>
-        <button onMouseDown={(e) => { e.preventDefault(); const url = prompt('Enter URL:'); if (url) { document.execCommand('createLink', false, url); window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*'); } }} className="p-1.5 hover:bg-gray-100 rounded text-gray-400 transition-colors"><LinkIcon className="w-4 h-4" /></button>
+        <button onMouseDown={(e) => { e.preventDefault(); const url = prompt('Enter URL:'); if (url) { document.execCommand('createLink', false, url); window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*'); } }} className="p-1.5 hover:bg-gray-100 rounded text-foreground/50 transition-colors"><LinkIcon className="w-4 h-4" /></button>
         <div className="w-[1px] h-5 bg-gray-200 mx-1"></div>
         <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('justifyLeft', false); window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*'); }} className="p-1.5 hover:bg-gray-100 rounded text-gray-700 transition-colors"><AlignLeft className="w-4 h-4" /></button>
         <button onMouseDown={(e) => { e.preventDefault(); document.execCommand('formatBlock', false, 'BLOCKQUOTE'); window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*'); }} className="p-1.5 hover:bg-gray-100 rounded text-gray-700 transition-colors"><Quote className="w-4 h-4" /></button>

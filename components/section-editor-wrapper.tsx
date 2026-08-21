@@ -38,6 +38,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
   // Context Menu State
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<'arrange' | 'save' | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Form states
   const [rowCount, setRowCount] = useState(22);
@@ -66,12 +67,14 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
   }, [activeEditorId, sectionId]);
 
   useEffect(() => {
-    const handleGlobalClick = () => {
-      if (contextMenu) setContextMenu(null);
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
     };
-    document.addEventListener('click', handleGlobalClick);
-    return () => document.removeEventListener('click', handleGlobalClick);
-  }, [contextMenu]);
+    document.addEventListener('mousedown', handleGlobalClick);
+    return () => document.removeEventListener('mousedown', handleGlobalClick);
+  }, []);
 
   const isSectionActive = activeEditorId === sectionId;
   const showControls = isEditMode && activeEditorId !== 'header' && activeEditorId !== 'footer' && isSectionHovered;
@@ -123,6 +126,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
         {/* Right Click Context Menu */}
         {contextMenu && (
           <div 
+            ref={contextMenuRef}
             className="fixed bg-white rounded shadow-2xl border border-gray-200 py-1.5 z-[100] w-56 text-[13px] text-gray-800 font-medium"
             style={{ top: contextMenu.y, left: contextMenu.x }}
             onMouseLeave={() => setActiveSubMenu(null)}
@@ -135,10 +139,10 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
               }}
             >
               <span>Copy section</span>
-              <span className="text-[10px] font-bold tracking-wider text-gray-400">CTRL C</span>
+              <span className="text-[10px] font-bold tracking-wider text-foreground/50">CTRL C</span>
             </button>
             <button 
-              className={`w-full text-left px-4 py-2 flex items-center justify-between transition-colors ${clipboardSection ? 'hover:bg-gray-100 text-gray-800' : 'text-gray-400 cursor-not-allowed'}`}
+              className={`w-full text-left px-4 py-2 flex items-center justify-between transition-colors ${clipboardSection ? 'hover:bg-gray-100 text-gray-800' : 'text-foreground/50 cursor-not-allowed'}`}
               onClick={() => {
                 if (clipboardSection) {
                   pasteSection(sectionId);
@@ -147,7 +151,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
               }}
             >
               <span>Paste</span>
-              <span className={`text-[10px] font-bold tracking-wider ${clipboardSection ? 'text-gray-400' : 'text-gray-300'}`}>CTRL V</span>
+              <span className={`text-[10px] font-bold tracking-wider ${clipboardSection ? 'text-foreground/50' : 'text-gray-300'}`}>CTRL V</span>
             </button>
             <button 
               className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors" 
@@ -167,7 +171,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
             >
               <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center justify-between">
                 <span>Save section</span>
-                <span className="text-gray-400 text-lg leading-none mb-1">›</span>
+                <span className="text-foreground/50 text-lg leading-none mb-1">›</span>
               </button>
               {activeSubMenu === 'save' && (
                 <div className="absolute top-0 left-full ml-1 w-48 bg-white border border-gray-200 rounded shadow-xl py-1.5 z-[110]">
@@ -199,7 +203,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
             >
               <button className={`w-full text-left px-4 py-2 transition-colors flex items-center justify-between ${activeSubMenu === 'arrange' ? 'bg-gray-100' : 'hover:bg-gray-100'}`}>
                 <span>Arrange</span>
-                <span className="text-gray-400 text-lg leading-none mb-1">›</span>
+                <span className="text-foreground/50 text-lg leading-none mb-1">›</span>
               </button>
               {activeSubMenu === 'arrange' && (
                 <div className="absolute top-0 left-full ml-1 w-48 bg-white border border-gray-200 rounded shadow-xl py-1.5 z-[110]">
@@ -242,7 +246,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
             
             <button className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center justify-between" onClick={() => window.parent.postMessage({ type: 'CMS_ACTION', action: 'TOGGLE_GRID' }, '*')}>
               <span>Hide grid</span>
-              <span className="text-[10px] font-bold tracking-wider text-gray-400">G</span>
+              <span className="text-[10px] font-bold tracking-wider text-foreground/50">G</span>
             </button>
           </div>
         )}
@@ -255,12 +259,12 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
           >
             {/* Tabs */}
             <div className="flex items-center gap-4 border-b border-gray-200 px-4 pt-2 relative">
-               <button onClick={() => setActiveTab('design')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'design' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>Design</button>
-               <button onClick={() => setActiveTab('background')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'background' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>Background</button>
-               <button onClick={() => setActiveTab('colors')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'colors' ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-black'}`}>Colors</button>
+               <button onClick={() => setActiveTab('design')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'design' ? 'border-b-2 border-black text-black' : 'text-foreground/60 hover:text-black'}`}>Design</button>
+               <button onClick={() => setActiveTab('background')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'background' ? 'border-b-2 border-black text-black' : 'text-foreground/60 hover:text-black'}`}>Background</button>
+               <button onClick={() => setActiveTab('colors')} className={`pb-3 pt-2 px-1 text-[13px] font-medium transition-colors ${activeTab === 'colors' ? 'border-b-2 border-black text-black' : 'text-foreground/60 hover:text-black'}`}>Colors</button>
                <button 
                  onClick={() => setIsEditorModalOpen(false)}
-                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-black transition-colors rounded hover:bg-gray-100"
+                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-foreground/50 hover:text-black transition-colors rounded hover:bg-gray-100"
                >
                  <X className="w-4 h-4" />
                </button>
@@ -271,7 +275,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                  <div className="space-y-6">
                    {/* Grid Section */}
                    <div>
-                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Grid</h4>
+                     <h4 className="text-[10px] font-bold text-foreground/60 uppercase tracking-widest mb-4">Grid</h4>
                      <div className="flex items-center justify-between mb-4">
                        <span className="text-sm">Row Count</span>
                        <input type="number" value={rowCount} onChange={(e) => setRowCount(Number(e.target.value))} className="w-20 bg-gray-100 border-none rounded px-3 py-1.5 text-center text-sm outline-none focus:ring-2 focus:ring-black/5" />
@@ -288,7 +292,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                    
                    {/* Section */}
                    <div className="border-t border-gray-100 pt-5">
-                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Section</h4>
+                     <h4 className="text-[10px] font-bold text-foreground/60 uppercase tracking-widest mb-4">Section</h4>
                      <div className="flex items-center justify-between">
                        <span className="text-sm">Fill Screen</span>
                        <label className="relative inline-flex items-center cursor-pointer">
@@ -300,7 +304,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                    
                    {/* Styling */}
                    <div className="border-t border-gray-100 pt-5">
-                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Styling</h4>
+                     <h4 className="text-[10px] font-bold text-foreground/60 uppercase tracking-widest mb-4">Styling</h4>
                      <div className="flex items-center justify-between">
                        <span className="text-sm">Divider</span>
                        <label className="relative inline-flex items-center cursor-pointer">
@@ -312,13 +316,13 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                    
                    {/* Anchor Link */}
                    <div className="border-t border-gray-100 pt-5">
-                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                       Anchor Link <span className="text-[10px] w-3 h-3 flex items-center justify-center font-normal border border-gray-400 text-gray-500 rounded-full">i</span>
+                     <h4 className="text-[10px] font-bold text-foreground/60 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                       Anchor Link <span className="text-[10px] w-3 h-3 flex items-center justify-center font-normal border border-gray-400 text-foreground/60 rounded-full">i</span>
                      </h4>
                      <div className="relative mt-2">
-                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">#</span>
+                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 font-bold">#</span>
                        <input type="text" placeholder="Add name" value={anchorLink} onChange={(e) => setAnchorLink(e.target.value)} className="w-full bg-gray-100 rounded px-3 pl-8 py-2.5 text-sm outline-none focus:ring-2 focus:ring-black/5" />
-                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50">
                          <Copy className="w-4 h-4" />
                        </span>
                      </div>
@@ -329,9 +333,9 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                {activeTab === 'background' && (
                  <div className="space-y-6">
                    <div className="flex p-1 bg-gray-100 rounded">
-                     <button onClick={() => setBgType('image')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'image' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Image</button>
-                     <button onClick={() => setBgType('video')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'video' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Video</button>
-                     <button onClick={() => setBgType('art')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'art' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Art</button>
+                     <button onClick={() => setBgType('image')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'image' ? 'bg-white shadow-sm' : 'text-foreground/60 hover:text-gray-700'}`}>Image</button>
+                     <button onClick={() => setBgType('video')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'video' ? 'bg-white shadow-sm' : 'text-foreground/60 hover:text-gray-700'}`}>Video</button>
+                     <button onClick={() => setBgType('art')} className={`flex-1 py-1.5 text-[13px] font-medium transition-colors rounded ${bgType === 'art' ? 'bg-white shadow-sm' : 'text-foreground/60 hover:text-gray-700'}`}>Art</button>
                    </div>
                    
                    <div className="border border-dashed border-gray-300 rounded-lg p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 transition-colors">
@@ -339,14 +343,14 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
                        <Plus className="w-5 h-5 text-black" />
                      </div>
                      <p className="text-[13px] text-gray-800">Add an Image</p>
-                     <p className="text-[11px] text-gray-500 mt-1">20 MB max</p>
+                     <p className="text-[11px] text-foreground/60 mt-1">20 MB max</p>
                    </div>
                    
                    <div>
-                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Background Width</h4>
+                     <h4 className="text-[10px] font-bold text-foreground/60 uppercase tracking-widest mb-3">Background Width</h4>
                      <div className="flex border border-gray-200 rounded">
-                       <button onClick={() => setBgWidth('full')} className={`flex-1 py-2 text-[13px] font-medium transition-colors ${bgWidth === 'full' ? 'bg-white text-black' : 'bg-gray-50 text-gray-500 hover:text-gray-700'}`}>Full Bleed</button>
-                       <button onClick={() => setBgWidth('inset')} className={`flex-1 py-2 text-[13px] font-medium transition-colors border-l border-gray-200 ${bgWidth === 'inset' ? 'bg-white text-black' : 'bg-gray-50 text-gray-500 hover:text-gray-700'}`}>Inset</button>
+                       <button onClick={() => setBgWidth('full')} className={`flex-1 py-2 text-[13px] font-medium transition-colors ${bgWidth === 'full' ? 'bg-white text-black' : 'bg-gray-50 text-foreground/60 hover:text-gray-700'}`}>Full Bleed</button>
+                       <button onClick={() => setBgWidth('inset')} className={`flex-1 py-2 text-[13px] font-medium transition-colors border-l border-gray-200 ${bgWidth === 'inset' ? 'bg-white text-black' : 'bg-gray-50 text-foreground/60 hover:text-gray-700'}`}>Inset</button>
                      </div>
                    </div>
                  </div>
@@ -354,7 +358,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
 
                {activeTab === 'colors' && (
                  <div className="space-y-5">
-                   <p className="text-[13px] text-gray-600 leading-relaxed">
+                   <p className="text-[13px] text-foreground/75 leading-relaxed">
                      Select a color theme for this section. To change a theme's colors, visit the <span className="underline cursor-pointer hover:text-black">Color Theme Editor</span>.
                    </p>
                    

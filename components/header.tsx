@@ -104,6 +104,13 @@ const EditorHighlight = ({
           e.stopPropagation();
           onSelect?.();
         }}
+        onDoubleClick={(e) => {
+          if (onEdit) {
+            e.preventDefault();
+            e.stopPropagation();
+            onEdit();
+          }
+        }}
       >
         <div className={`absolute -top-[22px] left-[-2px] bg-[#007bff] text-white text-[9px] font-bold px-1.5 py-0.5 pointer-events-none transition-opacity whitespace-nowrap uppercase rounded-sm shadow-sm ${
           isActiveSection 
@@ -118,7 +125,7 @@ const EditorHighlight = ({
         {/* Editor Toolbar */}
         {isActiveSection && (
           <div 
-            className={`absolute bg-white rounded-lg shadow-xl border border-gray-200 flex items-center p-1 gap-1 z-[120] ${
+            className={`absolute bg-card rounded-lg shadow-xl border border-gray-200 flex items-center p-1 gap-1 z-[120] ${
               toolbarPosition === 'right' ? 'top-1/2 -translate-y-1/2 -right-14' : 
               toolbarPosition === 'left' ? 'top-1/2 -translate-y-1/2 -left-14' : 
               'left-1/2 -translate-x-1/2 -bottom-14'
@@ -287,6 +294,10 @@ export default function Header() {
   const [headerHeight, setHeaderHeight] = useState(2); // vw
   const [headerFixedPosition, setHeaderFixedPosition] = useState(true);
 
+  const [announcementText, setAnnouncementText] = useState("Shrawan Sale is LIVE! Massive Discounts on Premium Gear");
+  const [announcementAnimation, setAnnouncementAnimation] = useState<'pulse' | 'bounce' | 'flash' | 'none'>('pulse');
+  const [announcementShow, setAnnouncementShow] = useState(true);
+
   // Auth modal popup states
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
@@ -451,7 +462,8 @@ export default function Header() {
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
     headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
-    headerHeight, headerFixedPosition
+    headerHeight, headerFixedPosition,
+    announcementText, announcementAnimation, announcementShow
   });
 
   useEffect(() => {
@@ -460,14 +472,16 @@ export default function Header() {
       headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
       headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
       headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
-      headerHeight, headerFixedPosition
+      headerHeight, headerFixedPosition,
+      announcementText, announcementAnimation, announcementShow
     };
   }, [
     headerLayout, headerLinkSpacing, headerElementSpacing,
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
     headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
-    headerHeight, headerFixedPosition
+    headerHeight, headerFixedPosition,
+    announcementText, announcementAnimation, announcementShow
   ]);
 
   const loadSavedSettings = React.useCallback(() => {
@@ -490,6 +504,9 @@ export default function Header() {
         if (parsed.headerBorderPosition !== undefined) setHeaderBorderPosition(parsed.headerBorderPosition);
         if (parsed.headerHeight !== undefined) setHeaderHeight(parsed.headerHeight);
         if (parsed.headerFixedPosition !== undefined) setHeaderFixedPosition(parsed.headerFixedPosition);
+        if (parsed.announcementText !== undefined) setAnnouncementText(parsed.announcementText);
+        if (parsed.announcementAnimation !== undefined) setAnnouncementAnimation(parsed.announcementAnimation);
+        if (parsed.announcementShow !== undefined) setAnnouncementShow(parsed.announcementShow);
       }
     } catch (e) {
       console.error('Failed to load header settings', e);
@@ -499,6 +516,17 @@ export default function Header() {
   // Load initially
   useEffect(() => {
     loadSavedSettings();
+  }, [loadSavedSettings]);
+
+  // Sync cross-tab
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'cms_header_settings') {
+        loadSavedSettings();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, [loadSavedSettings]);
 
   // Track if style changes occur during edit mode
@@ -517,7 +545,8 @@ export default function Header() {
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor, 
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
     headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
-    headerHeight, headerFixedPosition
+    headerHeight, headerFixedPosition,
+    announcementText, announcementAnimation, announcementShow
   ]);
 
   const headerRef = useRef<HTMLElement>(null);
@@ -658,7 +687,7 @@ export default function Header() {
           {!isEditorActive && (
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
               <button 
-                className="pointer-events-none bg-white text-black font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-xl border border-gray-200 flex items-center gap-2"
+                className="pointer-events-none bg-card text-foreground font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-xl border border-gray-200 flex items-center gap-2"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit Site Header
@@ -674,7 +703,7 @@ export default function Header() {
                   e.stopPropagation();
                   setEditingSection("HEADER_DESIGN");
                 }}
-                className="pointer-events-auto bg-white text-black font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-2xl border border-gray-200 flex items-center gap-2 hover:bg-gray-50 transition-all"
+                className="pointer-events-auto bg-card text-foreground font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-2xl border border-gray-200 flex items-center gap-2 hover:bg-background transition-all"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit Design
@@ -682,16 +711,16 @@ export default function Header() {
 
               {/* Design Popup */}
               {editingSection === "HEADER_DESIGN" && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full right-0 mt-2 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                   {headerDesignTab === 'main' && (
                     <>
                       <div className="flex border-b border-gray-200">
                         <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
-                        <button className="px-4 py-3 text-xs font-bold text-gray-500 hover:text-black">Color</button>
+                        <button className="px-4 py-3 text-xs font-bold text-foreground/60 hover:text-foreground">Color</button>
                       </div>
                       <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
                         <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Layout</label>
+                          <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Layout</label>
                           <div className="bg-gray-100 p-4 rounded-lg flex justify-center items-center">
                             <select 
                                value={headerLayout}
@@ -706,12 +735,12 @@ export default function Header() {
                         </div>
                         
                         <div className="space-y-4 pt-4 border-t border-gray-100">
-                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Spacing</label>
+                          <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Spacing</label>
                           
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-xs font-medium">Link Spacing</span>
-                              <span className="text-xs text-gray-500">{headerLinkSpacing}vw</span>
+                              <span className="text-xs text-foreground/60">{headerLinkSpacing}vw</span>
                             </div>
                             <input 
                               type="range" min="0" max="5" step="0.25" 
@@ -723,7 +752,7 @@ export default function Header() {
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-xs font-medium">Element Spacing</span>
-                              <span className="text-xs text-gray-500">{headerElementSpacing}vw</span>
+                              <span className="text-xs text-foreground/60">{headerElementSpacing}vw</span>
                             </div>
                             <input 
                               type="range" min="0" max="5" step="0.25" 
@@ -735,34 +764,34 @@ export default function Header() {
 
                         {/* Effects & Size */}
                         <div className="space-y-4 pt-4 border-t border-gray-100">
-                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Effects</label>
+                          <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Effects</label>
                           <div className="space-y-1">
                             <div 
-                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 px-2 -mx-2 rounded transition-colors"
+                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-background px-2 -mx-2 rounded transition-colors"
                               onClick={() => setHeaderDesignTab('dropShadow')}
                             >
                               <span className="text-sm">Drop shadow</span>
-                              <ChevronDown className="w-4 h-4 -rotate-90 text-gray-400" />
+                              <ChevronDown className="w-4 h-4 -rotate-90 text-foreground/50" />
                             </div>
                             <div 
-                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-gray-50 px-2 -mx-2 rounded transition-colors"
+                              className="flex items-center justify-between py-2 cursor-pointer hover:bg-background px-2 -mx-2 rounded transition-colors"
                               onClick={() => setHeaderDesignTab('border')}
                             >
                               <span className="text-sm">Border</span>
-                              <ChevronDown className="w-4 h-4 -rotate-90 text-gray-400" />
+                              <ChevronDown className="w-4 h-4 -rotate-90 text-foreground/50" />
                             </div>
                             <div className="flex items-center justify-between py-2">
                               <span className="text-sm">Fixed position</span>
                               <label className="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only peer" checked={headerFixedPosition} onChange={e => setHeaderFixedPosition(e.target.checked)} />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-700"></div>
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-700"></div>
                               </label>
                             </div>
                           </div>
                         </div>
 
                         <div className="space-y-4 pt-4 border-t border-gray-100">
-                          <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Size</label>
+                          <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Size</label>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-sm">Height</span>
@@ -790,18 +819,18 @@ export default function Header() {
                       <div className="p-4 space-y-6">
                         <div className="flex bg-gray-100 p-1 rounded border border-gray-200">
                           <button 
-                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'soft' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`}
+                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'soft' ? 'bg-card shadow-sm text-foreground' : 'text-foreground/60'}`}
                             onClick={() => { setHeaderDropShadowMode('soft'); setHeaderDropShadowEnabled(true); }}
                           >
                             Soft
                           </button>
                           <button 
-                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'strong' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`}
+                            className={`flex-1 py-1 text-xs font-semibold rounded ${headerDropShadowMode === 'strong' ? 'bg-card shadow-sm text-foreground' : 'text-foreground/60'}`}
                             onClick={() => { setHeaderDropShadowMode('strong'); setHeaderDropShadowEnabled(true); }}
                           >
                             Strong
                           </button>
-                          <button className="px-2 text-gray-400 hover:text-black">
+                          <button className="px-2 text-foreground/50 hover:text-foreground">
                             ...
                           </button>
                         </div>
@@ -881,10 +910,10 @@ export default function Header() {
                         <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
                           <span className="text-sm w-20">Thickness</span>
                           <div className="flex bg-gray-100 rounded border border-gray-200 flex-1">
-                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'S' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('S'); setHeaderBorderEnabled(true); }}>S</button>
-                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'M' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('M'); setHeaderBorderEnabled(true); }}>M</button>
-                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'L' ? 'bg-white shadow-sm text-black' : 'text-gray-500'}`} onClick={() => { setHeaderBorderThickness('L'); setHeaderBorderEnabled(true); }}>L</button>
-                            <button className="px-2 text-gray-400">...</button>
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'S' ? 'bg-card shadow-sm text-foreground' : 'text-foreground/60'}`} onClick={() => { setHeaderBorderThickness('S'); setHeaderBorderEnabled(true); }}>S</button>
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'M' ? 'bg-card shadow-sm text-foreground' : 'text-foreground/60'}`} onClick={() => { setHeaderBorderThickness('M'); setHeaderBorderEnabled(true); }}>M</button>
+                            <button className={`flex-1 py-1 text-xs font-semibold rounded ${headerBorderThickness === 'L' ? 'bg-card shadow-sm text-foreground' : 'text-foreground/60'}`} onClick={() => { setHeaderBorderThickness('L'); setHeaderBorderEnabled(true); }}>L</button>
+                            <button className="px-2 text-foreground/50">...</button>
                           </div>
                         </div>
 
@@ -909,7 +938,7 @@ export default function Header() {
                         <div className="pt-4 text-center">
                           <button 
                             onClick={() => setHeaderBorderEnabled(false)}
-                            className="text-xs font-bold tracking-widest text-black hover:text-gray-600 uppercase"
+                            className="text-xs font-bold tracking-widest text-foreground hover:text-foreground/75 uppercase"
                           >
                             Remove
                           </button>
@@ -925,25 +954,73 @@ export default function Header() {
       )}
 
       {/* 1. Announcement Bar */}
-      <EditorHighlight 
-        label="ANNOUNCEMENT BAR" 
-        isEditorActive={isEditorActive} 
-        isActiveSection={activeSection === "ANNOUNCEMENT BAR"}
-        hasActiveSection={activeSection !== null}
-        onSelect={() => setActiveSection("ANNOUNCEMENT BAR")}
-        wrapperClassName="w-full"
-      >
-      <div 
-        className="w-full bg-primary text-[#0d1e1c] text-[11px] font-extrabold py-2 px-6 flex items-center justify-between shadow-sm"
-      >
-        <span className="mx-auto flex items-center gap-1.5 animate-pulse">
-          <Sparkles className="w-3.5 h-3.5" /> Shrawan Sale is LIVE! Massive Discounts on Premium Gear
-        </span>
-        <div className="hidden md:flex items-center gap-1 hover:underline text-[11px] cursor-pointer" onClick={() => router.push("/#locations")}>
-          <MapPin className="w-3.5 h-3.5" /> <span>Find our store</span>
+      {announcementShow && (
+        <EditorHighlight 
+          label="ANNOUNCEMENT BAR" 
+          isEditorActive={isEditorActive} 
+          isActiveSection={activeSection === "ANNOUNCEMENT BAR"}
+          hasActiveSection={activeSection !== null}
+          onSelect={() => setActiveSection("ANNOUNCEMENT BAR")}
+          onEdit={() => setEditingSection("ANNOUNCEMENT BAR")}
+          wrapperClassName="w-full relative"
+          toolbarPosition="bottom"
+        >
+        <div 
+          className="w-full bg-primary text-[#0d1e1c] text-[11px] font-extrabold py-2 px-6 flex items-center justify-between shadow-sm"
+        >
+          <span className={`mx-auto flex items-center gap-1.5 ${
+            announcementAnimation === 'pulse' ? 'animate-pulse' : 
+            announcementAnimation === 'bounce' ? 'animate-bounce' : 
+            announcementAnimation === 'flash' ? 'animate-[pulse_0.5s_cubic-bezier(0.4,0,0.6,1)_infinite]' : ''
+          }`}>
+            <Sparkles className="w-3.5 h-3.5" /> {announcementText}
+          </span>
+          <div className="hidden md:flex items-center gap-1 hover:underline text-[11px] cursor-pointer" onClick={() => router.push("/#locations")}>
+            <MapPin className="w-3.5 h-3.5" /> <span>Find our store</span>
+          </div>
         </div>
-      </div>
-      </EditorHighlight>
+        
+        {/* Edit Popup for Announcement Bar */}
+        {editingSection === "ANNOUNCEMENT BAR" && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex border-b border-gray-200">
+              <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Content & Animation</button>
+            </div>
+            <div className="p-4 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Text</label>
+                <input 
+                  type="text" 
+                  value={announcementText} 
+                  onChange={e => setAnnouncementText(e.target.value)}
+                  className="w-full border-b border-gray-300 pb-1 text-sm outline-none focus:border-black transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Animation Effect</label>
+                <select
+                  value={announcementAnimation}
+                  onChange={e => setAnnouncementAnimation(e.target.value as any)}
+                  className="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-black transition-colors"
+                >
+                  <option value="none">None</option>
+                  <option value="pulse">Pulse</option>
+                  <option value="flash">Flash</option>
+                  <option value="bounce">Bounce</option>
+                </select>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Show Bar</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" checked={announcementShow} onChange={e => setAnnouncementShow(e.target.checked)} />
+                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-700"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+        </EditorHighlight>
+      )}
 
       {/* 2. Main Header (Logo, Search, Right actions) */}
       <div className="w-full bg-card-bg" style={{ paddingTop: `${headerHeight}vw`, paddingBottom: `${headerHeight}vw` }}>
@@ -988,13 +1065,13 @@ export default function Header() {
 
             {/* Edit Popup for Site Title & Logo */}
             {editingSection === "SITE TITLE & LOGO" && (
-              <div className="absolute top-full left-0 mt-4 w-72 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-full left-0 mt-4 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex border-b border-gray-200">
                   <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Content</button>
                 </div>
                 <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Site Title</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Site Title</label>
                     <input 
                       type="text" 
                       value={siteTitle} 
@@ -1003,9 +1080,9 @@ export default function Header() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Logo Image</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Logo Image</label>
                     <div 
-                      className={`relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden ${isDragging ? 'border-black bg-gray-50' : 'border-gray-300 hover:bg-gray-50'}`}
+                      className={`relative border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden ${isDragging ? 'border-black bg-background' : 'border-gray-300 hover:bg-background'}`}
                       onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
                       onDragLeave={e => { e.preventDefault(); setIsDragging(false); }}
                       onDrop={e => {
@@ -1050,16 +1127,16 @@ export default function Header() {
                           <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-2">
                             <span className="text-xl leading-none">+</span>
                           </div>
-                          <span className="text-xs font-medium text-gray-800">Add logo</span>
-                          <span className="text-[10px] text-gray-400">20 MB max</span>
+                          <span className="text-xs font-medium text-foreground">Add logo</span>
+                          <span className="text-[10px] text-foreground/50">20 MB max</span>
                         </>
                       )}
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                       <label className="text-xs font-medium text-gray-800">Logo Height</label>
-                       <span className="text-xs text-gray-500">{logoHeight}px</span>
+                       <label className="text-xs font-medium text-foreground">Logo Height</label>
+                       <span className="text-xs text-foreground/60">{logoHeight}px</span>
                     </div>
                     <input 
                       type="range" 
@@ -1072,8 +1149,8 @@ export default function Header() {
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                       <label className="text-xs font-medium text-gray-800">Mobile Logo Max Height</label>
-                       <span className="text-xs text-gray-500">{mobileLogoHeight}px</span>
+                       <label className="text-xs font-medium text-foreground">Mobile Logo Max Height</label>
+                       <span className="text-xs text-foreground/60">{mobileLogoHeight}px</span>
                     </div>
                     <input 
                       type="range" 
@@ -1141,7 +1218,7 @@ export default function Header() {
                     key={p.id}
                     href={`/product/${p.id}`}
                     onClick={() => setShowSearchResults(false)}
-                    className="flex items-center gap-3 p-2 hover:bg-card-bg hover:bg-white/10 rounded-xl transition-all"
+                    className="flex items-center gap-3 p-2 hover:bg-card-bg hover:bg-card/10 rounded-xl transition-all"
                   >
                     <div className="w-10 h-10 rounded-lg overflow-hidden border border-card-border relative flex-shrink-0 bg-card-bg">
                       <img src={p.image} alt={p.title} className="object-cover w-full h-full" />
@@ -1176,13 +1253,13 @@ export default function Header() {
 
           {/* Edit Popup for Search */}
           {editingSection === "SEARCH" && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
               <div className="flex border-b border-gray-200">
                 <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
               </div>
               <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Placeholder Text</label>
+                  <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Placeholder Text</label>
                   <input 
                     type="text" 
                     value={searchPlaceholder} 
@@ -1192,23 +1269,23 @@ export default function Header() {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Layout Style</label>
+                  <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Layout Style</label>
                   <div className="grid grid-cols-3 gap-2">
                     <button 
                       onClick={() => setSearchDesign('pill')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'pill' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'pill' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                     >
                       Pill
                     </button>
                     <button 
                       onClick={() => setSearchDesign('rectangle')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'rectangle' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'rectangle' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                     >
                       Rectangle
                     </button>
                     <button 
                       onClick={() => setSearchDesign('underline')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'underline' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'underline' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                     >
                       Underline
                     </button>
@@ -1217,8 +1294,8 @@ export default function Header() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                     <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Search Bar Width</label>
-                     <span className="text-xs text-gray-500">{searchSize}%</span>
+                     <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Search Bar Width</label>
+                     <span className="text-xs text-foreground/60">{searchSize}%</span>
                   </div>
                   <input 
                     type="range" 
@@ -1259,7 +1336,7 @@ export default function Header() {
                     else router.push(liveChatLink);
                   }
                 }}
-                className={`hidden lg:flex items-center gap-2 bg-card-bg border border-card-border hover:bg-black/5 hover:bg-white/10 transition-all cursor-pointer ${
+                className={`hidden lg:flex items-center gap-2 bg-card-bg border border-card-border hover:bg-black/5 hover:bg-card/10 transition-all cursor-pointer ${
                   liveChatShape === 'pill' ? 'rounded-full' : liveChatShape === 'rounded' ? 'rounded-md' : 'rounded-none'
                 } ${
                   liveChatSize === 'sm' ? 'px-3.5 py-1.5' : liveChatSize === 'md' ? 'px-4 py-2' : 'px-5 py-2.5'
@@ -1274,13 +1351,13 @@ export default function Header() {
 
               {/* Edit Popup for Live Chat */}
               {editingSection === "LIVE CHAT" && (
-                <div className="absolute top-full right-0 mt-4 w-80 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full right-0 mt-4 w-80 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                   <div className="flex border-b border-gray-200">
                     <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design & Content</button>
                   </div>
                   <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Button Text</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Button Text</label>
                       <input 
                         type="text" 
                         value={liveChatText} 
@@ -1289,7 +1366,7 @@ export default function Header() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Redirect Link</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Redirect Link</label>
                       <input 
                         type="text" 
                         value={liveChatLink}
@@ -1300,23 +1377,23 @@ export default function Header() {
                     </div>
                     
                     <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Button Shape</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Button Shape</label>
                       <div className="grid grid-cols-3 gap-2">
                         <button 
                           onClick={() => setLiveChatShape('pill')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'pill' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'pill' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Pill
                         </button>
                         <button 
                           onClick={() => setLiveChatShape('rounded')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'rounded' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'rounded' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Rounded
                         </button>
                         <button 
                           onClick={() => setLiveChatShape('square')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'square' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'square' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Square
                         </button>
@@ -1324,23 +1401,23 @@ export default function Header() {
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Button Size</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Button Size</label>
                       <div className="grid grid-cols-3 gap-2">
                         <button 
                           onClick={() => setLiveChatSize('sm')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Small
                         </button>
                         <button 
                           onClick={() => setLiveChatSize('md')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'md' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'md' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Medium
                         </button>
                         <button 
                           onClick={() => setLiveChatSize('lg')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'lg' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                           Large
                         </button>
@@ -1368,7 +1445,7 @@ export default function Header() {
             >
             <button
               onClick={() => setIsCartOpen(true)}
-              className={`rounded-full hover:bg-black/5 hover:bg-white/10 border border-card-border relative transition-all flex items-center justify-center text-foreground ${
+              className={`rounded-full hover:bg-black/5 hover:bg-card/10 border border-card-border relative transition-all flex items-center justify-center text-foreground ${
                 cartIconSize === 'sm' ? 'p-2' : cartIconSize === 'lg' ? 'p-3' : 'p-2.5'
               }`}
             >
@@ -1391,17 +1468,17 @@ export default function Header() {
 
             {/* Edit Popup for Cart */}
             {editingSection === "CART" && (
-              <div className="absolute top-full right-0 mt-4 w-64 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-full right-0 mt-4 w-64 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex border-b border-gray-200">
                   <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Cart Design</button>
                 </div>
                 <div className="p-4 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Cart Icon</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Cart Icon</label>
                     <select
                       value={cartIcon}
                       onChange={(e) => setCartIcon(e.target.value)}
-                      className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
+                      className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
                     >
                       <option value="ShoppingCart">Shopping Cart</option>
                       <option value="ShoppingBag">Shopping Bag</option>
@@ -1410,23 +1487,23 @@ export default function Header() {
                     </select>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Button Size</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Button Size</label>
                     <div className="grid grid-cols-3 gap-2">
                       <button 
                         onClick={() => setCartIconSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Small
                       </button>
                       <button 
                         onClick={() => setCartIconSize('md')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'md' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'md' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Medium
                       </button>
                       <button 
                         onClick={() => setCartIconSize('lg')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'lg' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Large
                       </button>
@@ -1470,7 +1547,7 @@ export default function Header() {
                   <div className="absolute right-0 top-full mt-2 w-44 bg-card-bg border border-card-border rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in duration-200 text-foreground">
                     <Link
                       href="/account"
-                      className="block px-3 py-2 hover:bg-black/5 hover:bg-white/10 rounded-xl transition-all font-semibold text-xs mb-0.5"
+                      className="block px-3 py-2 hover:bg-black/5 hover:bg-card/10 rounded-xl transition-all font-semibold text-xs mb-0.5"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
                       👤 My Account
@@ -1501,7 +1578,7 @@ export default function Header() {
                   setAuthModalMode('login');
                   setIsAuthModalOpen(true);
                 }}
-                className={`hidden sm:flex items-center gap-1.5 border border-card-border rounded-full hover:bg-card-bg hover:bg-white/10 font-bold transition-all cursor-pointer ${
+                className={`hidden sm:flex items-center gap-1.5 border border-card-border rounded-full hover:bg-card-bg hover:bg-card/10 font-bold transition-all cursor-pointer ${
                   accountTextSize === 'sm' ? 'px-3 py-1.5 text-[11px]' : accountTextSize === 'lg' ? 'px-4 py-2.5 text-sm' : 'px-3.5 py-2 text-xs'
                 }`}
                 style={{ color: accountColor }}
@@ -1518,17 +1595,17 @@ export default function Header() {
 
             {/* Edit Popup for Account */}
             {editingSection === "ACCOUNT" && (
-              <div className="absolute top-full right-0 mt-4 w-64 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-full right-0 mt-4 w-64 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex border-b border-gray-200">
                   <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Account Design</button>
                 </div>
                 <div className="p-4 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Account Icon</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Account Icon</label>
                     <select
                       value={accountIcon}
                       onChange={(e) => setAccountIcon(e.target.value)}
-                      className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
+                      className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
                     >
                       <option value="User">User Default</option>
                       <option value="UserCircle">User Circle</option>
@@ -1537,7 +1614,7 @@ export default function Header() {
                     </select>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Text & Icon Color</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Text & Icon Color</label>
                     <div className="flex gap-2 items-center">
                       <input
                         type="color"
@@ -1545,27 +1622,27 @@ export default function Header() {
                         onChange={(e) => setAccountColor(e.target.value)}
                         className="w-8 h-8 p-0 border-0 rounded cursor-pointer"
                       />
-                      <span className="text-xs text-gray-500">{accountColor}</span>
+                      <span className="text-xs text-foreground/60">{accountColor}</span>
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Size</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Size</label>
                     <div className="grid grid-cols-3 gap-2">
                       <button 
                         onClick={() => setAccountTextSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Small
                       </button>
                       <button 
                         onClick={() => setAccountTextSize('md')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'md' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'md' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Medium
                       </button>
                       <button 
                         onClick={() => setAccountTextSize('lg')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'lg' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${accountTextSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Large
                       </button>
@@ -1633,14 +1710,14 @@ export default function Header() {
 
             {/* Edit Popup for Navigation */}
             {editingSection === "NAVIGATION" && (
-              <div className="absolute top-full left-0 mt-4 w-96 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-full left-0 mt-4 w-96 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex border-b border-gray-200">
                   <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Links & Design</button>
                 </div>
                 <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Navigation Links</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Navigation Links</label>
                       <button 
                         onClick={() => setNavItems([...navItems, { id: Math.random().toString(), label: 'New Link', link: '/', categoryKey: '' }])}
                         className="text-xs text-blue-600 font-bold hover:underline"
@@ -1650,7 +1727,7 @@ export default function Header() {
                     </div>
                     <div className="space-y-2">
                       {navItems.map((item, index) => (
-                        <div key={item.id} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                        <div key={item.id} className="flex items-center gap-2 bg-background p-2 rounded-lg border border-gray-200">
                           <div className="flex flex-col gap-2 flex-1">
                             <input 
                               type="text" 
@@ -1661,7 +1738,7 @@ export default function Header() {
                                 newItems[index].label = e.target.value;
                                 setNavItems(newItems);
                               }}
-                              className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
+                              className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
                             />
                             <input 
                               type="text" 
@@ -1672,7 +1749,7 @@ export default function Header() {
                                 newItems[index].link = e.target.value;
                                 setNavItems(newItems);
                               }}
-                              className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
+                              className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
                             />
                           </div>
                           <button 
@@ -1680,7 +1757,7 @@ export default function Header() {
                               const newItems = navItems.filter((_, i) => i !== index);
                               setNavItems(newItems);
                             }}
-                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-1.5 text-foreground/50 hover:text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -1690,23 +1767,23 @@ export default function Header() {
                   </div>
 
                   <div className="space-y-3 pt-2 border-t border-gray-100">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Text Size</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Text Size</label>
                     <div className="grid grid-cols-3 gap-2">
                       <button 
                         onClick={() => setNavFontSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Small
                       </button>
                       <button 
                         onClick={() => setNavFontSize('base')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'base' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'base' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Medium
                       </button>
                       <button 
                         onClick={() => setNavFontSize('lg')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'lg' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${navFontSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Large
                       </button>
@@ -1715,8 +1792,8 @@ export default function Header() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                       <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Item Spacing</label>
-                       <span className="text-xs text-gray-500">{navSpacing}</span>
+                       <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Item Spacing</label>
+                       <span className="text-xs text-foreground/60">{navSpacing}</span>
                     </div>
                     <input 
                       type="range" 
@@ -1772,14 +1849,14 @@ export default function Header() {
 
             {/* Edit Popup for Quick Links */}
             {editingSection === "QUICK LINKS" && (
-              <div className="absolute top-full right-0 mt-4 w-96 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-full right-0 mt-4 w-96 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex border-b border-gray-200">
                   <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Quick Links & Design</button>
                 </div>
                 <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Links</label>
+                      <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Links</label>
                       <button 
                         onClick={() => setQuickLinks([...quickLinks, { id: Math.random().toString(), label: 'New Link', link: '/', color: '#000000', icon: 'Star' }])}
                         className="text-xs text-blue-600 font-bold hover:underline"
@@ -1789,7 +1866,7 @@ export default function Header() {
                     </div>
                     <div className="space-y-2">
                       {quickLinks.map((item, index) => (
-                        <div key={item.id} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                        <div key={item.id} className="flex items-center gap-2 bg-background p-2 rounded-lg border border-gray-200">
                           <div className="flex flex-col gap-2 flex-1">
                             <div className="flex gap-2">
                               <input 
@@ -1801,7 +1878,7 @@ export default function Header() {
                                   newItems[index].label = e.target.value;
                                   setQuickLinks(newItems);
                                 }}
-                                className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
+                                className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
                               />
                               <input
                                 type="color"
@@ -1824,7 +1901,7 @@ export default function Header() {
                                   newItems[index].link = e.target.value;
                                   setQuickLinks(newItems);
                                 }}
-                                className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
+                                className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
                               />
                               <select
                                 value={item.icon}
@@ -1833,7 +1910,7 @@ export default function Header() {
                                   newItems[index].icon = e.target.value;
                                   setQuickLinks(newItems);
                                 }}
-                                className="w-24 text-xs bg-white border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
+                                className="w-24 text-xs bg-card border border-gray-300 rounded px-2 py-1 outline-none focus:border-black"
                               >
                                 {Object.keys(availableIcons).map(iconName => (
                                   <option key={iconName} value={iconName}>{iconName}</option>
@@ -1846,7 +1923,7 @@ export default function Header() {
                               const newItems = quickLinks.filter((_, i) => i !== index);
                               setQuickLinks(newItems);
                             }}
-                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-1.5 text-foreground/50 hover:text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -1856,23 +1933,23 @@ export default function Header() {
                   </div>
 
                   <div className="space-y-3 pt-2 border-t border-gray-100">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Text Size</label>
+                    <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Text Size</label>
                     <div className="grid grid-cols-3 gap-2">
                       <button 
                         onClick={() => setQuickLinkFontSize('xs')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'xs' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'xs' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Small
                       </button>
                       <button 
                         onClick={() => setQuickLinkFontSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Medium
                       </button>
                       <button 
                         onClick={() => setQuickLinkFontSize('base')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'base' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${quickLinkFontSize === 'base' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         Large
                       </button>
@@ -1900,7 +1977,7 @@ export default function Header() {
           onClick={() => setIsAuthModalOpen(false)}
         >
           <div 
-            className="bg-card-bg border border-slate-100 rounded-[2.5rem] p-8 shadow-2xl relative w-full max-w-md max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 text-foreground"
+            className="bg-card-bg border border-card-border rounded-[2.5rem] p-8 shadow-2xl relative w-full max-w-md max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 text-foreground"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -1926,7 +2003,7 @@ export default function Header() {
                 <button
                   onClick={handleModalGoogleLogin}
                   disabled={authLoading}
-                  className="w-full py-2.5 bg-background border border-slate-100 hover:bg-slate-50 rounded-xl text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 bg-background border border-card-border hover:bg-background rounded-xl text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -1951,7 +2028,7 @@ export default function Header() {
 
                 <div className="relative flex items-center justify-center my-4">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-100"></div>
+                    <div className="w-full border-t border-card-border"></div>
                   </div>
                   <span className="relative bg-card-bg px-3.5 text-[10px] text-foreground/45 uppercase font-bold tracking-widest">
                     Or Sign in with Email / Phone
@@ -1967,7 +2044,7 @@ export default function Header() {
                       value={loginInput}
                       onChange={(e) => setLoginInput(e.target.value)}
                       disabled={authLoading}
-                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
 
@@ -1982,7 +2059,7 @@ export default function Header() {
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       disabled={authLoading}
-                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
 
@@ -1994,7 +2071,7 @@ export default function Header() {
                       id="modalRemember"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-slate-200 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                      className="rounded border-card-border text-primary focus:ring-primary w-4 h-4 cursor-pointer"
                     />
                     <label htmlFor="modalRemember" className="text-xs text-foreground/70 cursor-pointer select-none">
                       Remember this device
@@ -2042,7 +2119,7 @@ export default function Header() {
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
                       disabled={authLoading}
-                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
 
@@ -2055,7 +2132,7 @@ export default function Header() {
                         value={regEmail}
                         onChange={(e) => setRegEmail(e.target.value)}
                         disabled={authLoading}
-                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -2066,7 +2143,7 @@ export default function Header() {
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value)}
                         disabled={authLoading}
-                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       />
                     </div>
                   </div>
@@ -2079,7 +2156,7 @@ export default function Header() {
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       disabled={authLoading}
-                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
 
@@ -2091,7 +2168,7 @@ export default function Header() {
                       value={regConfirmPassword}
                       onChange={(e) => setRegConfirmPassword(e.target.value)}
                       disabled={authLoading}
-                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-card-border text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
 
@@ -2102,7 +2179,7 @@ export default function Header() {
                   <div className={`p-3.5 rounded-xl border transition-all duration-200 ${
                     regIsTrader 
                       ? "bg-amber-500/10 border-amber-500/30 text-amber-900" 
-                      : "bg-black/5 dark:bg-white/5 border-slate-200 hover:border-foreground/20"
+                      : "bg-black/5 dark:bg-card/5 border-card-border hover:border-foreground/20"
                   }`}>
                     <div className="flex items-start gap-2.5">
                       <input
@@ -2110,12 +2187,12 @@ export default function Header() {
                         id="modalIsTrader"
                         checked={regIsTrader}
                         onChange={(e) => setRegIsTrader(e.target.checked)}
-                        className="rounded border-slate-200 text-amber-500 focus:ring-amber-500 w-4 h-4 mt-0.5 shrink-0 cursor-pointer"
+                        className="rounded border-card-border text-amber-500 focus:ring-amber-500 w-4 h-4 mt-0.5 shrink-0 cursor-pointer"
                       />
                       <div className="space-y-1">
                         <label htmlFor="modalIsTrader" className="text-[11px] text-foreground font-extrabold cursor-pointer leading-tight flex items-center gap-1.5">
                           Register as Trader Account 
-                          <span className="text-[8px] uppercase font-black bg-amber-500 text-black px-1.5 py-0.5 rounded tracking-wide">Sellers Only</span>
+                          <span className="text-[8px] uppercase font-black bg-amber-500 text-foreground px-1.5 py-0.5 rounded tracking-wide">Sellers Only</span>
                         </label>
                         <p className="text-[10px] text-foreground/70 leading-normal font-medium">
                           Choose this if you want to upload and sell your products on this website.
@@ -2131,7 +2208,7 @@ export default function Header() {
                       id="modalTerms"
                       checked={regAgreeTerms}
                       onChange={(e) => setRegAgreeTerms(e.target.checked)}
-                      className="rounded border-slate-200 text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer"
+                      className="rounded border-card-border text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer"
                     />
                     <label htmlFor="modalTerms" className="text-[10px] text-foreground/80 cursor-pointer leading-tight">
                       I agree to the Expert Mobile Solution Terms &amp; Conditions and Privacy Policy.

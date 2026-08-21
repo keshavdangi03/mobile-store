@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useCmsStore } from '@/lib/cms-store';
 import { Image as ImageIcon, Upload, Search, X, Check, Loader2, RotateCcw, Pencil } from 'lucide-react';
 
@@ -29,6 +30,7 @@ export default function EditableImage({ imageId, defaultSrc, className = '', ...
   const [insertedId, setInsertedId] = useState<number | null>(null);
 
   const pickerRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -36,11 +38,14 @@ export default function EditableImage({ imageId, defaultSrc, className = '', ...
   const currentSrc = imageOverrides[imageId] || defaultSrc;
   const imageAssets = savedAssets.filter(a => a.type === 'Image' && a.url);
 
-  // Close picker on outside click
+  // Close picker and context menu on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (pickerRef.current && !pickerRef.current.contains(target)) {
         setShowPicker(false);
+      }
+      if (contextMenuRef.current && !contextMenuRef.current.contains(target)) {
         setContextMenu(null);
       }
     };
@@ -151,8 +156,9 @@ export default function EditableImage({ imageId, defaultSrc, className = '', ...
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
 
       {/* Right-click context menu */}
-      {contextMenu && (
+      {contextMenu && typeof document !== 'undefined' && createPortal((
         <div
+          ref={contextMenuRef}
           className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl py-1.5 w-52 text-[13px] text-gray-800 font-medium"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={e => e.stopPropagation()}
@@ -195,10 +201,10 @@ export default function EditableImage({ imageId, defaultSrc, className = '', ...
             Close
           </button>
         </div>
-      )}
+      ), document.body)}
 
       {/* Image Picker Modal */}
-      {showPicker && (
+      {showPicker && typeof document !== 'undefined' && createPortal((
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowPicker(false)}>
           <div ref={pickerRef} className="bg-white rounded-2xl shadow-2xl w-[520px] max-h-[80vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
             {/* Header */}
@@ -305,7 +311,7 @@ export default function EditableImage({ imageId, defaultSrc, className = '', ...
             </div>
           </div>
         </div>
-      )}
+      ), document.body)}
     </div>
   );
 }

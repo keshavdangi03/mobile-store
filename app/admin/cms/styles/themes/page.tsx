@@ -6,31 +6,31 @@ import { useRouter } from "next/navigation";
 
 const THEME_CATEGORIES = [
   {
-    name: "PROFESSIONAL",
+    name: "PRIMARY",
     variants: [
       {
         id: "professional-1",
         font: "font-sans",
         fontFamily: "var(--font-inter), sans-serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#f8fafc]", "bg-[#e2e8f0]", "bg-[#71717a]", "bg-[#000000]"],
+        colors: ["bg-[#f7fcfb]", "bg-[#ffffff]", "bg-[#f1f5f9]", "bg-[#00AFA2]", "bg-[#0d1e1c]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-transparent border border-black",
-        buttonText: "text-black",
-        cardBg: "bg-[#f8f9fa]",
-        cardBorder: "border-gray-300"
+        buttonBg: "bg-[#00AFA2]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#f1f5f9]"
       },
       {
         id: "professional-2",
-        font: "font-serif text-black",
+        font: "font-serif text-[#0f172a]",
         fontFamily: "var(--font-playfair), serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#e5e3d9]", "bg-[#16a34a]", "bg-[#1f2937]", "bg-[#000000]"],
+        colors: ["bg-[#f8fafc]", "bg-[#ffffff]", "bg-[#e2e8f0]", "bg-[#0c2b5c]", "bg-[#0f172a]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-[#16a34a]",
-        buttonText: "text-white",
-        cardBg: "bg-[#e5e3d9]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#0c2b5c]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#e2e8f0]"
       }
     ]
   },
@@ -39,27 +39,27 @@ const THEME_CATEGORIES = [
     variants: [
       {
         id: "playful-1",
-        font: "text-[#4a152e] italic tracking-wider",
+        font: "text-[#4a044e] italic tracking-wider",
         fontFamily: "var(--font-chewy), cursive",
         aaText: "Aa",
-        colors: ["bg-[#fdf8f5]", "bg-[#d0c4f5]", "bg-[#a78bfa]", "bg-[#9f1239]", "bg-[#4a152e]"],
+        colors: ["bg-[#faf5ff]", "bg-[#ffffff]", "bg-[#f5d0fe]", "bg-[#d946ef]", "bg-[#4a044e]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#4a152e]",
+        buttonBg: "bg-[#d946ef]",
         buttonText: "text-[#ffffff]",
-        cardBg: "bg-[#d0c4f5]",
-        cardBorder: "border-transparent"
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#f5d0fe]"
       },
       {
         id: "playful-2",
-        font: "font-serif font-bold text-[#134e4a]",
+        font: "font-serif font-bold text-[#1e3a8a]",
         fontFamily: "var(--font-playfair), serif",
         aaText: "Aa",
-        colors: ["bg-[#fdf8f5]", "bg-[#eecb74]", "bg-[#67e8f9]", "bg-[#0284c7]", "bg-[#1f2937]"],
+        colors: ["bg-[#fffbeb]", "bg-[#ffffff]", "bg-[#fde68a]", "bg-[#3b82f6]", "bg-[#1e3a8a]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#1f2937]",
+        buttonBg: "bg-[#3b82f6]",
         buttonText: "text-[#ffffff]",
-        cardBg: "bg-[#eecb74]",
-        cardBorder: "border-transparent"
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#fde68a]"
       }
     ]
   },
@@ -68,27 +68,27 @@ const THEME_CATEGORIES = [
     variants: [
       {
         id: "sophisticated-1",
-        font: "text-[#453123]",
+        font: "text-[#451a03]",
         fontFamily: "var(--font-cormorant), serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#e8decb]", "bg-[#b8a28e]", "bg-[#5c4c42]", "bg-[#292524]"],
+        colors: ["bg-[#fafaf9]", "bg-[#ffffff]", "bg-[#e7e5e4]", "bg-[#b45309]", "bg-[#451a03]"],
         buttonShape: "rounded-sm",
-        buttonBg: "bg-[#292524]",
+        buttonBg: "bg-[#b45309]",
         buttonText: "text-[#ffffff]",
-        cardBg: "bg-[#e8decb]",
-        cardBorder: "border-transparent"
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#e7e5e4]"
       },
       {
         id: "sophisticated-2",
-        font: "text-[#1e293b]",
+        font: "text-[#334155]",
         fontFamily: "var(--font-syne), sans-serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#ece4d6]", "bg-[#dca68d]", "bg-[#334155]", "bg-[#0f172a]"],
+        colors: ["bg-[#fff1f2]", "bg-[#ffffff]", "bg-[#ffe4e6]", "bg-[#e11d48]", "bg-[#334155]"],
         buttonShape: "rounded-sm",
-        buttonBg: "bg-[#dca68d]",
-        buttonText: "text-white",
-        cardBg: "bg-[#ece4d6]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#e11d48]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#ffe4e6]"
       }
     ]
   },
@@ -97,27 +97,27 @@ const THEME_CATEGORIES = [
     variants: [
       {
         id: "friendly-1",
-        font: "font-sans font-black text-[#172554]",
+        font: "font-sans font-black text-[#0f172a]",
         fontFamily: "var(--font-nunito), sans-serif",
         aaText: "Aa",
-        colors: ["bg-[#fef3c7]", "bg-[#76939e]", "bg-[#475569]", "bg-[#1e293b]", "bg-[#0f172a]"],
+        colors: ["bg-[#f0f9ff]", "bg-[#ffffff]", "bg-[#e0f2fe]", "bg-[#0ea5e9]", "bg-[#0f172a]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#76939e] border border-[#475569]",
-        buttonText: "text-white",
-        cardBg: "bg-[#76939e]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#0ea5e9]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#e0f2fe]"
       },
       {
         id: "friendly-2",
-        font: "text-[#14532d]",
+        font: "text-[#064e3b]",
         fontFamily: "var(--font-dm-serif), serif",
         aaText: "Aa",
-        colors: ["bg-[#f8fafc]", "bg-[#e6e2d1]", "bg-[#bef264]", "bg-[#86efac]", "bg-[#14532d]"],
+        colors: ["bg-[#ecfdf5]", "bg-[#ffffff]", "bg-[#d1fae5]", "bg-[#10b981]", "bg-[#064e3b]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#14532d]",
-        buttonText: "text-white",
-        cardBg: "bg-[#e6e2d1]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#10b981]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#d1fae5]"
       }
     ]
   },
@@ -126,27 +126,27 @@ const THEME_CATEGORIES = [
     variants: [
       {
         id: "quirky-1",
-        font: "font-sans font-black text-[#064e3b]",
+        font: "font-sans font-black text-[#000000]",
         fontFamily: "var(--font-space), monospace",
         aaText: "Aa",
-        colors: ["bg-[#f8fafc]", "bg-[#eef37b]", "bg-[#bae6fd]", "bg-[#dc2626]", "bg-[#064e3b]"],
+        colors: ["bg-[#fef08a]", "bg-[#ffffff]", "bg-[#000000]", "bg-[#000000]", "bg-[#000000]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#064e3b]",
-        buttonText: "text-white",
-        cardBg: "bg-[#eef37b]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#000000]",
+        buttonText: "text-[#fef08a]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#000000]"
       },
       {
         id: "quirky-2",
-        font: "text-black",
+        font: "text-[#2e1065]",
         fontFamily: "var(--font-syne), sans-serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#fbbd42]", "bg-[#fbcfe8]", "bg-[#a855f7]", "bg-[#000000]"],
+        colors: ["bg-[#fdf4ff]", "bg-[#ffffff]", "bg-[#fbcfe8]", "bg-[#db2777]", "bg-[#2e1065]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-[#000000]",
-        buttonText: "text-white",
-        cardBg: "bg-[#fbbd42]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#db2777]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#fbcfe8]"
       }
     ]
   },
@@ -158,24 +158,24 @@ const THEME_CATEGORIES = [
         font: "text-black",
         fontFamily: "var(--font-anton), sans-serif",
         aaText: "AA",
-        colors: ["bg-[#ffffff]", "bg-[#fdb57b]", "bg-[#f97316]", "bg-[#1f2937]", "bg-[#000000]"],
+        colors: ["bg-[#ffffff]", "bg-[#fff7ed]", "bg-[#ea580c]", "bg-[#ea580c]", "bg-[#000000]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-[#f97316]",
-        buttonText: "text-white",
-        cardBg: "bg-[#fdb57b]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#ea580c]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#fff7ed]",
+        cardBorder: "border-[#ea580c]"
       },
       {
         id: "bold-2",
         font: "text-black",
         fontFamily: "var(--font-archivo), sans-serif",
         aaText: "AA",
-        colors: ["bg-[#ffffff]", "bg-[#dfdfdf]", "bg-[#cbd5e1]", "bg-[#1d4ed8]", "bg-[#111827]"],
+        colors: ["bg-[#f4f4f5]", "bg-[#ffffff]", "bg-[#d4d4d8]", "bg-[#1d4ed8]", "bg-[#000000]"],
         buttonShape: "rounded-full",
-        buttonBg: "bg-[#111827]",
-        buttonText: "text-white",
-        cardBg: "bg-[#dfdfdf]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#1d4ed8]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#ffffff]",
+        cardBorder: "border-[#d4d4d8]"
       }
     ]
   },
@@ -187,24 +187,24 @@ const THEME_CATEGORIES = [
         font: "font-sans font-bold text-black",
         fontFamily: "var(--font-space), sans-serif",
         aaText: "Aa",
-        colors: ["bg-[#ffffff]", "bg-[#f4f4f5]", "bg-[#f05a28]", "bg-[#3f3f46]", "bg-[#000000]"],
+        colors: ["bg-[#ffffff]", "bg-[#fef2f2]", "bg-[#fee2e2]", "bg-[#dc2626]", "bg-[#000000]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-[#f05a28]",
-        buttonText: "text-white",
-        cardBg: "bg-[#f4f4f5]",
-        cardBorder: "border-transparent"
+        buttonBg: "bg-[#dc2626]",
+        buttonText: "text-[#ffffff]",
+        cardBg: "bg-[#fef2f2]",
+        cardBorder: "border-[#fee2e2]"
       },
       {
         id: "innovative-2",
-        font: "font-sans font-black text-black",
+        font: "font-sans font-black text-[#0f172a]",
         fontFamily: "var(--font-syne), sans-serif",
         aaText: "AA",
-        colors: ["bg-[#ffffff]", "bg-[#f8fafc]", "bg-[#e2e8f0]", "bg-[#334155]", "bg-[#000000]"],
+        colors: ["bg-[#f0fdfa]", "bg-[#ffffff]", "bg-[#ccfbf1]", "bg-[#0d9488]", "bg-[#0f172a]"],
         buttonShape: "rounded-none",
-        buttonBg: "bg-transparent border border-black",
-        buttonText: "text-black",
+        buttonBg: "bg-[#0d9488]",
+        buttonText: "text-[#ffffff]",
         cardBg: "bg-[#ffffff]",
-        cardBorder: "border-card-border"
+        cardBorder: "border-[#ccfbf1]"
       }
     ]
   }
@@ -225,10 +225,8 @@ export default function ThemesPanel() {
 
   const handleThemeClick = (themeId: string) => {
     setActiveTheme(themeId);
-    // Broadcast message to iframe to preview theme instantly
-    window.dispatchEvent(new CustomEvent('cms-theme-change', { detail: { theme: themeId } }));
     
-    // Also postMessage to the iframe
+    // Only postMessage to the iframe to preview (DO NOT use window.dispatchEvent to avoid changing CMS UI)
     const iframes = document.getElementsByTagName('iframe');
     for (let i = 0; i < iframes.length; i++) {
       iframes[i].contentWindow?.postMessage({ type: 'CMS_PREVIEW_THEME', theme: themeId }, '*');

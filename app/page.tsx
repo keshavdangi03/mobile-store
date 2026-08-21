@@ -321,8 +321,8 @@ export default function Home() {
                         onClick={() => setHeroVariant(v)}
                         className={`px-3 py-1 rounded-full text-[10px] font-black transition-all border cursor-pointer ${
                           heroVariant === v
-                            ? "bg-slate-900 border-slate-900 text-white shadow-sm"
-                            : "bg-transparent border-slate-200 hover:bg-black/5 text-slate-700"
+                            ? "bg-slate-900 border-card-border text-white shadow-sm"
+                            : "bg-transparent border-card-border hover:bg-black/5 text-foreground/75"
                         }`}
                       >
                         {v}
@@ -339,7 +339,7 @@ export default function Home() {
                         className={`px-3 py-1 rounded-full text-[9px] font-black transition-all border cursor-pointer ${
                           heroAddon === a
                             ? "bg-primary border-primary text-white shadow-sm"
-                            : "bg-transparent border-slate-200 hover:bg-black/5 text-slate-700"
+                            : "bg-transparent border-card-border hover:bg-black/5 text-foreground/75"
                         }`}
                       >
                         {a === "Tablet Only" ? "Only" : a.replace("With ", "")}
@@ -349,14 +349,14 @@ export default function Home() {
                 </div>
 
                 {/* Dynamic Price & outline CTA Button */}
-                <div className="flex items-center gap-6 pt-3.5 border-t border-slate-200/60 w-full justify-center md:justify-start">
+                <div className="flex items-center gap-6 pt-3.5 border-t border-card-border/60 w-full justify-center md:justify-start">
                   <div>
                     <div className="text-[9px] uppercase font-bold text-slate-500">Total Price</div>
-                    <div className="text-xl font-black text-slate-900">Rs. {getHeroPrice().toLocaleString()}</div>
+                    <div className="text-xl font-black text-foreground">Rs. {getHeroPrice().toLocaleString()}</div>
                   </div>
                   <button
                     onClick={handleHeroAddToCart}
-                    className="border border-slate-900 bg-transparent hover:bg-slate-900 hover:text-white text-slate-900 text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase cursor-pointer"
+                    className="border border-card-border bg-transparent hover:bg-slate-900 hover:text-white text-foreground text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase cursor-pointer"
                   >
                     Shop Now &rarr;
                   </button>
@@ -397,14 +397,14 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <div className="flex items-center gap-6 pt-3.5 border-t border-slate-200/60 w-full justify-center md:justify-start">
+                <div className="flex items-center gap-6 pt-3.5 border-t border-card-border/60 w-full justify-center md:justify-start">
                   <div>
                     <div className="text-[9px] uppercase font-bold text-slate-500">Deal Price</div>
-                    <div className="text-xl font-black text-slate-900">Rs. 189,999</div>
+                    <div className="text-xl font-black text-foreground">Rs. 189,999</div>
                   </div>
                   <Link
                     href="/product/asus-rog-strix-g16"
-                    className="border border-slate-900 bg-transparent hover:bg-slate-900 hover:text-white text-slate-900 text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
+                    className="border border-card-border bg-transparent hover:bg-slate-900 hover:text-white text-foreground text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
                   >
                     View Specs &rarr;
                   </Link>
@@ -423,7 +423,7 @@ export default function Home() {
               
               {/* Decorative Icon on the left */}
               <div className="flex-1 flex items-center justify-center relative w-full z-10">
-                <div className="w-48 h-48 md:w-56 md:h-56 relative shrink-0 flex items-center justify-center bg-white/40 border border-slate-100 rounded-full shadow-inner animate-pulse">
+                <div className="w-48 h-48 md:w-56 md:h-56 relative shrink-0 flex items-center justify-center bg-card/40 border border-card-border rounded-full shadow-inner animate-pulse">
                   <GraduationCap className="w-20 h-20 text-primary" />
                 </div>
               </div>
@@ -448,7 +448,7 @@ export default function Home() {
                 <div className="pt-3.5 w-full flex justify-center md:justify-start">
                   <Link
                     href="/training"
-                    className="border border-slate-900 bg-transparent hover:bg-slate-900 hover:text-white text-slate-900 text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
+                    className="border border-card-border bg-transparent hover:bg-slate-900 hover:text-white text-foreground text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
                   >
                     Join Academy &rarr;
                   </Link>
@@ -467,7 +467,7 @@ export default function Home() {
               
               {/* Decorative Icon on the left */}
               <div className="flex-1 flex items-center justify-center relative w-full z-10">
-                <div className="w-48 h-48 md:w-56 md:h-56 relative shrink-0 flex items-center justify-center bg-white/40 border border-slate-100 rounded-full shadow-inner animate-pulse">
+                <div className="w-48 h-48 md:w-56 md:h-56 relative shrink-0 flex items-center justify-center bg-card/40 border border-card-border rounded-full shadow-inner animate-pulse">
                   <Wrench className="w-20 h-20 text-primary" />
                 </div>
               </div>
@@ -492,7 +492,7 @@ export default function Home() {
                 <div className="pt-3.5 w-full flex justify-center md:justify-start">
                   <Link
                     href="/repair"
-                    className="border border-slate-900 bg-transparent hover:bg-slate-900 hover:text-white text-slate-900 text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
+                    className="border border-card-border bg-transparent hover:bg-slate-900 hover:text-white text-foreground text-xs font-black tracking-widest px-6 py-2.5 rounded-md transition-all uppercase block w-max text-center cursor-pointer"
                   >
                     Request Repair &rarr;
                   </Link>
@@ -520,13 +520,13 @@ export default function Home() {
           {/* Navigation Arrows (visible on hover) */}
           <button
             onClick={() => setActiveSlide((prev) => (prev === 0 ? carouselSlides.length - 1 : prev - 1))}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-50 shadow-md cursor-pointer z-20 transition-all duration-300 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card border border-card-border flex items-center justify-center text-foreground hover:bg-background shadow-md cursor-pointer z-20 transition-all duration-300 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => setActiveSlide((prev) => (prev === carouselSlides.length - 1 ? 0 : prev + 1))}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-50 shadow-md cursor-pointer z-20 transition-all duration-300 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card border border-card-border flex items-center justify-center text-foreground hover:bg-background shadow-md cursor-pointer z-20 transition-all duration-300 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -535,14 +535,14 @@ export default function Home() {
         {/* Side Banner Cards */}
         <div className="flex flex-col gap-6">
           {/* Side Promo 1: Projectors */}
-          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-slate-100 p-6 flex flex-col justify-between min-h-[200px]">
+          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-card-border p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-36 h-full select-none z-0">
               <EditableImage imageId="static-img-4" defaultSrc="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=200" className="object-cover w-full h-full" />
             </div>
             <div className="z-10 text-foreground space-y-2 max-w-[65%]">
               <div className="text-[10px] font-black text-[#00AFA2] uppercase tracking-widest">Projectors & Screens</div>
-              <h3 className="text-lg font-extrabold leading-tight text-slate-900">Grab Special Offers on Projectors</h3>
-              <p className="text-xs text-slate-700">Transform your living room into a theater.</p>
+              <h3 className="text-lg font-extrabold leading-tight text-foreground">Grab Special Offers on Projectors</h3>
+              <p className="text-xs text-foreground/75">Transform your living room into a theater.</p>
             </div>
             <Link
               href="/category/projector"
@@ -553,14 +553,14 @@ export default function Home() {
           </div>
 
           {/* Side Promo 2: Smartphones */}
-          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-slate-100 p-6 flex flex-col justify-between min-h-[200px]">
+          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-card-border p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-36 h-full select-none z-0">
               <EditableImage imageId="static-img-5" defaultSrc="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" className="object-cover w-full h-full" />
             </div>
             <div className="z-10 text-foreground space-y-2 max-w-[65%]">
               <div className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Best Deals</div>
-              <h3 className="text-lg font-extrabold leading-tight text-slate-900">Best Deals on Smartphones</h3>
-              <p className="text-xs text-slate-700">Smart choices, Smart savings, Smart prices.</p>
+              <h3 className="text-lg font-extrabold leading-tight text-foreground">Best Deals on Smartphones</h3>
+              <p className="text-xs text-foreground/75">Smart choices, Smart savings, Smart prices.</p>
             </div>
             <Link
               href="/category/smartphone"
@@ -593,9 +593,9 @@ export default function Home() {
               <Link
                 key={cat.slug}
                 href={`/category/${cat.slug}`}
-                className="flex flex-col items-center p-4 bg-card-bg rounded-2xl hover:scale-105 hover:shadow-md border border-slate-100 hover:border-primary/20 transition-all text-center group"
+                className="flex flex-col items-center p-4 bg-card-bg rounded-2xl hover:scale-105 hover:shadow-md border border-card-border hover:border-primary/20 transition-all text-center group"
               >
-                <div className="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center mb-3 transition-transform group-hover:scale-105 duration-200">
+                <div className="w-16 h-16 rounded-full bg-background border border-card-border overflow-hidden flex items-center justify-center mb-3 transition-transform group-hover:scale-105 duration-200">
                   <img
                     src={imgUrl}
                     alt={cat.name}
@@ -747,11 +747,11 @@ export default function Home() {
                   return (
                     <div
                       key={product.id}
-                      className="bg-card-bg border border-slate-100 rounded-[2rem] overflow-hidden p-3.5 relative group hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                      className="bg-card-bg border border-card-border rounded-[2rem] overflow-hidden p-3.5 relative group hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                     >
                       <div>
                         {/* Image box */}
-                        <Link href={`/product/${product.id}`} className="block h-40 w-full relative overflow-hidden bg-slate-50/80 rounded-[1.5rem] mb-3 flex items-center justify-center">
+                        <Link href={`/product/${product.id}`} className="block h-40 w-full relative overflow-hidden bg-background/80 rounded-[1.5rem] mb-3 flex items-center justify-center">
                           <EditableImage imageId={`arrival-img-${product.id}`} defaultSrc={product.image}
                             alt={product.title}
                             className="object-contain max-h-[85%] max-w-[85%] group-hover:scale-105 transition-transform duration-300"
@@ -807,15 +807,15 @@ export default function Home() {
                   
                   {/* Countdown Timer capsule with gradient border */}
                   <div className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 p-[1.5px] rounded-full shadow-sm">
-                    <div className="bg-white rounded-full px-4 py-1 flex items-center gap-1 text-[11px] font-bold text-slate-800">
+                    <div className="bg-card rounded-full px-4 py-1 flex items-center gap-1 text-[11px] font-bold text-foreground">
                       <span className="text-[10px] uppercase tracking-wider text-slate-500 font-extrabold mr-1">ENDS IN</span>
-                      <span className="font-mono text-slate-900 text-xs font-black">{padLeft(timeLeft.hours)}</span>
+                      <span className="font-mono text-foreground text-xs font-black">{padLeft(timeLeft.hours)}</span>
                       <span className="text-[9px] text-orange-500 font-black mr-1">H</span>
                       <span className="text-slate-300">:</span>
-                      <span className="font-mono text-slate-900 text-xs font-black ml-1">{padLeft(timeLeft.minutes)}</span>
+                      <span className="font-mono text-foreground text-xs font-black ml-1">{padLeft(timeLeft.minutes)}</span>
                       <span className="text-[9px] text-pink-500 font-black mr-1">M</span>
                       <span className="text-slate-300">:</span>
-                      <span className="font-mono text-slate-900 text-xs font-black ml-1">{padLeft(timeLeft.seconds)}</span>
+                      <span className="font-mono text-foreground text-xs font-black ml-1">{padLeft(timeLeft.seconds)}</span>
                       <span className="text-[9px] text-purple-500 font-black">S</span>
                     </div>
                   </div>
@@ -832,7 +832,7 @@ export default function Home() {
                   return (
                     <div
                       key={product.id}
-                      className="bg-card-bg border border-slate-100 rounded-[2rem] overflow-hidden p-3.5 relative group hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                      className="bg-card-bg border border-card-border rounded-[2rem] overflow-hidden p-3.5 relative group hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                     >
                       <div>
                         {/* Discount Tag on top left */}
@@ -841,7 +841,7 @@ export default function Home() {
                         </span>
 
                         {/* Image box */}
-                        <Link href={`/product/${product.id}`} className="block h-40 w-full relative overflow-hidden bg-slate-50/80 rounded-[1.5rem] mb-3 flex items-center justify-center">
+                        <Link href={`/product/${product.id}`} className="block h-40 w-full relative overflow-hidden bg-background/80 rounded-[1.5rem] mb-3 flex items-center justify-center">
                           <EditableImage imageId={`deal-img-${product.id}`} defaultSrc={product.image}
                             alt={product.title}
                             className="object-contain max-h-[85%] max-w-[85%] group-hover:scale-105 transition-transform duration-300"
@@ -882,7 +882,7 @@ export default function Home() {
 
       case 'testimonials_section': return (
         <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
-          <section className="bg-slate-50 py-12 border-y border-card-border/50">
+          <section className="bg-background py-12 border-y border-card-border/50">
             <div className="max-w-7xl mx-auto px-6 relative">
               <h2 className="text-3xl md:text-4xl font-black text-center text-foreground mb-10 tracking-tight">
                 What Our Customers Say
@@ -1017,7 +1017,7 @@ return (
           <div className="bg-card-bg border border-card-border rounded-2xl shadow-2xl mb-4 overflow-hidden w-72 animate-in fade-in slide-in-from-bottom-2 duration-200 text-foreground">
             {/* Green Header */}
             <div className="bg-[#075e54] text-white p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-card/10 flex items-center justify-center flex-shrink-0">
                 <WhatsAppIcon className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -1027,7 +1027,7 @@ return (
             </div>
 
             {/* Body content */}
-            <div className="p-4 bg-white  space-y-4">
+            <div className="p-4 bg-card  space-y-4">
               <p className="text-xs text-foreground/75 leading-relaxed">
                 Have questions? Chat with our team directly on WhatsApp.
               </p>

@@ -191,3 +191,11 @@ export const useCmsStore = create<CmsStore>()(
     }
   )
 );
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'cms-store') {
+      useCmsStore.persist.rehydrate();
+    }
+  });
+}
