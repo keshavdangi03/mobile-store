@@ -23,7 +23,23 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const initialBrand = resolvedSearchParams.brand || "";
 
   // Category name & icon
-  const activeCategory = INITIAL_CATEGORIES.find((c) => c.slug === slug);
+  const [categoriesList, setCategoriesList] = useState<{ slug: string; name: string; image: string }[]>(INITIAL_CATEGORIES);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("expert_mobile_categories");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const needsMigration = parsed.some((c: any) => !c.image && c.icon);
+      if (needsMigration) {
+        localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
+        setCategoriesList(INITIAL_CATEGORIES);
+      } else {
+        setCategoriesList(parsed);
+      }
+    }
+  }, []);
+
+  const activeCategory = categoriesList.find((c) => c.slug === slug);
   const categoryName = slug === "all" ? "All Products" : activeCategory?.name || slug;
   
   // State variables for filter inputs

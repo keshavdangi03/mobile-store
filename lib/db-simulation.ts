@@ -56,16 +56,16 @@ export interface Order {
 }
 
 export const INITIAL_CATEGORIES = [
-  { slug: "laptop", name: "Laptop", icon: "💻", count: 24 },
-  { slug: "apple", name: "Apple", icon: "🍏", count: 18 },
-  { slug: "smartphone", name: "Smart Phone", icon: "📱", count: 32 },
-  { slug: "tablet", name: "Tablet", icon: "📁", count: 12 },
-  { slug: "pc-components", name: "PC Components", icon: "🔌", count: 45 },
-  { slug: "monitor", name: "Monitor", icon: "🖥️", count: 15 },
-  { slug: "projector", name: "Projector", icon: "📽️", count: 8 },
-  { slug: "earbuds", name: "Earbuds", icon: "🎧", count: 20 },
-  { slug: "drone", name: "Drone", icon: "🚁", count: 6 },
-  { slug: "headphone", name: "Headphone", icon: "🎧", count: 14 },
+  { slug: "laptop", name: "Laptop", image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80", count: 24 },
+  { slug: "apple", name: "Apple", image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=120&h=120&fit=crop&q=80", count: 18 },
+  { slug: "smartphone", name: "Smart Phone", image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=120&h=120&fit=crop&q=80", count: 32 },
+  { slug: "tablet", name: "Tablet", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=120&h=120&fit=crop&q=80", count: 12 },
+  { slug: "pc-components", name: "PC Components", image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=120&h=120&fit=crop&q=80", count: 45 },
+  { slug: "monitor", name: "Monitor", image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=120&h=120&fit=crop&q=80", count: 15 },
+  { slug: "projector", name: "Projector", image: "https://images.unsplash.com/photo-1535016120720-40c646be5580?w=120&h=120&fit=crop&q=80", count: 8 },
+  { slug: "earbuds", name: "Earbuds", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=120&h=120&fit=crop&q=80", count: 20 },
+  { slug: "drone", name: "Drone", image: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?w=120&h=120&fit=crop&q=80", count: 6 },
+  { slug: "headphone", name: "Headphone", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120&h=120&fit=crop&q=80", count: 14 },
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [

@@ -71,9 +71,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="w-full max-w-sm bg-[#14141b] border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl relative">
           <div className="text-center space-y-2">
             <div className="w-12 h-12 bg-gradient-to-tr from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto shadow-md">
-              M
+              E
             </div>
-            <h2 className="text-xl font-black tracking-tight">Mobile Store Admin</h2>
+            <h2 className="text-xl font-black tracking-tight">Expert Mobile Solution Admin</h2>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Authentication Required</p>
           </div>
 

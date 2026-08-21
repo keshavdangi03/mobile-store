@@ -292,14 +292,14 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4" style={{ gap: `${footerColumnGap}rem` }}>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">M</div>
-              <span className="text-xl font-extrabold tracking-tight text-white">MOBILE STORE</span>
+              <img src="/logo.png" className="w-14 h-14 object-contain" alt="Logo" />
+              <span className="text-xl font-extrabold tracking-tight text-white">EXPERT MOBILE SOLUTION</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">Nepal's premium tech destination. Genuine products with official warranties.</p>
             <div className="text-xs text-slate-400 space-y-1">
-              <p>📍 New Road, Kathmandu</p>
-              <p>📞 +977-9800000000</p>
-              <p>✉️ support@mobilestore.com</p>
+              <p>📍 Chabahil, Ganesthan Marg, Kathmandu</p>
+              <p>📞 +977 9851052140</p>
+              <p>✉️ expertmobilesolution111@gmail.com</p>
             </div>
           </div>
           <div className="space-y-4">
@@ -339,8 +339,8 @@ export default function Footer() {
       {footerLayout === 'centered' && (
         <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
           <div className="flex items-center justify-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-xl">M</div>
-            <span className="text-2xl font-extrabold tracking-tight text-white">MOBILE STORE</span>
+            <img src="/logo.png" className="w-16 h-16 object-contain" alt="Logo" />
+            <span className="text-2xl font-extrabold tracking-tight text-white">EXPERT MOBILE SOLUTION</span>
           </div>
           <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">Nepal's premium tech destination. Genuine laptops, smartphones & accessories with official warranties.</p>
           <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-300">
@@ -352,7 +352,7 @@ export default function Footer() {
             <input type="email" placeholder="Subscribe to deals..." className="bg-slate-800 border border-slate-700 text-slate-100 text-xs px-4 py-2 rounded-full outline-none focus:border-primary w-56" />
             <button className="bg-primary text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-primary-hover transition-all">Join</button>
           </div>
-          <p className="text-xs text-slate-500">📍 New Road, Kathmandu &nbsp;|&nbsp; 📞 +977-9800000000 &nbsp;|&nbsp; ✉️ support@mobilestore.com</p>
+          <p className="text-xs text-slate-500">📍 Chabahil, Ganesthan Marg, Kathmandu &nbsp;|&nbsp; 📞 +977 9851052140 &nbsp;|&nbsp; ✉️ expertmobilesolution111@gmail.com</p>
         </div>
       )}
 
@@ -360,15 +360,15 @@ export default function Footer() {
       {footerLayout === 'minimal' && (
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold">M</div>
-            <span className="text-lg font-extrabold tracking-tight text-white">MOBILE STORE</span>
+            <img src="/logo.png" className="w-12 h-12 object-contain" alt="Logo" />
+            <span className="text-lg font-extrabold tracking-tight text-white">EXPERT MOBILE SOLUTION</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5 text-xs text-slate-400">
             {[['Laptops','/category/laptop'],['Phones','/category/smartphone'],['Apple','/category/apple'],['PC Parts','/category/pc-components'],['Warranty','/#warranty'],['Privacy','/#privacy']].map(([l,h])=>(
               <Link key={l} href={h} className="hover:text-primary transition-colors">{l}</Link>
             ))}
           </div>
-          <p className="text-xs text-slate-500">📞 +977-9800000000</p>
+          <p className="text-xs text-slate-500">📞 +977 9851052140</p>
         </div>
       )}
 
@@ -377,8 +377,8 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">M</div>
-              <span className="text-xl font-extrabold tracking-tight text-white">MOBILE STORE</span>
+              <img src="/logo.png" className="w-14 h-14 object-contain" alt="Logo" />
+              <span className="text-xl font-extrabold tracking-tight text-white">EXPERT MOBILE SOLUTION</span>
             </div>
             <p className="text-sm text-slate-300 font-medium">Get exclusive deals, new arrivals & flash sale alerts straight to your inbox.</p>
             <div className="flex gap-2 max-w-md">
@@ -394,10 +394,9 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">Contact</h4>
             <div className="text-xs text-slate-400 space-y-2">
-              <p>📍 New Road, Kathmandu, Nepal</p>
-              <p>📞 +977-1-4444444</p>
-              <p>📞 +977-9800000000</p>
-              <p>✉️ support@mobilestore.com</p>
+              <p>📍 Chabahil, Ganesthan Marg, Kathmandu, Nepal</p>
+              <p>📞 +977 9851052140</p>
+              <p>✉️ expertmobilesolution111@gmail.com</p>
               <p>🗓️ Sun–Fri: 10AM–7:30PM</p>
               <p>🗓️ Sat: 11AM–5PM</p>
             </div>
@@ -410,14 +409,14 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2" style={{ gap: `${footerColumnGap}rem` }}>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">M</div>
-              <span className="text-xl font-extrabold tracking-tight text-white">MOBILE STORE</span>
+              <img src="/logo.png" className="w-14 h-14 object-contain" alt="Logo" />
+              <span className="text-xl font-extrabold tracking-tight text-white">EXPERT MOBILE SOLUTION</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">Nepal's premium tech shopping destination. We supply genuine laptops, smartphones, PC components, and accessories with official warranties.</p>
             <div className="text-xs text-slate-400 space-y-1.5">
-              <p>📍 New Road, Kathmandu, Nepal</p>
-              <p>📞 +977-1-4444444 | +977-9800000000</p>
-              <p>✉️ support@mobilestore.com</p>
+              <p>📍 Chabahil, Ganesthan Marg, Kathmandu, Nepal</p>
+              <p>📞 +977 9851052140</p>
+              <p>✉️ expertmobilesolution111@gmail.com</p>
               <p>🗓️ Sun–Fri: 10:00 AM – 7:30 PM</p>
             </div>
           </div>
@@ -445,7 +444,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="w-full bg-slate-950 border-t border-slate-800/60 py-4 px-6 mt-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500">
-          <span>&copy; {new Date().getFullYear()} Mobile Store. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} Expert Mobile Solution. All rights reserved.</span>
           <span className="mt-1 sm:mt-0 flex gap-4">
             <span>Designed by Quarkinfotech</span>
             <span>Enhanced with Antigravity AI</span>

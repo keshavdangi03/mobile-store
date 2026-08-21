@@ -8,7 +8,7 @@ export default function SEOPanel() {
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
 
-  const [title, setTitle] = useState("Mobile Store | Premium Electronics");
+  const [title, setTitle] = useState("Expert Mobile Solution | Premium Electronics");
   const [description, setDescription] = useState("Shop the latest smartphones, laptops, and premium accessories with exclusive discounts and 24/7 support.");
 
   const handleSave = () => {

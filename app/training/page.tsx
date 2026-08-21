@@ -360,11 +360,7 @@ export default function TrainingPage() {
                 <span className="text-[10px] text-foreground/45 font-bold uppercase">Safe Checkout Verified</span>
                 <button
                   onClick={() => handleEnrollClick(course)}
-                  className={`px-5 py-2.5 rounded-full font-bold text-xs uppercase text-white shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer ${
-                    course.type === "physical"
-                      ? "bg-emerald-600 hover:bg-emerald-500"
-                      : "bg-teal-600 hover:bg-teal-500"
-                  }`}
+                  className="px-5 py-2.5 rounded-full font-bold text-xs uppercase text-[#0d1e1c] bg-primary hover:bg-primary-hover shadow-md transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
                 >
                   Enroll Now <ChevronRight className="w-3.5 h-3.5" />
                 </button>

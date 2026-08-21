@@ -4,12 +4,24 @@ import React, { useState, useEffect } from "react";
 import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
 import { getDbProducts, saveDbProduct, deleteDbProduct } from "@/app/actions";
 
+
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Tabs for managing products vs categories
+  const [activeTab, setActiveTab] = useState<"products" | "categories">("products");
+
+  // Categories list dynamic state
+  const [categories, setCategories] = useState<{ slug: string; name: string; image: string; count?: number }[]>([]);
+
+  // Category Add Form fields
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatImage, setNewCatImage] = useState("https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80");
 
   // Form Fields
   const [id, setId] = useState("");
@@ -37,9 +49,92 @@ export default function AdminProductsPage() {
     });
   };
 
+  // Load categories from localStorage
+  const loadCategories = () => {
+    const saved = localStorage.getItem("expert_mobile_categories");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const needsMigration = parsed.some((c: any) => !c.image && c.icon);
+      if (needsMigration) {
+        setCategories(INITIAL_CATEGORIES);
+        localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
+      } else {
+        setCategories(parsed);
+      }
+    } else {
+      setCategories(INITIAL_CATEGORIES);
+      localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
+    }
+  };
+
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
+
+  // Category Handlers
+  const handleAddCategoryDirect = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCatName.trim()) return;
+    const slug = newCatName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    if (categories.some(c => c.slug === slug)) {
+      alert("This category slug already exists!");
+      return;
+    }
+    const newCat = { slug, name: newCatName, image: newCatImage };
+    const updated = [...categories, newCat];
+    setCategories(updated);
+    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    window.dispatchEvent(new Event("categories_updated"));
+    setNewCatName("");
+    setNewCatImage("https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80");
+  };
+
+  const handleEditCategory = (cat: { slug: string; name: string; image: string }) => {
+    const name = prompt("Edit category name:", cat.name);
+    if (!name) return;
+    const catImage = prompt("Edit category image URL:", cat.image) || cat.image;
+    const updated = categories.map((c) => 
+      c.slug === cat.slug ? { ...c, name, image: catImage } : c
+    );
+    setCategories(updated);
+    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    window.dispatchEvent(new Event("categories_updated"));
+  };
+
+  const handleDeleteCategory = (slug: string) => {
+    if (confirm(`Are you sure you want to delete this category? All products under this category will remain, but their category label will change to "uncategorized".`)) {
+      const updated = categories.filter((c) => c.slug !== slug);
+      setCategories(updated);
+      localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+      window.dispatchEvent(new Event("categories_updated"));
+    }
+  };
+
+  const handleCategoryDropdownChange = (val: string) => {
+    if (val === "ADD_NEW_CAT") {
+      const name = prompt("Enter new category name (e.g. Smart Watch):");
+      if (!name) {
+        setCategory(categories[0]?.slug || "laptop");
+        return;
+      }
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      if (categories.some(c => c.slug === slug)) {
+        alert("This category already exists!");
+        setCategory(slug);
+        return;
+      }
+      const catImage = prompt("Enter an image URL for this category:", "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80") || "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80";
+      const newCat = { slug, name, image: catImage };
+      const updated = [...categories, newCat];
+      setCategories(updated);
+      localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+      window.dispatchEvent(new Event("categories_updated"));
+      setCategory(slug);
+    } else {
+      setCategory(val);
+    }
+  };
 
   const handleOpenAddModal = () => {
     setEditingProduct(null);
@@ -151,16 +246,134 @@ export default function AdminProductsPage() {
           <h1 className="text-xl md:text-2xl font-black text-white">Manage Products</h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Inventory Catalog CRUD Panel</p>
         </div>
+        {activeTab === "products" && (
+          <button
+            onClick={handleOpenAddModal}
+            className="px-4 py-2 bg-primary hover:bg-primary-hover text-[#0d1e1c] text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-1.5"
+          >
+            ➕ Add New Product
+          </button>
+        )}
+      </div>
+
+      {/* Tabs Switcher */}
+      <div className="flex border-b border-slate-800 gap-6">
         <button
-          onClick={handleOpenAddModal}
-          className="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5"
+          onClick={() => setActiveTab("products")}
+          className={`pb-3 text-xs font-black uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
+            activeTab === "products"
+              ? "border-primary text-white font-black"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
         >
-          ➕ Add New Product
+          📦 Products list ({products.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("categories")}
+          className={`pb-3 text-xs font-black uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
+            activeTab === "categories"
+              ? "border-primary text-white font-black"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          🗂️ Manage Categories ({categories.length})
         </button>
       </div>
 
-      {/* Products list table grid */}
-      <div className="bg-[#14141b] border border-slate-800 rounded-3xl overflow-hidden shadow-md">
+      {activeTab === "categories" ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left panel: Add Category Form */}
+          <div className="bg-[#14141b] border border-slate-800 rounded-3xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Add New Category</h3>
+            <form onSubmit={handleAddCategoryDirect} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Category Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Smart Watch, Camera"
+                  value={newCatName}
+                  onChange={(e) => setNewCatName(e.target.value)}
+                  className="w-full text-xs px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl outline-none focus:border-primary text-slate-100"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Category Image URL *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. https://images.unsplash.com/..."
+                  value={newCatImage}
+                  onChange={(e) => setNewCatImage(e.target.value)}
+                  className="w-full text-xs px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl outline-none focus:border-primary text-slate-100"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-2 bg-primary hover:bg-primary-hover text-[#0d1e1c] font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer"
+              >
+                ➕ Add Category
+              </button>
+            </form>
+          </div>
+
+          {/* Right panel: Categories list table */}
+          <div className="lg:col-span-2 bg-[#14141b] border border-slate-800 rounded-3xl overflow-hidden shadow-md">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-800 text-[10px] uppercase font-bold text-slate-400 bg-slate-900/60">
+                    <th className="p-4">Image</th>
+                    <th className="p-4">Category Name</th>
+                    <th className="p-4">Slug</th>
+                    <th className="p-4">Associated Products</th>
+                    <th className="p-4 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800 text-xs font-medium text-slate-300">
+                  {categories.map((cat) => {
+                    const assocProductsCount = products.filter((p) => p.category === cat.slug).length;
+                    return (
+                      <tr key={cat.slug} className="hover:bg-slate-900/35 transition-colors">
+                        <td className="p-4">
+                          <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-800 bg-slate-900 flex-shrink-0">
+                            <img src={cat.image || "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=120&h=120&fit=crop&q=80"} alt={cat.name} className="object-cover w-full h-full" />
+                          </div>
+                        </td>
+                        <td className="p-4 font-bold text-white">{cat.name}</td>
+                        <td className="p-4 text-slate-500">{cat.slug}</td>
+                        <td className="p-4">
+                          <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 font-bold text-[10px]">
+                            {assocProductsCount} products
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => handleEditCategory(cat)}
+                              className="px-2.5 py-1 bg-blue-950 border border-blue-900/50 hover:bg-blue-900/40 text-blue-400 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCategory(cat.slug)}
+                              className="px-2.5 py-1 bg-red-950 border border-red-900/50 hover:bg-red-900/40 text-red-400 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Products list table grid */
+        <div className="bg-[#14141b] border border-slate-800 rounded-3xl overflow-hidden shadow-md">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -285,7 +498,7 @@ export default function AdminProductsPage() {
                 &gt;|
               </button>
             </div>
-
+            
             {/* Right: Summary info */}
             <span className="text-[11px] font-bold text-slate-400">
               Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalItems)} of {totalItems} ({totalPages} {totalPages === 1 ? "Page" : "Pages"})
@@ -293,6 +506,7 @@ export default function AdminProductsPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* CRUD Edit/Add Modal Overlay */}
       {isModalOpen && (
@@ -347,12 +561,13 @@ export default function AdminProductsPage() {
                   <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Category</label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => handleCategoryDropdownChange(e.target.value)}
                     className="w-full text-xs px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl outline-none text-slate-100"
                   >
-                    {INITIAL_CATEGORIES.map((c) => (
+                    {categories.map((c) => (
                       <option key={c.slug} value={c.slug}>{c.name}</option>
                     ))}
+                    <option value="ADD_NEW_CAT" className="text-primary font-bold">➕ Add New Category...</option>
                   </select>
                 </div>
                 

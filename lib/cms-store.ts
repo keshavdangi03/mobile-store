@@ -52,9 +52,11 @@ const initialSectionsByRoute: Record<string, string[]> = {
   '/': [
     'hero_section',
     'categories_section',
+    'new_arrivals_section',
     'services_section',
     'promo_banner_section',
-    'limited_deals_section'
+    'limited_deals_section',
+    'testimonials_section'
   ]
 };
 

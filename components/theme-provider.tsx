@@ -22,17 +22,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { styleOverrides } = useCmsStore();
 
   useEffect(() => {
-    // Determine initial theme on client mount
-    const saved = localStorage.getItem("zolpa_theme") as Theme | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.classList.toggle("dark", saved === "dark");
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const initial = prefersDark ? "dark" : "light";
-      setTheme(initial);
-      document.documentElement.classList.toggle("dark", initial === "dark");
-    }
+    // Force light theme
+    setTheme("light");
+    document.documentElement.classList.remove("dark");
+    localStorage.removeItem("zolpa_theme");
 
     const savedDesign = localStorage.getItem("zolpa_design_theme") as DesignTheme | null;
     if (savedDesign) {
@@ -76,10 +69,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = () => {
-    const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    localStorage.setItem("zolpa_theme", nextTheme);
-    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    // Dark mode is disabled
   };
 
   const previewDesignTheme = (newTheme: DesignTheme) => {

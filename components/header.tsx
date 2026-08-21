@@ -36,7 +36,8 @@ import {
   ShoppingBag,
   ShoppingBasket,
   Package,
-  UserCircle
+  UserCircle,
+  Headphones
 } from "lucide-react";
 
 const availableIcons = {
@@ -187,10 +188,10 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   
-  const [siteTitle, setSiteTitle] = useState("Mobile Store");
-  const [logoHeight, setLogoHeight] = useState(32);
-  const [mobileLogoHeight, setMobileLogoHeight] = useState(30);
-  const [logoImage, setLogoImage] = useState<string | null>(null);
+  const [siteTitle, setSiteTitle] = useState("Expert Mobile Solution");
+  const [logoHeight, setLogoHeight] = useState(56);
+  const [mobileLogoHeight, setMobileLogoHeight] = useState(48);
+  const [logoImage, setLogoImage] = useState<string | null>("/logo.png");
   const [isDragging, setIsDragging] = useState(false);
   
   const [searchPlaceholder, setSearchPlaceholder] = useState('Search for "Alienware series", "iPad 8", "Sony"...');
@@ -212,14 +213,45 @@ export default function Header() {
     { id: '7', label: "Projector", link: "/category/projector", categoryKey: "projector" },
     { id: '8', label: "Earbuds", link: "/category/earbuds", categoryKey: "earbuds" },
   ]);
+
+  // Sync navItems with dynamic categories from localStorage
+  useEffect(() => {
+    const syncNavFromStorage = () => {
+      try {
+        const saved = localStorage.getItem("expert_mobile_categories");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].slug) {
+            setNavItems(
+              parsed.map((c: { slug: string; name: string }, i: number) => ({
+                id: String(i + 1),
+                label: c.name,
+                link: `/category/${c.slug}`,
+                categoryKey: c.slug,
+              }))
+            );
+          }
+        }
+      } catch {
+        // keep defaults on error
+      }
+    };
+    syncNavFromStorage();
+    window.addEventListener("storage", syncNavFromStorage);
+    window.addEventListener("categories_updated", syncNavFromStorage);
+    return () => {
+      window.removeEventListener("storage", syncNavFromStorage);
+      window.removeEventListener("categories_updated", syncNavFromStorage);
+    };
+  }, []);
   const [navFontSize, setNavFontSize] = useState<'sm' | 'base' | 'lg'>('sm');
   const [navSpacing, setNavSpacing] = useState(6);
 
   const [quickLinks, setQuickLinks] = useState([
-    { id: '1', label: "Mobile Training", link: "/training", color: "#10b981", icon: "GraduationCap" },
-    { id: '2', label: "Repair Services", link: "/repair", color: "#3b82f6", icon: "Wrench" },
+    { id: '1', label: "Mobile Training", link: "/training", color: "#00AFA2", icon: "GraduationCap" },
+    { id: '2', label: "Repair Services", link: "/repair", color: "#00AFA2", icon: "Wrench" },
     { id: '3', label: "Stock Clearance", link: "/category/all?clearance=true", color: "#f97316", icon: "Flame" },
-    { id: '4', label: "EMI Products", link: "/category/all?emi=true", color: "#a855f7", icon: "CreditCard" },
+    { id: '4', label: "EMI Products", link: "/category/all?emi=true", color: "#3b82f6", icon: "CreditCard" },
   ]);
   const [quickLinkFontSize, setQuickLinkFontSize] = useState<'xs' | 'sm' | 'base'>('xs');
 
@@ -232,7 +264,7 @@ export default function Header() {
 
   const [accountTextSize, setAccountTextSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [accountIcon, setAccountIcon] = useState('User');
-  const [accountColor, setAccountColor] = useState('#007bff');
+  const [accountColor, setAccountColor] = useState('#00AFA2');
 
   const [headerLayout, setHeaderLayout] = useState('default');
   const [headerLinkSpacing, setHeaderLinkSpacing] = useState(1);
@@ -254,6 +286,164 @@ export default function Header() {
 
   const [headerHeight, setHeaderHeight] = useState(2); // vw
   const [headerFixedPosition, setHeaderFixedPosition] = useState(true);
+
+  // Auth modal popup states
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+  
+  // Auth modal form states
+  const [loginInput, setLoginInput] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  
+  const [regName, setRegName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPhone, setRegPhone] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState("");
+  const [regAgreeTerms, setRegAgreeTerms] = useState(false);
+  const [regIsTrader, setRegIsTrader] = useState(false);
+  
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+
+  const handleModalLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginInput.trim() || !loginPassword.trim()) {
+      setAuthError("Please fill in all fields.");
+      return;
+    }
+    setAuthLoading(true);
+    setAuthError("");
+    setTimeout(() => {
+      if (loginInput.toLowerCase() === "admin" && loginPassword === "admin") {
+        sessionStorage.setItem("admin_auth", "true");
+        setAuthLoading(false);
+        setIsAuthModalOpen(false);
+        router.push("/admin");
+        return;
+      }
+      if (typeof window !== "undefined") {
+        const registeredUsersRaw = localStorage.getItem("zolpa_users");
+        const registeredUsers = registeredUsersRaw ? JSON.parse(registeredUsersRaw) : [];
+        const matchedUser = registeredUsers.find(
+          (u: any) => u.email === loginInput || u.phone === loginInput
+        );
+        if (matchedUser) {
+          if (matchedUser.password !== loginPassword) {
+            setAuthLoading(false);
+            setAuthError("Incorrect password.");
+            return;
+          }
+          const sessionUser = {
+            name: matchedUser.name,
+            email: matchedUser.email,
+            phone: matchedUser.phone,
+            isTrader: matchedUser.isTrader,
+            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
+          };
+          localStorage.setItem("customer_session", JSON.stringify(sessionUser));
+          setAuthLoading(false);
+          setIsAuthModalOpen(false);
+          window.dispatchEvent(new Event("storage"));
+          loadCustomerSession();
+          return;
+        } else {
+          // Fallback to guest user auto-registration for quick testing
+          const guestUser = {
+            name: loginInput.split("@")[0] || "Customer",
+            email: loginInput.includes("@") ? loginInput : "user@mobilestore.com",
+            phone: !loginInput.includes("@") ? loginInput : "9800000000",
+            isTrader: false,
+            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
+          };
+          localStorage.setItem("customer_session", JSON.stringify(guestUser));
+          setAuthLoading(false);
+          setIsAuthModalOpen(false);
+          window.dispatchEvent(new Event("storage"));
+          loadCustomerSession();
+          return;
+        }
+      }
+    }, 1000);
+  };
+
+  const handleModalGoogleLogin = () => {
+    setAuthLoading(true);
+    setAuthError("");
+    setTimeout(() => {
+      const mockGoogleUser = {
+        name: "Google Guest User",
+        email: "google.guest@gmail.com",
+        phone: "+977-9800000000",
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
+      };
+      localStorage.setItem("customer_session", JSON.stringify(mockGoogleUser));
+      setAuthLoading(false);
+      setIsAuthModalOpen(false);
+      window.dispatchEvent(new Event("storage"));
+      loadCustomerSession();
+    }, 800);
+  };
+
+  const handleModalRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
+      setAuthError("Please fill in all required fields.");
+      return;
+    }
+    if (regPassword.length < 6) {
+      setAuthError("Password must be at least 6 characters.");
+      return;
+    }
+    if (regPassword !== regConfirmPassword) {
+      setAuthError("Passwords do not match.");
+      return;
+    }
+    if (!regAgreeTerms) {
+      setAuthError("You must agree to the Terms & Conditions.");
+      return;
+    }
+    setAuthLoading(true);
+    setAuthError("");
+    setAuthSuccess("");
+    setTimeout(() => {
+      const newUser = {
+        name: regName,
+        email: regEmail,
+        phone: regPhone,
+        password: regPassword,
+        isTrader: regIsTrader
+      };
+      if (typeof window !== "undefined") {
+        const existingUsersRaw = localStorage.getItem("zolpa_users");
+        const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+        const userExists = existingUsers.some((u: any) => u.email === regEmail || u.phone === regPhone);
+        if (userExists) {
+          setAuthLoading(false);
+          setAuthError("An account with this email or phone number already exists.");
+          return;
+        }
+        existingUsers.push(newUser);
+        localStorage.setItem("zolpa_users", JSON.stringify(existingUsers));
+      }
+      setAuthLoading(false);
+      setAuthSuccess("Account created successfully!");
+      // Clear register fields
+      setRegName("");
+      setRegEmail("");
+      setRegPhone("");
+      setRegPassword("");
+      setRegConfirmPassword("");
+      setRegAgreeTerms(false);
+      setRegIsTrader(false);
+      setTimeout(() => {
+        setAuthSuccess("");
+        setAuthModalMode('login');
+      }, 1000);
+    }, 1000);
+  };
 
   // Keep a ref of all settings for the save handler to access latest values
   const currentSettingsRef = useRef({
@@ -440,8 +630,7 @@ export default function Header() {
     }
   }
 
-  headerStyles.paddingTop = `${headerHeight}vw`;
-  headerStyles.paddingBottom = `${headerHeight}vw`;
+
 
   return (
     <header 
@@ -745,22 +934,21 @@ export default function Header() {
         wrapperClassName="w-full"
       >
       <div 
-        className="w-full bg-gradient-to-r from-primary to-primary-hover text-[11px] font-medium py-2 px-6 flex items-center justify-between"
-        style={{ color: 'var(--btn-text)' }}
+        className="w-full bg-primary text-[#0d1e1c] text-[11px] font-extrabold py-2 px-6 flex items-center justify-between shadow-sm"
       >
         <span className="mx-auto flex items-center gap-1.5 animate-pulse">
           <Sparkles className="w-3.5 h-3.5" /> Shrawan Sale is LIVE! Massive Discounts on Premium Gear
         </span>
         <div className="hidden md:flex items-center gap-1 hover:underline text-[11px] cursor-pointer" onClick={() => router.push("/#locations")}>
-          <MapPin className="w-3 h-3" /> <span>Find our store</span>
+          <MapPin className="w-3.5 h-3.5" /> <span>Find our store</span>
         </div>
       </div>
       </EditorHighlight>
 
       {/* 2. Main Header (Logo, Search, Right actions) */}
-      <div className="w-full bg-card-bg">
+      <div className="w-full bg-card-bg" style={{ paddingTop: `${headerHeight}vw`, paddingBottom: `${headerHeight}vw` }}>
         <div 
-          className="max-w-7xl mx-auto w-full px-6 py-4 flex flex-col md:flex-row items-center justify-between"
+          className="max-w-7xl mx-auto w-full px-6 flex flex-col md:flex-row items-center justify-between"
           style={{ gap: `${headerElementSpacing}vw` }}
         >
           
@@ -787,12 +975,12 @@ export default function Header() {
               ) : (
                 <div 
                   style={{ width: logoHeight, height: logoHeight }}
-                  className="rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:rotate-12 transition-all duration-300 flex-shrink-0"
+                  className="rounded-full bg-primary flex items-center justify-center text-[#0d1e1c] font-black text-lg shadow-md group-hover:rotate-12 transition-all duration-300 flex-shrink-0"
                 >
-                  M
+                  E
                 </div>
               )}
-              <span className="text-xl font-black tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent uppercase whitespace-nowrap">
+              <span className="text-xl font-black tracking-tight text-foreground uppercase whitespace-nowrap group-hover:text-primary transition-colors">
                 {siteTitle}
               </span>
             </Link>
@@ -1077,10 +1265,7 @@ export default function Header() {
                   liveChatSize === 'sm' ? 'px-3.5 py-1.5' : liveChatSize === 'md' ? 'px-4 py-2' : 'px-5 py-2.5'
                 }`}
               >
-                <span className={`relative flex ${liveChatSize === 'sm' ? 'h-2 w-2' : liveChatSize === 'md' ? 'h-2.5 w-2.5' : 'h-3 w-3'}`}>
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-full w-full bg-accent-green"></span>
-                </span>
+                <Headphones className="w-4 h-4 text-foreground/75" />
                 <span className={`font-semibold text-foreground/80 ${liveChatSize === 'sm' ? 'text-xs' : liveChatSize === 'md' ? 'text-sm' : 'text-base'}`}>
                   {liveChatText}
                 </span>
@@ -1168,95 +1353,7 @@ export default function Header() {
 
 
 
-          {/* Theme Switcher Toggle */}
-          <div className="relative">
-            <EditorHighlight 
-              label="THEME" 
-              isEditorActive={isEditorActive}
-              isActiveSection={activeSection === "THEME"}
-              hasActiveSection={activeSection !== null}
-              onSelect={() => setActiveSection("THEME")}
-              onEdit={() => setEditingSection("THEME")}
-              toolbarPosition="bottom"
-            >
-            <button
-              onClick={toggleTheme}
-              className={`rounded-full hover:bg-black/5 hover:bg-white/10 border border-card-border text-foreground transition-all flex items-center justify-center ${
-                themeIconSize === 'sm' ? 'p-2' : themeIconSize === 'lg' ? 'p-3' : 'p-2.5'
-              }`}
-              title="Toggle theme"
-            >
-              {(() => {
-                const IconName = theme === 'light' ? themeDarkIcon : themeLightIcon;
-                const ActiveIcon = availableIcons[IconName as keyof typeof availableIcons] || availableIcons.Sun;
-                const iconClass = themeIconSize === 'sm' ? 'w-3.5 h-3.5' : themeIconSize === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
-                return <ActiveIcon className={iconClass} />;
-              })()}
-            </button>
-            </EditorHighlight>
-            
-            {/* Edit Popup for Theme */}
-            {editingSection === "THEME" && (
-              <div className="absolute top-full right-0 mt-4 w-64 bg-white border border-gray-200 shadow-2xl rounded-lg z-[200] text-black font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Theme Design</button>
-                </div>
-                <div className="p-4 space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Light Mode Icon</label>
-                    <select
-                      value={themeLightIcon}
-                      onChange={(e) => setThemeLightIcon(e.target.value)}
-                      className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
-                    >
-                      <option value="Sun">Sun</option>
-                      <option value="SunDim">Sun Dim</option>
-                      <option value="Lightbulb">Lightbulb</option>
-                      <option value="Monitor">Monitor</option>
-                      <option value="Star">Star</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Dark Mode Icon</label>
-                    <select
-                      value={themeDarkIcon}
-                      onChange={(e) => setThemeDarkIcon(e.target.value)}
-                      className="w-full text-xs bg-white border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
-                    >
-                      <option value="Moon">Moon</option>
-                      <option value="MoonStar">Moon & Star</option>
-                      <option value="Lightbulb">Lightbulb</option>
-                      <option value="Monitor">Monitor</option>
-                      <option value="Star">Star</option>
-                    </select>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Button Size</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button 
-                        onClick={() => setThemeIconSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${themeIconSize === 'sm' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
-                      >
-                        Small
-                      </button>
-                      <button 
-                        onClick={() => setThemeIconSize('md')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${themeIconSize === 'md' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
-                      >
-                        Medium
-                      </button>
-                      <button 
-                        onClick={() => setThemeIconSize('lg')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${themeIconSize === 'lg' ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
-                      >
-                        Large
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+
 
           {/* Cart Icon with badge */}
           <div className="relative">
@@ -1395,13 +1492,19 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <Link
-                href="/login"
-                className={`hidden sm:flex items-center gap-1.5 border border-card-border rounded-full hover:bg-card-bg hover:bg-white/10 font-bold transition-all ${
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (isEditorActive) return;
+                  setAuthError("");
+                  setAuthSuccess("");
+                  setAuthModalMode('login');
+                  setIsAuthModalOpen(true);
+                }}
+                className={`hidden sm:flex items-center gap-1.5 border border-card-border rounded-full hover:bg-card-bg hover:bg-white/10 font-bold transition-all cursor-pointer ${
                   accountTextSize === 'sm' ? 'px-3 py-1.5 text-[11px]' : accountTextSize === 'lg' ? 'px-4 py-2.5 text-sm' : 'px-3.5 py-2 text-xs'
                 }`}
                 style={{ color: accountColor }}
-                onClick={(e) => isEditorActive && e.preventDefault()}
               >
                 {(() => {
                   const ActiveIcon = availableIcons[accountIcon as keyof typeof availableIcons] || availableIcons.User;
@@ -1409,7 +1512,7 @@ export default function Header() {
                   return <ActiveIcon className={iconClass} style={{ color: accountColor }} />;
                 })()} 
                 Sign In
-              </Link>
+              </button>
             )}
             </EditorHighlight>
 
@@ -1650,17 +1753,17 @@ export default function Header() {
                       if (isEditorActive) { e.preventDefault(); return; }
                       router.push(link.link);
                     }}
-                    className={`px-3 py-1 cursor-pointer font-bold rounded-lg border flex items-center gap-1 transition-all ${
+                    className={`px-3 py-1.5 cursor-pointer font-bold border rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
                       quickLinkFontSize === 'xs' ? 'text-[11px]' : quickLinkFontSize === 'sm' ? 'text-xs' : 'text-sm'
                     }`}
                     style={{
                       color: link.color,
-                      backgroundColor: link.color + '15',
-                      borderColor: link.color + '40'
+                      backgroundColor: link.color + '10',
+                      borderColor: link.color + '30'
                     }}
                   >
                     <Icon className="w-3.5 h-3.5" />
-                    {link.label}
+                    <span>{link.label}</span>
                   </div>
                 );
               })}
@@ -1788,6 +1891,277 @@ export default function Header() {
           initialCategory={hoveredCategory}
           onClose={() => setHoveredCategory(null)}
         />
+      )}
+
+      {/* Floating Authentication Modal (Sign In / Sign Up) */}
+      {isAuthModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999] p-4"
+          onClick={() => setIsAuthModalOpen(false)}
+        >
+          <div 
+            className="bg-card-bg border border-slate-100 rounded-[2.5rem] p-8 shadow-2xl relative w-full max-w-md max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 text-foreground"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute top-6 right-6 text-foreground/60 hover:text-foreground cursor-pointer z-10 p-1 rounded-full hover:bg-black/5 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {authModalMode === 'login' ? (
+              // ── SIGN IN MODE ──
+              <div className="space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="w-12 h-12 bg-gradient-to-tr from-primary to-secondary rounded-full flex items-center justify-center text-white font-extrabold text-xl mx-auto shadow-md">
+                    E
+                  </div>
+                  <h2 className="text-2xl font-black tracking-tight text-foreground">Welcome Back</h2>
+                  <p className="text-xs text-foreground/60">Sign in to sync your cart and tracks orders</p>
+                </div>
+
+                {/* Social Login Button */}
+                <button
+                  onClick={handleModalGoogleLogin}
+                  disabled={authLoading}
+                  className="w-full py-2.5 bg-background border border-slate-100 hover:bg-slate-50 rounded-xl text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-.1.85-2.04 2.15v1.78h3.29c1.92-1.78 3.8-5.78 3.8-5.78z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-3.29-1.78c-.91.61-2.07.97-3.67.97-3.13 0-5.78-2.11-6.73-4.96H1.05v1.85C3.04 20.12 7.15 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.27 15.32c-.25-.7-.39-1.45-.39-2.22s.14-1.52.39-2.22V7.03H1.05C.38 8.38 0 10.15 0 12s.38 3.62 1.05 4.97l4.22-1.65z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.96 1.19 15.24 0 12 0 7.15 0 3.04 3.88 1.05 7.03l4.22 1.65c.95-2.85 3.6-4.96 6.73-4.96z"
+                    />
+                  </svg>
+                  Google मार्फत जारी राख्नुहोस्
+                </button>
+
+                <div className="relative flex items-center justify-center my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-100"></div>
+                  </div>
+                  <span className="relative bg-card-bg px-3.5 text-[10px] text-foreground/45 uppercase font-bold tracking-widest">
+                    Or Sign in with Email / Phone
+                  </span>
+                </div>
+
+                <form onSubmit={handleModalLogin} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Email or Phone Number</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. user@gmail.com or 98XXXXXXXX"
+                      value={loginInput}
+                      onChange={(e) => setLoginInput(e.target.value)}
+                      disabled={authLoading}
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Password</label>
+                      <span className="text-[10px] font-bold text-primary hover:underline cursor-pointer">Forgot password?</span>
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      disabled={authLoading}
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+
+                  {authError && <p className="text-[10px] text-red-500 font-bold text-center">{authError}</p>}
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="modalRemember"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="rounded border-slate-200 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                    />
+                    <label htmlFor="modalRemember" className="text-xs text-foreground/70 cursor-pointer select-none">
+                      Remember this device
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full py-3 bg-primary hover:bg-primary-hover active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    {authLoading ? "Signing In..." : "Sign In"}
+                  </button>
+                </form>
+
+                <div className="text-center pt-2">
+                  <p className="text-xs text-foreground/60">
+                    New to Expert Mobile Solution?{" "}
+                    <button 
+                      onClick={() => { setAuthError(""); setAuthModalMode('register'); }}
+                      className="font-bold text-primary hover:underline bg-transparent border-none cursor-pointer p-0 ml-1"
+                    >
+                      Sign Up Free
+                    </button>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              // ── SIGN UP MODE ──
+              <div className="space-y-6">
+                <div className="text-center space-y-2">
+                  <div className="w-12 h-12 bg-gradient-to-tr from-primary to-secondary rounded-full flex items-center justify-center text-white font-extrabold text-xl mx-auto shadow-md">
+                    E
+                  </div>
+                  <h2 className="text-2xl font-black tracking-tight text-foreground">Create an Account</h2>
+                  <p className="text-xs text-foreground/60">Register with email or phone to get started</p>
+                </div>
+
+                <form onSubmit={handleModalRegister} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Full Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Keshav Dangi"
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      disabled={authLoading}
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Email Address *</label>
+                      <input
+                        type="email"
+                        placeholder="name@gmail.com"
+                        value={regEmail}
+                        onChange={(e) => setRegEmail(e.target.value)}
+                        disabled={authLoading}
+                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Phone Number *</label>
+                      <input
+                        type="tel"
+                        placeholder="98XXXXXXXX"
+                        value={regPhone}
+                        onChange={(e) => setRegPhone(e.target.value)}
+                        disabled={authLoading}
+                        className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Password (Min. 6 chars) *</label>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      disabled={authLoading}
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-foreground/60 uppercase tracking-wide">Confirm Password *</label>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      value={regConfirmPassword}
+                      onChange={(e) => setRegConfirmPassword(e.target.value)}
+                      disabled={authLoading}
+                      className="w-full text-xs px-3.5 py-2.5 bg-background border border-slate-200 text-foreground rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+
+                  {authError && <p className="text-[10px] text-red-500 font-bold text-center">{authError}</p>}
+                  {authSuccess && <p className="text-[10px] text-emerald-500 font-bold text-center">{authSuccess}</p>}
+
+                  {/* Trader Account selection */}
+                  <div className={`p-3.5 rounded-xl border transition-all duration-200 ${
+                    regIsTrader 
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-900" 
+                      : "bg-black/5 dark:bg-white/5 border-slate-200 hover:border-foreground/20"
+                  }`}>
+                    <div className="flex items-start gap-2.5">
+                      <input
+                        type="checkbox"
+                        id="modalIsTrader"
+                        checked={regIsTrader}
+                        onChange={(e) => setRegIsTrader(e.target.checked)}
+                        className="rounded border-slate-200 text-amber-500 focus:ring-amber-500 w-4 h-4 mt-0.5 shrink-0 cursor-pointer"
+                      />
+                      <div className="space-y-1">
+                        <label htmlFor="modalIsTrader" className="text-[11px] text-foreground font-extrabold cursor-pointer leading-tight flex items-center gap-1.5">
+                          Register as Trader Account 
+                          <span className="text-[8px] uppercase font-black bg-amber-500 text-black px-1.5 py-0.5 rounded tracking-wide">Sellers Only</span>
+                        </label>
+                        <p className="text-[10px] text-foreground/70 leading-normal font-medium">
+                          Choose this if you want to upload and sell your products on this website.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Agree to terms */}
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="modalTerms"
+                      checked={regAgreeTerms}
+                      onChange={(e) => setRegAgreeTerms(e.target.checked)}
+                      className="rounded border-slate-200 text-primary focus:ring-primary w-4 h-4 mt-0.5 cursor-pointer"
+                    />
+                    <label htmlFor="modalTerms" className="text-[10px] text-foreground/80 cursor-pointer leading-tight">
+                      I agree to the Expert Mobile Solution Terms &amp; Conditions and Privacy Policy.
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full py-3 bg-primary hover:bg-primary-hover active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    {authLoading ? "Creating Account..." : "Create Account"}
+                  </button>
+                </form>
+
+                <div className="text-center pt-2">
+                  <p className="text-xs text-foreground/60">
+                    Already have an account?{" "}
+                    <button 
+                      onClick={() => { setAuthError(""); setAuthModalMode('login'); }}
+                      className="font-bold text-primary hover:underline bg-transparent border-none cursor-pointer p-0 ml-1"
+                    >
+                      Sign In instead
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </header>
   );

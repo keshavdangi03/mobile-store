@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -38,17 +38,31 @@ const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const SIDEBAR_CATEGORIES = [
-  { slug: "laptop", name: "Laptop", icon: Laptop },
-  { slug: "apple", name: "Apple", icon: AppleIcon },
-  { slug: "smartphone", name: "Smart Phone", icon: Smartphone },
-  { slug: "tablet", name: "Tablet", icon: Tablet },
-  { slug: "pc-components", name: "PC Components", icon: Cpu },
-  { slug: "monitor", name: "Monitor", icon: Monitor },
-  { slug: "projector", name: "Projector", icon: Projector },
-  { slug: "earbuds", name: "Earbuds", icon: Headphones },
-  { slug: "drone", name: "Drone", icon: Compass },
-  { slug: "headphone", name: "Headphone", icon: Headphones },
+// Default icon mapping keyed by slug (fallback for built-in categories)
+const SLUG_ICON_MAP: Record<string, React.ElementType> = {
+  laptop: Laptop,
+  apple: AppleIcon,
+  smartphone: Smartphone,
+  tablet: Tablet,
+  "pc-components": Cpu,
+  monitor: Monitor,
+  projector: Projector,
+  earbuds: Headphones,
+  drone: Compass,
+  headphone: Headphones,
+};
+
+const DEFAULT_SIDEBAR_CATEGORIES = [
+  { slug: "laptop", name: "Laptop" },
+  { slug: "apple", name: "Apple" },
+  { slug: "smartphone", name: "Smart Phone" },
+  { slug: "tablet", name: "Tablet" },
+  { slug: "pc-components", name: "PC Components" },
+  { slug: "monitor", name: "Monitor" },
+  { slug: "projector", name: "Projector" },
+  { slug: "earbuds", name: "Earbuds" },
+  { slug: "drone", name: "Drone" },
+  { slug: "headphone", name: "Headphone" },
 ];
 
 const MENU_CONTENT_DATA: { [key: string]: MegaMenuSection[] } = {
@@ -171,6 +185,31 @@ const MENU_CONTENT_DATA: { [key: string]: MegaMenuSection[] } = {
 export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState(initialCategory?.toLowerCase() || "laptop");
+  const [sidebarCategories, setSidebarCategories] = useState(DEFAULT_SIDEBAR_CATEGORIES);
+
+  // Load categories from localStorage and stay in sync with admin changes
+  useEffect(() => {
+    const loadCats = () => {
+      try {
+        const saved = localStorage.getItem("expert_mobile_categories");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].slug) {
+            setSidebarCategories(parsed.map((c: { slug: string; name: string }) => ({ slug: c.slug, name: c.name })));
+          }
+        }
+      } catch {
+        // fallback to defaults on parse error
+      }
+    };
+    loadCats();
+    window.addEventListener("storage", loadCats);
+    window.addEventListener("categories_updated", loadCats);
+    return () => {
+      window.removeEventListener("storage", loadCats);
+      window.removeEventListener("categories_updated", loadCats);
+    };
+  }, []);
 
   const sections = MENU_CONTENT_DATA[activeCategory];
 
@@ -182,9 +221,9 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
       <div className="max-w-7xl mx-auto flex h-[480px]">
         {/* Left Side: Category list sidebar */}
         <div className="w-64 bg-card-bg dark:bg-slate-950/60 border-r border-card-border flex flex-col py-4 overflow-y-auto">
-          {SIDEBAR_CATEGORIES.map((cat) => {
+          {sidebarCategories.map((cat) => {
             const isActive = activeCategory === cat.slug;
-            const Icon = cat.icon;
+            const Icon = SLUG_ICON_MAP[cat.slug] ?? null;
             return (
               <div
                 key={cat.slug}
@@ -195,12 +234,12 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
                 }}
                 className={`w-full px-6 py-3 flex items-center justify-between text-xs font-bold transition-all cursor-pointer border-l-4 ${
                   isActive
-                    ? "border-primary bg-white  text-primary"
-                    : "border-transparent text-foreground/80 hover:bg-black/5/50 dark:hover:bg-slate-900/30"
+                    ? "border-primary bg-white text-primary"
+                    : "border-transparent text-foreground/80 hover:bg-black/5 dark:hover:bg-slate-900/30"
                 }`}
               >
                 <span className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? "text-primary animate-pulse" : "text-foreground/50"}`} />
+                  {Icon && <Icon className={`w-4 h-4 ${isActive ? "text-primary animate-pulse" : "text-foreground/50"}`} />}
                   {cat.name}
                 </span>
                 {isActive && <ChevronRight className="w-3.5 h-3.5 text-primary" />}

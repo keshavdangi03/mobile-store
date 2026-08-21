@@ -23,7 +23,7 @@ const syne = Syne({ variable: "--font-syne", subsets: ["latin"] });
 const chewy = Chewy({ weight: "400", variable: "--font-chewy", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Mobile Store - Premium Electronics Destination",
+  title: "Expert Mobile Solution - Premium Electronics Destination",
   description: "Nepal's premium electronics shopping hub for genuine laptops, smartphones, and PC components with official warranty.",
 };
 

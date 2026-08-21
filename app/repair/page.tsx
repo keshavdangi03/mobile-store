@@ -109,7 +109,7 @@ export default function RepairPage() {
       {/* Left Columns: Interactive Info Step Tracker */}
       <div className="lg:col-span-5 space-y-8">
         <div className="space-y-4">
-          <span className="px-3.5 py-1.5 bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 text-xs font-black rounded-full uppercase tracking-wider">
+          <span className="px-3.5 py-1.5 bg-primary/10 text-primary border border-primary/20 text-xs font-black rounded-full uppercase tracking-wider">
             Repair Services
           </span>
           <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-tight">
@@ -126,7 +126,7 @@ export default function RepairPage() {
         <div className="relative border-l-2 border-dashed border-card-border pl-6 ml-3 space-y-8 text-xs font-semibold text-foreground/80">
           {/* Step 1 */}
           <div className="relative">
-            <span className="absolute -left-9 top-0.5 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] shadow-sm">
+            <span className="absolute -left-9 top-0.5 bg-primary text-[#0d1e1c] rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-sm">
               1
             </span>
             <div className="space-y-1">
@@ -139,7 +139,7 @@ export default function RepairPage() {
 
           {/* Step 2 */}
           <div className="relative">
-            <span className="absolute -left-9 top-0.5 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] shadow-sm">
+            <span className="absolute -left-9 top-0.5 bg-primary text-[#0d1e1c] rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-sm">
               2
             </span>
             <div className="space-y-1">
@@ -152,7 +152,7 @@ export default function RepairPage() {
 
           {/* Step 3 */}
           <div className="relative">
-            <span className="absolute -left-9 top-0.5 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] shadow-sm">
+            <span className="absolute -left-9 top-0.5 bg-primary text-[#0d1e1c] rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-sm">
               3
             </span>
             <div className="space-y-1">
@@ -165,7 +165,7 @@ export default function RepairPage() {
 
           {/* Step 4 */}
           <div className="relative">
-            <span className="absolute -left-9 top-0.5 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] shadow-sm">
+            <span className="absolute -left-9 top-0.5 bg-primary text-[#0d1e1c] rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-sm">
               4
             </span>
             <div className="space-y-1">
@@ -178,7 +178,7 @@ export default function RepairPage() {
 
           {/* Step 5 */}
           <div className="relative">
-            <span className="absolute -left-9 top-0.5 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px] shadow-sm">
+            <span className="absolute -left-9 top-0.5 bg-primary text-[#0d1e1c] rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-sm">
               5
             </span>
             <div className="space-y-1">
@@ -315,7 +315,7 @@ export default function RepairPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:brightness-105 text-white font-extrabold rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+          className="w-full py-3 bg-primary hover:bg-primary-hover text-[#0d1e1c] font-extrabold rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
         >
           {submitting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
