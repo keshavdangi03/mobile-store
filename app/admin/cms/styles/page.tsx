@@ -46,8 +46,11 @@ const FORM_PACKS = [
   { bg: 'bg-[#f5f5f5]', style: 'solid-square', formBg: 'bg-[#fdf8f5]', border: 'border-transparent', radius: '4px', btnRadius: '4px', cssProps: { '--form-bg': 'var(--card-bg)', '--form-border': 'transparent', '--form-radius': '4px', '--form-btn-radius': '4px', '--form-border-b': 'none' } },
 ];
 
+import { useCmsStore } from "@/lib/cms-store";
+
 export default function SiteStylesPanel() {
   const router = useRouter();
+  const { setStyleOverrides } = useCmsStore();
 
   const [activePopover, setActivePopover] = useState<'fonts' | 'colors' | 'buttons' | 'forms' | null>(null);
   const [fontsView, setFontsView] = useState<'packs' | 'customize' | 'headings' | 'paragraphs' | 'buttons-font' | 'misc'>('packs');
@@ -80,6 +83,7 @@ export default function SiteStylesPanel() {
   };
 
   const handleOverride = (overrides: Record<string, string>) => {
+    setStyleOverrides(overrides);
     const iframes = document.getElementsByTagName('iframe');
     for (let i = 0; i < iframes.length; i++) {
       iframes[i].contentWindow?.postMessage({ type: 'CMS_STYLE_OVERRIDE', overrides }, '*');

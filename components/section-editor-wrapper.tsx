@@ -13,6 +13,7 @@ import {
   X
 } from "lucide-react";
 import { SectionContext } from "@/lib/section-context";
+import AddSectionModal from "./add-section-modal";
 
 export default function SectionEditorWrapper({ children, sectionId }: { children: React.ReactNode, sectionId: string }) {
   const {
@@ -31,6 +32,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
   const [isSectionHovered, setIsSectionHovered] = useState(false);
   
   const [isEditorModalOpen, setIsEditorModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'background' | 'colors'>('design');
 
   // Context Menu State
@@ -98,7 +100,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
           <>
             {/* Top Center ADD SECTION */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-[60]">
-              <button className="bg-[#007bff] hover:bg-blue-600 text-white text-[10px] font-bold px-4 py-1.5 rounded uppercase tracking-wider shadow-sm transition-colors">
+              <button onClick={() => setIsAddModalOpen(true)} className="bg-[#007bff] hover:bg-blue-600 text-white text-[10px] font-bold px-4 py-1.5 rounded uppercase tracking-wider shadow-sm transition-colors">
                 Add Section
               </button>
             </div>
@@ -383,7 +385,12 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
             </div>
           </div>
         )}
-
+        
+        <AddSectionModal 
+          isOpen={isAddModalOpen} 
+          onClose={() => setIsAddModalOpen(false)} 
+          afterId={sectionId} 
+        />
         {children}
       </div>
     </SectionContext.Provider>

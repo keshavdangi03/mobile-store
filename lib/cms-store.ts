@@ -21,11 +21,16 @@ interface CmsStore {
   
   // Images
   imageOverrides: Record<string, string>;
+  styleOverrides: Record<string, string>;
+  setStyleOverrides: (overrides: Record<string, string>) => void;
   setImageOverride: (id: string, url: string) => void;
   
   // Section layout management
-  pageSections: string[];
-  setPageSections: (sections: string[]) => void;
+  sectionsByRoute: Record<string, string[]>;
+  currentRoute: string;
+  setCurrentRoute: (route: string) => void;
+  setSectionsForRoute: (route: string, sections: string[]) => void;
+  addSection: (route: string, afterId: string | null, sectionType: string) => void;
   moveSectionUp: (id: string) => void;
   moveSectionDown: (id: string) => void;
   duplicateSection: (id: string) => void;
@@ -43,13 +48,15 @@ interface CmsStore {
   removeAsset: (id: string) => void;
 }
 
-const initialSections = [
-  'hero_section',
-  'categories_section',
-  'services_section',
-  'promo_banner_section',
-  'limited_deals_section'
-];
+const initialSectionsByRoute: Record<string, string[]> = {
+  '/': [
+    'hero_section',
+    'categories_section',
+    'services_section',
+    'promo_banner_section',
+    'limited_deals_section'
+  ]
+};
 
 export const useCmsStore = create<CmsStore>()(
   persist(
@@ -64,55 +71,86 @@ export const useCmsStore = create<CmsStore>()(
       setHasUnsavedChanges: (hasChanges) => set({ hasUnsavedChanges: hasChanges }),
 
       imageOverrides: {},
+      styleOverrides: {},
+      setStyleOverrides: (overrides) => set((state) => ({ styleOverrides: { ...state.styleOverrides, ...overrides }, hasUnsavedChanges: true })),
       setImageOverride: (id, url) => set((state) => ({ 
         imageOverrides: { ...state.imageOverrides, [id]: url }, 
         hasUnsavedChanges: true 
       })),
 
-      pageSections: initialSections,
-      setPageSections: (sections) => set({ pageSections: sections, hasUnsavedChanges: true }),
+      sectionsByRoute: initialSectionsByRoute,
+      currentRoute: "/",
+      setCurrentRoute: (route) => set({ currentRoute: route }),
+      setSectionsForRoute: (route, sections) => set((state) => ({ sectionsByRoute: { ...state.sectionsByRoute, [route]: sections }, hasUnsavedChanges: true })),
       
       moveSectionUp: (id) => set((state) => {
-        const idx = state.pageSections.indexOf(id);
-        if (idx <= 0) return state; // Already at top or not found
-        const newSections = [...state.pageSections];
+        const route = state.currentRoute;
+        const currentSections = state.sectionsByRoute[route] || [];
+        const idx = currentSections.indexOf(id);
+        if (idx <= 0) return state;
+        const newSections = [...currentSections];
         [newSections[idx - 1], newSections[idx]] = [newSections[idx], newSections[idx - 1]];
-        return { pageSections: newSections, hasUnsavedChanges: true };
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
       }),
       
       moveSectionDown: (id) => set((state) => {
-        const idx = state.pageSections.indexOf(id);
-        if (idx === -1 || idx === state.pageSections.length - 1) return state;
-        const newSections = [...state.pageSections];
+        const route = state.currentRoute;
+        const currentSections = state.sectionsByRoute[route] || [];
+        const idx = currentSections.indexOf(id);
+        if (idx === -1 || idx === currentSections.length - 1) return state;
+        const newSections = [...currentSections];
         [newSections[idx + 1], newSections[idx]] = [newSections[idx], newSections[idx + 1]];
-        return { pageSections: newSections, hasUnsavedChanges: true };
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
       }),
       
       duplicateSection: (id) => set((state) => {
-        const idx = state.pageSections.indexOf(id);
+        const route = state.currentRoute;
+        const currentSections = state.sectionsByRoute[route] || [];
+        const idx = currentSections.indexOf(id);
         if (idx === -1) return state;
-        const newSections = [...state.pageSections];
+        const newSections = [...currentSections];
         const newId = `${id.split('-')[0]}-${Date.now()}`;
         newSections.splice(idx + 1, 0, newId);
-        return { pageSections: newSections, hasUnsavedChanges: true };
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
       }),
       
       deleteSection: (id) => set((state) => {
-        const newSections = state.pageSections.filter(sectionId => sectionId !== id);
-        return { pageSections: newSections, hasUnsavedChanges: true };
+        const route = state.currentRoute;
+        const currentSections = state.sectionsByRoute[route] || [];
+        const newSections = currentSections.filter(sectionId => sectionId !== id);
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
       }),
 
       clipboardSection: null,
       setClipboardSection: (id) => set({ clipboardSection: id }),
       
+      addSection: (route, afterId, sectionType) => set((state) => {
+        const currentSections = state.sectionsByRoute[route] || [];
+        const newSections = [...currentSections];
+        const newId = `${sectionType}-${Date.now()}`;
+        if (afterId) {
+          const idx = newSections.indexOf(afterId);
+          if (idx !== -1) {
+            newSections.splice(idx + 1, 0, newId);
+          } else {
+            newSections.push(newId);
+          }
+        } else {
+          newSections.push(newId);
+        }
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
+      }),
+      
       pasteSection: (afterId) => set((state) => {
         if (!state.clipboardSection) return state;
-        const idx = state.pageSections.indexOf(afterId);
+        const route = state.currentRoute;
+        const currentSections = state.sectionsByRoute[route] || [];
+        const idx = currentSections.indexOf(afterId);
         if (idx === -1) return state;
-        const newSections = [...state.pageSections];
+        const newSections = [...currentSections];
         const newId = `${state.clipboardSection.split('-')[0]}-${Date.now()}`;
         newSections.splice(idx + 1, 0, newId);
-        return { pageSections: newSections, hasUnsavedChanges: true };
+        return { sectionsByRoute: { ...state.sectionsByRoute, [route]: newSections }, hasUnsavedChanges: true };
       }),
 
       savedAssets: [],
@@ -143,9 +181,10 @@ export const useCmsStore = create<CmsStore>()(
     {
       name: 'cms-store', // name of the item in the storage (must be unique)
       partialize: (state) => ({ 
-        pageSections: state.pageSections,
+        sectionsByRoute: state.sectionsByRoute,
         savedAssets: state.savedAssets,
-        imageOverrides: state.imageOverrides
+        imageOverrides: state.imageOverrides,
+        styleOverrides: state.styleOverrides
       }), // only save these fields
     }
   )

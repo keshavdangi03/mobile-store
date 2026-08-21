@@ -47,7 +47,8 @@ const categoryIcons: { [key: string]: React.ComponentType<any> } = {
 
 export default function Home() {
   const { addToCart } = useCart();
-  const { isEditMode, pageSections } = useCmsStore();
+  const { isEditMode, sectionsByRoute } = useCmsStore();
+  const pageSections = sectionsByRoute['/'] || [];
   const [products, setProducts] = useState<Product[]>([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(true);
@@ -165,7 +166,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-6 pt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Dynamic Carousel Slide Box */}
-        <div className="lg:col-span-2 relative rounded-3xl overflow-hidden shadow-xl min-h-[440px] flex flex-col bg-slate-900 text-white">
+        <div className="lg:col-span-2 relative rounded-3xl overflow-hidden shadow-xl min-h-[440px] flex flex-col bg-card-bg text-foreground border border-card-border">
           {activeSlide === 0 && (
             // Slide 1: Interactive Xiaomi Pad 8
             <div className={`flex-1 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 justify-between bg-gradient-to-tr ${carouselSlides[0].bgGradient}`}>
@@ -175,7 +176,7 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[0].title}</h2>
                 </div>
                 
-                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                <ul className="text-xs md:text-sm text-foreground/80 space-y-2">
                   {carouselSlides[0].specs.map((spec, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <Check className="w-3.5 h-3.5 text-secondary flex-shrink-0" /> {spec}
@@ -186,7 +187,7 @@ export default function Home() {
                 {/* Configuration Interactive Pills */}
                 <div className="space-y-3 pt-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] uppercase font-bold text-slate-300 w-full md:w-auto">Config:</span>
+                    <span className="text-[10px] uppercase font-bold text-foreground/60 w-full md:w-auto">Config:</span>
                     {["8GB + 128GB", "8GB + 256GB"].map((v) => (
                       <button
                         key={v}
@@ -194,7 +195,7 @@ export default function Home() {
                         className={`px-3 py-1 rounded-full text-xs font-bold transition-all border ${
                           heroVariant === v
                             ? "bg-secondary border-secondary text-white"
-                            : "bg-white/10 border-white/20 hover:bg-white/20 text-slate-100"
+                            : "bg-transparent border-card-border hover:bg-foreground/5 text-foreground/80"
                         }`}
                       >
                         {v}
@@ -203,7 +204,7 @@ export default function Home() {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] uppercase font-bold text-slate-300 w-full md:w-auto">Bundle:</span>
+                    <span className="text-[10px] uppercase font-bold text-foreground/60 w-full md:w-auto">Bundle:</span>
                     {["Tablet Only", "With Focus Pen Pro OR Keyboard", "With Focus Pen Pro & Keyboard"].map((a) => (
                       <button
                         key={a}
@@ -211,7 +212,7 @@ export default function Home() {
                         className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all border ${
                           heroAddon === a
                             ? "bg-primary border-primary text-white"
-                            : "bg-white/10 border-white/20 hover:bg-white/20 text-slate-100"
+                            : "bg-transparent border-card-border hover:bg-foreground/5 text-foreground/80"
                         }`}
                       >
                         {a === "Tablet Only" ? "Only" : a.replace("With ", "")}
@@ -221,9 +222,9 @@ export default function Home() {
                 </div>
 
                 {/* Interactive Dynamic Price & Add Call */}
-                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                <div className="flex items-center gap-4 pt-4 border-t border-card-border">
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-slate-300">Total Price</div>
+                    <div className="text-[10px] uppercase font-bold text-foreground/60">Total Price</div>
                     <div className="text-2xl font-black text-white">Rs. {getHeroPrice().toLocaleString()}</div>
                   </div>
                   <button
@@ -254,7 +255,7 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[1].title}</h2>
                 </div>
                 
-                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                <ul className="text-xs md:text-sm text-foreground/80 space-y-2">
                   {carouselSlides[1].specs.map((spec, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <Check className="w-3.5 h-3.5 text-primary-hover flex-shrink-0" /> {spec}
@@ -264,7 +265,7 @@ export default function Home() {
 
                 <div className="pt-4 flex items-center gap-4">
                   <div>
-                    <div className="text-[10px] text-slate-300 uppercase font-bold">Deal Price</div>
+                    <div className="text-[10px] text-foreground/60 uppercase font-bold">Deal Price</div>
                     <div className="text-2xl font-black text-white">Rs. 189,999</div>
                   </div>
                   <Link
@@ -292,7 +293,7 @@ export default function Home() {
               <video 
                 src={carouselSlides[2].videoUrl} 
                 autoPlay loop muted playsInline 
-                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-overlay" 
+                className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none mix-blend-overlay" 
               />
               <div className="flex-1 space-y-6 z-10">
                 <div>
@@ -300,7 +301,7 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[2].title}</h2>
                 </div>
                 
-                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                <ul className="text-xs md:text-sm text-foreground/80 space-y-2">
                   {carouselSlides[2].specs.map((spec, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <Check className="w-3.5 h-3.5 text-secondary flex-shrink-0" /> {spec}
@@ -319,8 +320,8 @@ export default function Home() {
               </div>
 
               {/* Decorative Vector */}
-              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/10 rounded-full z-10 blur-0">
-                <GraduationCap className="w-20 h-20 text-emerald-400 animate-pulse" />
+              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-card-border/30 border border-card-border rounded-full z-10 blur-0">
+                <GraduationCap className="w-20 h-20 text-primary animate-pulse" />
               </div>
             </div>
           )}
@@ -331,7 +332,7 @@ export default function Home() {
               <video 
                 src={carouselSlides[3].videoUrl} 
                 autoPlay loop muted playsInline 
-                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-overlay" 
+                className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none mix-blend-overlay" 
               />
               <div className="flex-1 space-y-6 z-10">
                 <div>
@@ -339,7 +340,7 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-extrabold mt-2 tracking-tight">{carouselSlides[3].title}</h2>
                 </div>
                 
-                <ul className="text-xs md:text-sm text-slate-200/90 space-y-2">
+                <ul className="text-xs md:text-sm text-foreground/80 space-y-2">
                   {carouselSlides[3].specs.map((spec, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" /> {spec}
@@ -358,8 +359,8 @@ export default function Home() {
               </div>
 
               {/* Decorative Vector */}
-              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/10 rounded-full z-10 blur-0">
-                <Wrench className="w-20 h-20 text-blue-400 animate-pulse" />
+              <div className="w-48 h-48 md:w-64 md:h-64 relative flex-shrink-0 flex items-center justify-center bg-card-border/30 border border-card-border rounded-full z-10 blur-0">
+                <Wrench className="w-20 h-20 text-primary animate-pulse" />
               </div>
             </div>
           )}
@@ -371,7 +372,7 @@ export default function Home() {
                 key={idx}
                 onClick={() => setActiveSlide(idx)}
                 className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  activeSlide === idx ? "bg-white w-6" : "bg-white/40 hover:bg-white/60"
+                  activeSlide === idx ? "bg-primary w-6" : "bg-card-border hover:bg-primary/50"
                 }`}
               />
             ))}
@@ -381,36 +382,36 @@ export default function Home() {
         {/* Side Banner Cards */}
         <div className="flex flex-col gap-6">
           {/* Side Promo 1: Projectors */}
-          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-emerald-950 p-6 flex flex-col justify-between min-h-[200px]">
+          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-card-border p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-32 h-full opacity-30 select-none">
               <EditableImage imageId="static-img-4" defaultSrc="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=200" className="object-cover w-full h-full" />
             </div>
-            <div className="z-10 text-white space-y-2">
+            <div className="z-10 text-foreground space-y-2">
               <span className="text-[10px] font-bold text-accent-green bg-emerald-900/60 px-2 py-0.5 rounded uppercase tracking-wider">Projectors & Screens</span>
               <h3 className="text-xl font-bold leading-tight">Grab Special Offers on Projectors</h3>
-              <p className="text-xs text-emerald-200">Transform your living room into a theater.</p>
+              <p className="text-xs text-foreground/60">Transform your living room into a theater.</p>
             </div>
             <Link
               href="/category/projector"
-              className="z-10 w-max px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-full transition-colors"
+              className="z-10 w-max px-4 py-1.5 bg-primary hover:opacity-90 text-primary-foreground font-bold text-xs rounded-full transition-colors"
             >
               Shop Now &rarr;
             </Link>
           </div>
 
           {/* Side Promo 2: Smartphones */}
-          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-orange-950 p-6 flex flex-col justify-between min-h-[200px]">
+          <div className="flex-1 rounded-3xl overflow-hidden relative shadow-lg bg-card-bg border border-card-border p-6 flex flex-col justify-between min-h-[200px]">
             <div className="absolute top-0 right-0 w-32 h-full opacity-35 select-none">
               <EditableImage imageId="static-img-5" defaultSrc="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" className="object-cover w-full h-full" />
             </div>
-            <div className="z-10 text-white space-y-2">
+            <div className="z-10 text-foreground space-y-2">
               <span className="text-[10px] font-bold text-orange-400 bg-orange-900/60 px-2 py-0.5 rounded uppercase tracking-wider">Best Deals</span>
               <h3 className="text-xl font-bold leading-tight">Best Deals on Smartphones</h3>
-              <p className="text-xs text-orange-200">Smart choices, Smart savings, Smart prices.</p>
+              <p className="text-xs text-foreground/60">Smart choices, Smart savings, Smart prices.</p>
             </div>
             <Link
               href="/category/smartphone"
-              className="z-10 w-max px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-full transition-colors"
+              className="z-10 w-max px-4 py-1.5 bg-primary hover:opacity-90 text-primary-foreground font-bold text-xs rounded-full transition-colors"
             >
               View Sales &rarr;
             </Link>
@@ -656,6 +657,15 @@ export default function Home() {
 
             </SectionEditorWrapper>
 );
+      case 'blank_section': return (
+        <SectionEditorWrapper key={sectionId} sectionId={sectionId}>
+          <section className="max-w-7xl mx-auto px-6 py-12">
+            <div className="bg-card-bg border border-card-border rounded-3xl p-8 min-h-[200px] flex items-center justify-center">
+              <BlockEditorWrapper blockId={`${sectionId}-text`} defaultText="Empty Section. Click to edit." />
+            </div>
+          </section>
+        </SectionEditorWrapper>
+      );
       default: return null;
     }
   };

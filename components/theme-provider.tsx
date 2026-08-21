@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useCmsStore } from "@/lib/cms-store";
 
 type Theme = "light" | "dark";
 type DesignTheme = string;
@@ -18,6 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [designTheme, setDesignThemeState] = useState<DesignTheme>("professional-1");
   const [mounted, setMounted] = useState(false);
+  const { styleOverrides } = useCmsStore();
 
   useEffect(() => {
     // Determine initial theme on client mount
@@ -41,6 +43,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     
     setMounted(true);
+    // Apply persisted styles
+    if (styleOverrides) {
+      Object.entries(styleOverrides).forEach(([key, value]) => {
+        document.documentElement.style.setProperty(key, value as string);
+      });
+    }
 
     // Listen for CMS theme changes
     const handleMessage = (event: MessageEvent) => {

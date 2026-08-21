@@ -112,7 +112,7 @@ export default function RepairPage() {
             Repair Services
           </span>
           <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-tight">
-            Fix Your Device in <span className="bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">5 Easy Steps</span>
+            <BlockEditorWrapper blockId="repair-heading" defaultText="Fix Your Device in 5 Easy Steps" />
           </h1>
           <p className="text-xs text-foreground/60 leading-relaxed">
             Professional multi-brand repair service with certified OEM parts. Track every milestone live from your customer profile page.
