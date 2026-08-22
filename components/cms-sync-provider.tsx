@@ -6,7 +6,7 @@ import { getDbCmsConfig } from "@/app/actions";
 import { useTheme } from "./theme-provider";
 
 export default function CmsSyncProvider({ children }: { children: React.ReactNode }) {
-  const { initFromDatabase } = useCmsStore();
+  const { initFromDatabase, saveToDatabase } = useCmsStore();
   const { setDesignTheme } = useTheme();
   const isHydratedRef = useRef(false);
 
@@ -41,7 +41,18 @@ export default function CmsSyncProvider({ children }: { children: React.ReactNod
       .catch((err) => {
         console.error("Failed to load CMS config from PostgreSQL:", err);
       });
-  }, [initFromDatabase, setDesignTheme]);
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "CMS_SAVE_CHANGES") {
+        saveToDatabase();
+      }
+    };
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [initFromDatabase, saveToDatabase, setDesignTheme]);
 
   return <>{children}</>;
 }

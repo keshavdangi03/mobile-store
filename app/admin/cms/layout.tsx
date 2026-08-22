@@ -110,11 +110,13 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
           ) : (
             <>
               <button 
-                onClick={() => {
+                onClick={async () => {
                   setHasUnsavedChanges(false);
+                  await useCmsStore.getState().saveToDatabase();
                   dispatchToIframe('CMS_SAVE_CHANGES');
                   if (typeof window !== 'undefined') {
                     window.dispatchEvent(new Event('storage'));
+                    window.dispatchEvent(new Event('cms_db_synced'));
                   }
                 }}
                 className={`px-4 py-1.5 text-xs font-bold rounded tracking-wider transition-all uppercase flex items-center gap-1.5 cursor-pointer ${
@@ -311,10 +313,15 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
                 Discard
               </button>
               <button 
-                onClick={() => {
+                onClick={async () => {
                   setHasUnsavedChanges(false);
                   setShowSaveModal(false);
+                  await useCmsStore.getState().saveToDatabase();
                   dispatchToIframe('CMS_SAVE_CHANGES');
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new Event('storage'));
+                    window.dispatchEvent(new Event('cms_db_synced'));
+                  }
                   executeExit();
                 }}
                 className="px-4 py-2 text-sm font-bold text-white bg-black hover:bg-gray-800 rounded-lg shadow-sm transition-colors"
