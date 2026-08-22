@@ -561,7 +561,7 @@ export async function getCourseEnrollmentsByEmail(email: string): Promise<any[]>
     });
     const courses = await prisma.course.findMany();
     return enrollments.map((item: any) => {
-      const matchedCourse = courses.find(c => c.id === item.courseId);
+      const matchedCourse = courses.find((c: any) => c.id === item.courseId);
       return {
         ...item,
         videos: matchedCourse?.videos || [],
