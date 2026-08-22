@@ -6,6 +6,8 @@ import { useCmsStore } from "@/lib/cms-store";
 import Header from "./header";
 import Footer from "./footer";
 import CartDrawer from "./cart-drawer";
+import PromoBar from "./promo-bar";
+import AnnouncementBanner from "./announcement-banner";
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +39,10 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex-grow flex flex-col">
+      {/* Global sections from CMS — instant-sync via localStorage */}
+      <PromoBar />
       <Header />
+      <AnnouncementBanner />
       <main className="flex-1 flex flex-col">{children}</main>
       <Footer />
       <CartDrawer />

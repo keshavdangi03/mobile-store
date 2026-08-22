@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Monitor, Tablet, Smartphone, Play, Paintbrush, Loader2, Undo2, Redo2 } from "lucide-react";
+import { Monitor, Tablet, Smartphone, Play, Paintbrush, Loader2, Undo2, Redo2, Layers, FileText } from "lucide-react";
 
 import { usePathname, useRouter } from "next/navigation";
 import { useCmsStore } from "@/lib/cms-store";
@@ -18,7 +18,9 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
   const [currentPageStatus, setCurrentPageStatus] = useState("Page - Published");
   const [showSaveModal, setShowSaveModal] = useState(false);
   
-  const { isEditMode, setIsEditMode, hasUnsavedChanges, setHasUnsavedChanges } = useCmsStore();
+  // Independent UI toolbar state (prevents overwriting iframe storage state)
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pathname = usePathname();
@@ -111,17 +113,24 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
                 onClick={() => {
                   setHasUnsavedChanges(false);
                   dispatchToIframe('CMS_SAVE_CHANGES');
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new Event('storage'));
+                  }
                 }}
-                className="px-3 py-1.5 text-[10px] font-bold rounded tracking-widest transition-colors bg-gray-200 text-black hover:bg-gray-300 uppercase relative"
+                className={`px-4 py-1.5 text-xs font-bold rounded tracking-wider transition-all uppercase flex items-center gap-1.5 cursor-pointer ${
+                  hasUnsavedChanges
+                    ? "bg-[#007bff] text-white hover:bg-blue-600 shadow-md ring-2 ring-blue-300"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
               >
                 Save
                 {hasUnsavedChanges && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                 )}
               </button>
               <button 
                 onClick={handleEditClick}
-                className="text-[10px] font-bold tracking-widest text-black hover:text-gray-600 uppercase"
+                className="text-xs font-bold tracking-wider text-black hover:text-gray-600 uppercase px-2 py-1 cursor-pointer"
               >
                 Exit
               </button>
@@ -183,6 +192,30 @@ export default function CMSOverlayLayout({ children }: { children: React.ReactNo
             </div>
           </div>
           
+          <div className="relative group flex items-center justify-center">
+            <button 
+              onClick={() => router.push("/admin/cms/pages")}
+              className={`p-1.5 transition-colors rounded ${pathname.startsWith("/admin/cms/pages") ? "text-black bg-gray-200" : "text-gray-400 hover:text-black"}`} 
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+            <div className="absolute top-full mt-2 bg-black text-white text-[11px] font-medium px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              Pages
+            </div>
+          </div>
+
+          <div className="relative group flex items-center justify-center">
+            <button 
+              onClick={() => router.push("/admin/cms/sections")}
+              className={`p-1.5 transition-colors rounded ${pathname.startsWith("/admin/cms/sections") ? "text-black bg-gray-200" : "text-gray-400 hover:text-black"}`} 
+            >
+              <Layers className="w-4 h-4" />
+            </button>
+            <div className="absolute top-full mt-2 bg-black text-white text-[11px] font-medium px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+              Global Sections
+            </div>
+          </div>
+
           <div className="relative group flex items-center justify-center">
             <button 
               onClick={() => router.push("/admin/cms/styles")}

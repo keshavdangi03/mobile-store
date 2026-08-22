@@ -4,6 +4,7 @@ import {
   Layers, 
   Plus, 
   Pencil,
+  Sliders,
   LayoutTemplate,
   Copy,
   Heart as HeartIcon, 
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { SectionContext } from "@/lib/section-context";
 import AddSectionModal from "./add-section-modal";
+import SectionCustomizerModal from "./section-customizer-modal";
 
 export default function SectionEditorWrapper({ children, sectionId }: { children: React.ReactNode, sectionId: string }) {
   const {
@@ -27,10 +29,20 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
     clipboardSection,
     setClipboardSection,
     pasteSection,
-    saveSectionToAssets
+    saveSectionToAssets,
+    customSectionsData
   } = useCmsStore();
   const [isSectionHovered, setIsSectionHovered] = useState(false);
   
+  const isCustomSection = Boolean(
+    customSectionsData?.[sectionId] ||
+    sectionId.startsWith('blank_') ||
+    sectionId.startsWith('custom_') ||
+    sectionId === 'blank_section' ||
+    sectionId === 'custom_section'
+  );
+  
+  const [isCustomizerModalOpen, setIsCustomizerModalOpen] = useState(false);
   const [isEditorModalOpen, setIsEditorModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'background' | 'colors'>('design');
@@ -63,6 +75,7 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
   useEffect(() => {
     if (activeEditorId !== sectionId) {
       setIsEditorModalOpen(false);
+      setIsCustomizerModalOpen(false);
     }
   }, [activeEditorId, sectionId]);
 
@@ -87,7 +100,9 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
         onMouseLeave={() => setIsSectionHovered(false)}
         onDoubleClick={() => {
           if (isEditMode) {
-             setActiveEditorId(sectionId);
+            if (!isCustomSection) {
+              setIsCustomizerModalOpen(true);
+            }
           }
         }}
         onContextMenu={(e) => {
@@ -101,25 +116,80 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
         {/* Editor Overlay Elements */}
         {showControls && (
           <>
-            {/* Top Center ADD SECTION */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-[60]">
-              <button onClick={() => setIsAddModalOpen(true)} className="bg-[#007bff] hover:bg-blue-600 text-white text-[10px] font-bold px-4 py-1.5 rounded uppercase tracking-wider shadow-sm transition-colors">
-                Add Section
-              </button>
-            </div>
-
             {/* Top Left Buttons */}
-            <div className="absolute top-2 left-2 z-[60] flex items-center gap-2">
-              <button className="bg-white hover:bg-gray-50 text-gray-700 p-2 rounded shadow-sm border border-gray-200 transition-colors">
-                <Layers className="w-4 h-4" />
+            {!isCustomSection && (
+              <div className="absolute top-3 left-3 z-[60] flex items-center gap-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCustomizerModalOpen(true);
+                  }}
+                  className="bg-white/95 dark:bg-slate-900/95 hover:bg-white text-gray-800 dark:text-white px-3.5 py-1.5 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 flex items-center gap-2 transition-all text-xs font-black uppercase tracking-wider cursor-pointer"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-primary" />
+                  <span>Customize Section</span>
+                </button>
+              </div>
+            )}
+
+            {/* Top Right Floating Toolbar (Move, Duplicate, Delete) */}
+            <div className="absolute top-3 right-3 z-[60] flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/95 p-1 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  moveSectionUp(sectionId);
+                  window.parent?.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
+                  window.dispatchEvent(new Event('storage'));
+                }}
+                title="Move section up"
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200 transition-colors cursor-pointer"
+              >
+                <ArrowUp className="w-4 h-4" />
               </button>
-              <button className="bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 rounded shadow-sm border border-gray-200 flex items-center gap-1.5 transition-colors">
-                <Plus className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Add Block</span>
+              
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  moveSectionDown(sectionId);
+                  window.parent?.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
+                  window.dispatchEvent(new Event('storage'));
+                }}
+                title="Move section down"
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200 transition-colors cursor-pointer"
+              >
+                <ArrowDown className="w-4 h-4" />
+              </button>
+
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  duplicateSection(sectionId);
+                  window.parent?.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
+                  window.dispatchEvent(new Event('storage'));
+                }}
+                title="Duplicate section"
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200 transition-colors cursor-pointer"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+
+              <div className="w-[1px] h-4 bg-gray-300 dark:bg-slate-700 mx-0.5" />
+
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm("Permanently remove this section? You can click SAVE in the top bar to commit your changes.")) {
+                    deleteSection(sectionId);
+                    window.parent?.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
+                    window.dispatchEvent(new Event('storage'));
+                  }
+                }}
+                title="Delete section permanently"
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-950/50 text-red-500 hover:text-red-600 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
-
-
           </>
         )}
 
@@ -395,7 +465,28 @@ export default function SectionEditorWrapper({ children, sectionId }: { children
           onClose={() => setIsAddModalOpen(false)} 
           afterId={sectionId} 
         />
+
+        <SectionCustomizerModal
+          isOpen={isCustomizerModalOpen}
+          onClose={() => setIsCustomizerModalOpen(false)}
+          sectionId={sectionId}
+        />
         {children}
+
+        {/* Bottom Center ADD SECTION */}
+        {showControls && (
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-[60]">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsAddModalOpen(true);
+              }} 
+              className="bg-[#007bff] hover:bg-blue-600 text-white text-[11px] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-xl transition-all cursor-pointer hover:scale-105 border-2 border-white"
+            >
+              + Add Section Below
+            </button>
+          </div>
+        )}
       </div>
     </SectionContext.Provider>
   );

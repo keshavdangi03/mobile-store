@@ -6,6 +6,8 @@ import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
 import { useCart } from "@/components/cart-context";
 import { getDbProducts } from "@/app/actions";
 
+import SectionEditorWrapper from "@/components/section-editor-wrapper";
+
 interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -134,15 +136,17 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       </nav>
 
       {/* Hero Description Header */}
-      <div className="bg-sidebar-bg border border-card-border rounded-3xl p-6 md:p-8 mb-8 space-y-3">
-        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-          {categoryName} price in Nepal
-        </h1>
-        <p className="text-xs md:text-sm text-foreground/75 leading-relaxed max-w-4xl">
-          Browse and compare official {categoryName} models in Nepal. Explore detailed specifications, reviews, 
-          discounts, and 0% EMI financing plans. Shop authentic gear with physical warranty support from Putalisadak, Kathmandu.
-        </p>
-      </div>
+      <SectionEditorWrapper sectionId={`category-hero-${slug}`}>
+        <div className="bg-sidebar-bg border border-card-border rounded-3xl p-6 md:p-8 mb-8 space-y-3">
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
+            {categoryName} price in Nepal
+          </h1>
+          <p className="text-xs md:text-sm text-foreground/75 leading-relaxed max-w-4xl">
+            Browse and compare official {categoryName} models in Nepal. Explore detailed specifications, reviews, 
+            discounts, and 0% EMI financing plans. Shop authentic gear with physical warranty support from Putalisadak, Kathmandu.
+          </p>
+        </div>
+      </SectionEditorWrapper>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         

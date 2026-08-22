@@ -71,7 +71,7 @@ const MENU_CONTENT_DATA: { [key: string]: MegaMenuSection[] } = {
       title: "Laptop by Uses",
       items: [
         { name: "Gaming", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150&h=150&fit=crop", href: "/category/laptop?use=gaming" },
-        { name: "Work", image: "https://images.unsplash.com/photo-1496181130204-755241544e3f?w=150&h=150&fit=crop", href: "/category/laptop?use=work" },
+        { name: "Work", image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=300", href: "/category/laptop?use=work" },
         { name: "Students", image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=150&h=150&fit=crop", href: "/category/laptop?use=students" },
         { name: "Editing", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&h=150&fit=crop", href: "/category/laptop?use=editing" },
         { name: "Programming", image: "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=150&h=150&fit=crop", href: "/category/laptop?use=programming" },
@@ -84,7 +84,7 @@ const MENU_CONTENT_DATA: { [key: string]: MegaMenuSection[] } = {
         { name: "ROG Strix", image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
         { name: "ExpertBook", image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
         { name: "TUF Gaming", image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
-        { name: "Vivobook", image: "https://images.unsplash.com/photo-1496181130204-755241544e3f?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
+        { name: "Vivobook", image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=300", href: "/category/laptop?brand=Asus" },
         { name: "Zenbook", image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
         { name: "ProArt", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&h=150&fit=crop", href: "/category/laptop?brand=Asus" },
       ],

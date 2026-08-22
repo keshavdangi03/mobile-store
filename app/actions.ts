@@ -482,7 +482,7 @@ const INITIAL_COURSES = [
     duration: "Self-paced",
     location: null,
     schedule: null,
-    image: "https://images.unsplash.com/photo-1496181130204-755241544e3f?w=600&q=80",
+    image: "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600",
     videos: [
       { title: "Introduction to Mobile OS Architecture", duration: "12:45", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
       { title: "Flashing Android ROMs & Custom Recoveries", duration: "18:20", url: "https://www.w3schools.com/html/movie.mp4" },

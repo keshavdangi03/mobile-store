@@ -19,6 +19,8 @@ import {
   User, 
   Grid, 
   ChevronDown, 
+  ChevronLeft,
+  ChevronRight,
   Flame, 
   CreditCard,
   Pencil,
@@ -254,6 +256,56 @@ export default function Header() {
   const [navFontSize, setNavFontSize] = useState<'sm' | 'base' | 'lg'>('sm');
   const [navSpacing, setNavSpacing] = useState(6);
 
+  const navScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkNavScroll = () => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    const el = navScrollRef.current;
+    if (!el) return;
+
+    checkNavScroll();
+
+    const handleWheel = (e: WheelEvent) => {
+      if (el.scrollWidth > el.clientWidth) {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+          checkNavScroll();
+        }
+      }
+    };
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    el.addEventListener("scroll", checkNavScroll);
+    window.addEventListener("resize", checkNavScroll);
+
+    const timer = setTimeout(checkNavScroll, 150);
+
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+      el.removeEventListener("scroll", checkNavScroll);
+      window.removeEventListener("resize", checkNavScroll);
+      clearTimeout(timer);
+    };
+  }, [navItems, navSpacing, navFontSize]);
+
+  const scrollNav = (direction: 'left' | 'right') => {
+    if (!navScrollRef.current) return;
+    const scrollAmount = 260;
+    navScrollRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
+
   const [quickLinks, setQuickLinks] = useState([
     { id: '1', label: "Mobile Training", link: "/training", color: "#00AFA2", icon: "GraduationCap" },
     { id: '2', label: "Repair Services", link: "/repair", color: "#00AFA2", icon: "Wrench" },
@@ -458,6 +510,14 @@ export default function Header() {
 
   // Keep a ref of all settings for the save handler to access latest values
   const currentSettingsRef = useRef({
+    siteTitle, logoHeight, mobileLogoHeight, logoImage,
+    searchPlaceholder, searchDesign, searchSize,
+    liveChatText, liveChatShape, liveChatSize, liveChatLink,
+    navItems, navFontSize, navSpacing,
+    quickLinks, quickLinkFontSize,
+    themeIconSize, themeLightIcon, themeDarkIcon,
+    cartIconSize, cartIcon,
+    accountTextSize, accountIcon, accountColor,
     headerLayout, headerLinkSpacing, headerElementSpacing,
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
@@ -468,6 +528,14 @@ export default function Header() {
 
   useEffect(() => {
     currentSettingsRef.current = {
+      siteTitle, logoHeight, mobileLogoHeight, logoImage,
+      searchPlaceholder, searchDesign, searchSize,
+      liveChatText, liveChatShape, liveChatSize, liveChatLink,
+      navItems, navFontSize, navSpacing,
+      quickLinks, quickLinkFontSize,
+      themeIconSize, themeLightIcon, themeDarkIcon,
+      cartIconSize, cartIcon,
+      accountTextSize, accountIcon, accountColor,
       headerLayout, headerLinkSpacing, headerElementSpacing,
       headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
       headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
@@ -476,6 +544,14 @@ export default function Header() {
       announcementText, announcementAnimation, announcementShow
     };
   }, [
+    siteTitle, logoHeight, mobileLogoHeight, logoImage,
+    searchPlaceholder, searchDesign, searchSize,
+    liveChatText, liveChatShape, liveChatSize, liveChatLink,
+    navItems, navFontSize, navSpacing,
+    quickLinks, quickLinkFontSize,
+    themeIconSize, themeLightIcon, themeDarkIcon,
+    cartIconSize, cartIcon,
+    accountTextSize, accountIcon, accountColor,
     headerLayout, headerLinkSpacing, headerElementSpacing,
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor,
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
@@ -489,6 +565,30 @@ export default function Header() {
       const saved = localStorage.getItem('cms_header_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (parsed.siteTitle !== undefined) setSiteTitle(parsed.siteTitle);
+        if (parsed.logoHeight !== undefined) setLogoHeight(parsed.logoHeight);
+        if (parsed.mobileLogoHeight !== undefined) setMobileLogoHeight(parsed.mobileLogoHeight);
+        if (parsed.logoImage !== undefined) setLogoImage(parsed.logoImage);
+        if (parsed.searchPlaceholder !== undefined) setSearchPlaceholder(parsed.searchPlaceholder);
+        if (parsed.searchDesign !== undefined) setSearchDesign(parsed.searchDesign);
+        if (parsed.searchSize !== undefined) setSearchSize(parsed.searchSize);
+        if (parsed.liveChatText !== undefined) setLiveChatText(parsed.liveChatText);
+        if (parsed.liveChatShape !== undefined) setLiveChatShape(parsed.liveChatShape);
+        if (parsed.liveChatSize !== undefined) setLiveChatSize(parsed.liveChatSize);
+        if (parsed.liveChatLink !== undefined) setLiveChatLink(parsed.liveChatLink);
+        if (parsed.navItems !== undefined) setNavItems(parsed.navItems);
+        if (parsed.navFontSize !== undefined) setNavFontSize(parsed.navFontSize);
+        if (parsed.navSpacing !== undefined) setNavSpacing(parsed.navSpacing);
+        if (parsed.quickLinks !== undefined) setQuickLinks(parsed.quickLinks);
+        if (parsed.quickLinkFontSize !== undefined) setQuickLinkFontSize(parsed.quickLinkFontSize);
+        if (parsed.themeIconSize !== undefined) setThemeIconSize(parsed.themeIconSize);
+        if (parsed.themeLightIcon !== undefined) setThemeLightIcon(parsed.themeLightIcon);
+        if (parsed.themeDarkIcon !== undefined) setThemeDarkIcon(parsed.themeDarkIcon);
+        if (parsed.cartIconSize !== undefined) setCartIconSize(parsed.cartIconSize);
+        if (parsed.cartIcon !== undefined) setCartIcon(parsed.cartIcon);
+        if (parsed.accountTextSize !== undefined) setAccountTextSize(parsed.accountTextSize);
+        if (parsed.accountIcon !== undefined) setAccountIcon(parsed.accountIcon);
+        if (parsed.accountColor !== undefined) setAccountColor(parsed.accountColor);
         if (parsed.headerLayout !== undefined) setHeaderLayout(parsed.headerLayout);
         if (parsed.headerLinkSpacing !== undefined) setHeaderLinkSpacing(parsed.headerLinkSpacing);
         if (parsed.headerElementSpacing !== undefined) setHeaderElementSpacing(parsed.headerElementSpacing);
@@ -518,15 +618,22 @@ export default function Header() {
     loadSavedSettings();
   }, [loadSavedSettings]);
 
-  // Sync cross-tab
+  // Sync cross-tab and live custom events
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === 'cms_header_settings') {
         loadSavedSettings();
       }
     };
+    const handleCustomUpdate = () => {
+      loadSavedSettings();
+    };
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('header_settings_updated', handleCustomUpdate);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('header_settings_updated', handleCustomUpdate);
+    };
   }, [loadSavedSettings]);
 
   // Track if style changes occur during edit mode
@@ -541,12 +648,21 @@ export default function Header() {
       window.parent.postMessage({ type: 'CMS_UNSAVED_CHANGES' }, '*');
     }
   }, [
+    siteTitle, logoHeight, mobileLogoHeight, logoImage,
+    searchPlaceholder, searchDesign, searchSize,
+    liveChatText, liveChatShape, liveChatSize, liveChatLink,
+    navItems, navFontSize, navSpacing,
+    quickLinks, quickLinkFontSize,
+    themeIconSize, themeLightIcon, themeDarkIcon,
+    cartIconSize, cartIcon,
+    accountTextSize, accountIcon, accountColor,
     headerLayout, headerLinkSpacing, headerElementSpacing,
     headerDropShadowEnabled, headerDropShadowMode, headerDropShadowColor, 
     headerDropShadowSpread, headerDropShadowDistance, headerDropShadowBlur,
     headerBorderEnabled, headerBorderColor, headerBorderThickness, headerBorderPosition,
     headerHeight, headerFixedPosition,
-    announcementText, announcementAnimation, announcementShow
+    announcementText, announcementAnimation, announcementShow,
+    isVisualEditor
   ]);
 
   const headerRef = useRef<HTMLElement>(null);
@@ -567,6 +683,7 @@ export default function Header() {
         }
       } else if (event.data?.type === 'CMS_SAVE_CHANGES') {
         localStorage.setItem('cms_header_settings', JSON.stringify(currentSettingsRef.current));
+        window.dispatchEvent(new Event('storage'));
       } else if (event.data?.type === 'CMS_DISCARD_CHANGES') {
         loadSavedSettings();
       }
@@ -695,7 +812,7 @@ export default function Header() {
             </div>
           )}
 
-          {/* Active State - Bottom Right Design Button */}
+              {/* Active State - Bottom Right Design Button */}
           {isEditorActive && (
             <div className="absolute top-full right-4 mt-2 z-[110]">
               <button 
@@ -703,7 +820,7 @@ export default function Header() {
                   e.stopPropagation();
                   setEditingSection("HEADER_DESIGN");
                 }}
-                className="pointer-events-auto bg-card text-foreground font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-2xl border border-gray-200 flex items-center gap-2 hover:bg-background transition-all"
+                className="pointer-events-auto bg-white dark:bg-slate-900 text-foreground font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded shadow-2xl border border-gray-200 dark:border-slate-700 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit Design
@@ -711,14 +828,22 @@ export default function Header() {
 
               {/* Design Popup */}
               {editingSection === "HEADER_DESIGN" && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
                   {headerDesignTab === 'main' && (
                     <>
-                      <div className="flex border-b border-gray-200">
-                        <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
-                        <button className="px-4 py-3 text-xs font-bold text-foreground/60 hover:text-foreground">Color</button>
+                      <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-2">
+                        <div className="flex">
+                          <button className="px-4 py-3 text-xs font-bold border-b-2 border-black dark:border-white">Design</button>
+                          <button className="px-4 py-3 text-xs font-bold text-foreground/60 hover:text-foreground">Color</button>
+                        </div>
+                        <button 
+                          onClick={() => setEditingSection(null)}
+                          className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
-                      <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
+                      <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto bg-white dark:bg-slate-900">
                         <div className="space-y-3">
                           <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Layout</label>
                           <div className="bg-gray-100 p-4 rounded-lg flex justify-center items-center">
@@ -982,11 +1107,14 @@ export default function Header() {
         
         {/* Edit Popup for Announcement Bar */}
         {editingSection === "ANNOUNCEMENT BAR" && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="flex border-b border-gray-200">
-              <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Content & Animation</button>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+              <span className="text-xs font-black uppercase tracking-wider text-foreground">Content & Animation</span>
+              <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <div className="p-4 space-y-6">
+            <div className="p-4 space-y-6 bg-white dark:bg-slate-900">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Text</label>
                 <input 
@@ -1065,11 +1193,14 @@ export default function Header() {
 
             {/* Edit Popup for Site Title & Logo */}
             {editingSection === "SITE TITLE & LOGO" && (
-              <div className="absolute top-full left-0 mt-4 w-72 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Content</button>
+              <div className="absolute top-full left-0 mt-4 w-80 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">Content</span>
+                  <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
+                <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto bg-white dark:bg-slate-900">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Site Title</label>
                     <input 
@@ -1253,18 +1384,21 @@ export default function Header() {
 
           {/* Edit Popup for Search */}
           {editingSection === "SEARCH" && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-              <div className="flex border-b border-gray-200">
-                <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design</button>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-80 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-foreground">Search Design</span>
+                <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
+              <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto bg-white dark:bg-slate-900">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Placeholder Text</label>
                   <input 
                     type="text" 
                     value={searchPlaceholder} 
                     onChange={e => setSearchPlaceholder(e.target.value)}
-                    className="w-full border-b border-gray-300 pb-1 text-sm outline-none focus:border-black transition-colors"
+                    className="w-full border-b border-gray-300 dark:border-slate-700 bg-transparent pb-1 text-sm outline-none focus:border-black dark:focus:border-white transition-colors"
                   />
                 </div>
                 
@@ -1273,19 +1407,19 @@ export default function Header() {
                   <div className="grid grid-cols-3 gap-2">
                     <button 
                       onClick={() => setSearchDesign('pill')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'pill' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'pill' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                     >
                       Pill
                     </button>
                     <button 
                       onClick={() => setSearchDesign('rectangle')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'rectangle' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'rectangle' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                     >
                       Rectangle
                     </button>
                     <button 
                       onClick={() => setSearchDesign('underline')}
-                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'underline' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${searchDesign === 'underline' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                     >
                       Underline
                     </button>
@@ -1303,7 +1437,7 @@ export default function Header() {
                     max="100" 
                     value={searchSize} 
                     onChange={e => setSearchSize(parseInt(e.target.value))}
-                    className="w-full accent-black h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    className="w-full accent-black dark:accent-white h-1 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
               </div>
@@ -1351,18 +1485,21 @@ export default function Header() {
 
               {/* Edit Popup for Live Chat */}
               {editingSection === "LIVE CHAT" && (
-                <div className="absolute top-full right-0 mt-4 w-80 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                  <div className="flex border-b border-gray-200">
-                    <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Design & Content</button>
+                <div className="absolute top-full right-0 mt-4 w-80 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                    <span className="text-xs font-black uppercase tracking-wider text-foreground">Design & Content</span>
+                    <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto">
+                  <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto bg-white dark:bg-slate-900">
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Button Text</label>
                       <input 
                         type="text" 
                         value={liveChatText} 
                         onChange={e => setLiveChatText(e.target.value)}
-                        className="w-full border-b border-gray-300 pb-1 text-sm outline-none focus:border-black transition-colors"
+                        className="w-full border-b border-gray-300 dark:border-slate-700 bg-transparent pb-1 text-sm outline-none focus:border-black dark:focus:border-white transition-colors"
                       />
                     </div>
                     <div className="space-y-2">
@@ -1372,7 +1509,7 @@ export default function Header() {
                         value={liveChatLink}
                         placeholder="/support or https://example.com"
                         onChange={e => setLiveChatLink(e.target.value)}
-                        className="w-full border-b border-gray-300 pb-1 text-sm outline-none focus:border-black transition-colors"
+                        className="w-full border-b border-gray-300 dark:border-slate-700 bg-transparent pb-1 text-sm outline-none focus:border-black dark:focus:border-white transition-colors"
                       />
                     </div>
                     
@@ -1381,19 +1518,19 @@ export default function Header() {
                       <div className="grid grid-cols-3 gap-2">
                         <button 
                           onClick={() => setLiveChatShape('pill')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'pill' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'pill' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Pill
                         </button>
                         <button 
                           onClick={() => setLiveChatShape('rounded')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'rounded' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'rounded' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Rounded
                         </button>
                         <button 
                           onClick={() => setLiveChatShape('square')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'square' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatShape === 'square' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Square
                         </button>
@@ -1405,19 +1542,19 @@ export default function Header() {
                       <div className="grid grid-cols-3 gap-2">
                         <button 
                           onClick={() => setLiveChatSize('sm')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'sm' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Small
                         </button>
                         <button 
                           onClick={() => setLiveChatSize('md')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'md' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'md' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Medium
                         </button>
                         <button 
                           onClick={() => setLiveChatSize('lg')}
-                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                          className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${liveChatSize === 'lg' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                         >
                           Large
                         </button>
@@ -1427,10 +1564,6 @@ export default function Header() {
                 </div>
               )}
             </div>
-
-
-
-
 
           {/* Cart Icon with badge */}
           <div className="relative">
@@ -1468,17 +1601,20 @@ export default function Header() {
 
             {/* Edit Popup for Cart */}
             {editingSection === "CART" && (
-              <div className="absolute top-full right-0 mt-4 w-64 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Cart Design</button>
+              <div className="absolute top-full right-0 mt-4 w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">Cart Design</span>
+                  <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="p-4 space-y-6">
+                <div className="p-4 space-y-6 bg-white dark:bg-slate-900">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Cart Icon</label>
                     <select
                       value={cartIcon}
                       onChange={(e) => setCartIcon(e.target.value)}
-                      className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
+                      className="w-full text-xs bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-foreground rounded-lg px-2.5 py-2 outline-none focus:border-black dark:focus:border-white"
                     >
                       <option value="ShoppingCart">Shopping Cart</option>
                       <option value="ShoppingBag">Shopping Bag</option>
@@ -1491,19 +1627,19 @@ export default function Header() {
                     <div className="grid grid-cols-3 gap-2">
                       <button 
                         onClick={() => setCartIconSize('sm')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'sm' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'sm' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                       >
                         Small
                       </button>
                       <button 
                         onClick={() => setCartIconSize('md')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'md' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'md' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                       >
                         Medium
                       </button>
                       <button 
                         onClick={() => setCartIconSize('lg')}
-                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'lg' ? 'border-black bg-background' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`py-2 px-2 border rounded-lg text-xs font-medium transition-colors ${cartIconSize === 'lg' ? 'border-black dark:border-white bg-gray-100 dark:bg-slate-800' : 'border-gray-200 dark:border-slate-700 hover:border-gray-300'}`}
                       >
                         Large
                       </button>
@@ -1595,17 +1731,20 @@ export default function Header() {
 
             {/* Edit Popup for Account */}
             {editingSection === "ACCOUNT" && (
-              <div className="absolute top-full right-0 mt-4 w-64 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Account Design</button>
+              <div className="absolute top-full right-0 mt-4 w-72 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">Account Design</span>
+                  <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="p-4 space-y-6">
+                <div className="p-4 space-y-6 bg-white dark:bg-slate-900">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Account Icon</label>
                     <select
                       value={accountIcon}
                       onChange={(e) => setAccountIcon(e.target.value)}
-                      className="w-full text-xs bg-card border border-gray-300 rounded px-2 py-2 outline-none focus:border-black"
+                      className="w-full text-xs bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-foreground rounded-lg px-2.5 py-2 outline-none focus:border-black dark:focus:border-white"
                     >
                       <option value="User">User Default</option>
                       <option value="UserCircle">User Circle</option>
@@ -1660,7 +1799,7 @@ export default function Header() {
       <div className="w-full bg-card-bg dark:bg-slate-950 border-t border-card-border py-1">
         <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between gap-4 font-semibold">
           {/* Main Category Links */}
-          <div className="relative flex-1 max-w-[65%]">
+          <div className="relative flex-1 min-w-0">
             <EditorHighlight 
               label="NAVIGATION" 
               isEditorActive={isEditorActive} 
@@ -1671,12 +1810,10 @@ export default function Header() {
               wrapperClassName="w-full"
               toolbarPosition="bottom"
             >
-            <div className={`flex items-center overflow-x-auto no-scrollbar py-2 w-full ${
-              navFontSize === 'sm' ? 'text-sm' : navFontSize === 'base' ? 'text-base' : 'text-lg'
-            }`} style={{ gap: `${navSpacing * 0.25}rem` }}>
-              {/* Mega Dropdown Hover Activation */}
+            <div className="flex items-center gap-3 w-full">
+              {/* 1. Fixed "All Categories" Button */}
               <div 
-                className="relative py-1 cursor-pointer text-primary hover:text-primary-hover flex items-center gap-1.5 flex-shrink-0"
+                className="relative py-1 cursor-pointer text-primary hover:text-primary-hover flex items-center gap-1.5 flex-shrink-0 select-none whitespace-nowrap"
                 onMouseEnter={() => setHoveredCategory("laptop")} // Default mega menu anchor
                 onClick={(e) => {
                   if (isEditorActive) { e.preventDefault(); return; }
@@ -1684,37 +1821,85 @@ export default function Header() {
                   setHoveredCategory(null);
                 }}
               >
-                <Grid className="w-4 h-4" /> All Categories <ChevronDown className="w-3.5 h-3.5" />
+                <Grid className="w-4 h-4" /> 
+                <span>All Categories</span> 
+                <ChevronDown className="w-3.5 h-3.5" />
               </div>
 
-              {navItems.map((item) => (
-                <div
-                  key={item.id}
-                  className={`py-1 cursor-pointer transition-colors relative flex-shrink-0 ${
-                    pathname.includes(item.link) && item.link !== '/'
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-foreground/80 hover:text-primary"
-                  }`}
-                  onMouseEnter={() => item.categoryKey ? setHoveredCategory(item.categoryKey) : setHoveredCategory(null)}
-                  onClick={(e) => {
-                    if (isEditorActive) { e.preventDefault(); return; }
-                    router.push(item.link);
-                    setHoveredCategory(null);
-                  }}
+              {/* Divider */}
+              <div className="h-4 w-px bg-card-border flex-shrink-0" />
+
+              {/* 2. Scrollable Category Links Area */}
+              <div className="relative flex items-center flex-1 min-w-0 group">
+                {/* Left Scroll Arrow Button */}
+                {canScrollLeft && (
+                  <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-3 bg-gradient-to-r from-card-bg via-card-bg/95 to-transparent">
+                    <button
+                      type="button"
+                      onClick={() => scrollNav('left')}
+                      className="p-1 rounded-full bg-card shadow-md border border-card-border hover:bg-primary hover:text-white text-foreground transition-all cursor-pointer"
+                      aria-label="Scroll left"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Scrollable Container (Only Category Items) */}
+                <div 
+                  ref={navScrollRef}
+                  className={`flex items-center overflow-x-auto sleek-scrollbar py-2 w-full scroll-smooth ${
+                    navFontSize === 'sm' ? 'text-sm' : navFontSize === 'base' ? 'text-base' : 'text-lg'
+                  }`} 
+                  style={{ gap: `${navSpacing * 0.25}rem` }}
                 >
-                  {item.label}
+                  {navItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`py-1 cursor-pointer transition-colors relative flex-shrink-0 whitespace-nowrap ${
+                        pathname.includes(item.link) && item.link !== '/'
+                          ? "text-primary border-b-2 border-primary"
+                          : "text-foreground/80 hover:text-primary"
+                      }`}
+                      onMouseEnter={() => item.categoryKey ? setHoveredCategory(item.categoryKey) : setHoveredCategory(null)}
+                      onClick={(e) => {
+                        if (isEditorActive) { e.preventDefault(); return; }
+                        router.push(item.link);
+                        setHoveredCategory(null);
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {/* Right Scroll Arrow Button */}
+                {canScrollRight && (
+                  <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-3 bg-gradient-to-l from-card-bg via-card-bg/95 to-transparent">
+                    <button
+                      type="button"
+                      onClick={() => scrollNav('right')}
+                      className="p-1 rounded-full bg-card shadow-md border border-card-border hover:bg-primary hover:text-white text-foreground transition-all cursor-pointer"
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             </EditorHighlight>
 
             {/* Edit Popup for Navigation */}
             {editingSection === "NAVIGATION" && (
-              <div className="absolute top-full left-0 mt-4 w-96 bg-card border border-gray-200 shadow-2xl rounded-lg z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex border-b border-gray-200">
-                  <button className="px-4 py-3 text-xs font-bold border-b-2 border-black">Links & Design</button>
+              <div className="absolute top-full left-0 mt-4 w-96 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-2xl z-[200] text-foreground font-sans overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/80 px-4 py-2.5">
+                  <span className="text-xs font-black uppercase tracking-wider text-foreground">Links & Design</span>
+                  <button onClick={() => setEditingSection(null)} className="p-1 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto">
+                <div className="p-4 space-y-6 max-h-[500px] overflow-y-auto bg-white dark:bg-slate-900">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <label className="text-[10px] font-bold text-foreground/60 tracking-wider uppercase">Navigation Links</label>

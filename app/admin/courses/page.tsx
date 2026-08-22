@@ -104,7 +104,7 @@ function AdminCoursesContent() {
       type: courseType,
       price: parseFloat(coursePrice),
       duration: courseDuration,
-      image: courseImage.trim() || (courseType === "physical" ? "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80" : "https://images.unsplash.com/photo-1496181130204-755241544e3f?w=600&q=80"),
+      image: courseImage.trim() || (courseType === "physical" ? "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&q=80" : "https://images.pexels.com/photos/18105/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600"),
       location: courseLocation,
       schedule: courseSchedule
     });
