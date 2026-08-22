@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getDbTheme, saveDbTheme } from "@/app/actions";
 
 const THEME_CATEGORIES = [
   {
@@ -215,12 +216,14 @@ export default function ThemesPanel() {
   
   // Track currently selected theme
   const [activeTheme, setActiveTheme] = useState<string>("professional-1");
+  const [persistedTheme, setPersistedTheme] = useState<string>("professional-1");
 
   useEffect(() => {
-    const saved = localStorage.getItem("zolpa_design_theme");
-    if (saved) {
-      setActiveTheme(saved);
-    }
+    getDbTheme().then((theme) => {
+      const active = theme || "professional-1";
+      setActiveTheme(active);
+      setPersistedTheme(active);
+    });
   }, []);
 
   const handleThemeClick = (themeId: string) => {
@@ -233,18 +236,18 @@ export default function ThemesPanel() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const iframes = document.getElementsByTagName('iframe');
     for (let i = 0; i < iframes.length; i++) {
       iframes[i].contentWindow?.postMessage({ type: 'CMS_SAVE_THEME', theme: activeTheme }, '*');
     }
-    // Update our own local state
-    localStorage.setItem("zolpa_design_theme", activeTheme);
+    // Update PostgreSQL database
+    await saveDbTheme(activeTheme);
+    setPersistedTheme(activeTheme);
   };
 
   const handleBack = () => {
-    const saved = localStorage.getItem("zolpa_design_theme") || "professional-1";
-    if (activeTheme !== saved) {
+    if (activeTheme !== persistedTheme) {
       // Revert preview if navigating away without saving
       const iframes = document.getElementsByTagName('iframe');
       for (let i = 0; i < iframes.length; i++) {

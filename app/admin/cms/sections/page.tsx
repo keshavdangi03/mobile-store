@@ -6,6 +6,7 @@ import {
   Eye, EyeOff, Save, Check, Sparkles, Tag
 } from "lucide-react";
 import { useCmsStore, PromoBarConfig, AnnouncementBannerConfig } from "@/lib/cms-store";
+import { saveDbCmsConfig } from "@/app/actions";
 
 // ─── Toggle Switch ────────────────────────────────────────────────────────────
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -84,11 +85,14 @@ export default function SectionsPanel() {
   const banner = globalSections?.announcementBanner;
   const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
-    // Already auto-saved to Zustand/localStorage on every change.
-    // This just provides visual feedback.
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    try {
+      await saveDbCmsConfig({ globalSections });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      console.error("Error saving global sections to DB:", e);
+    }
   };
 
   return (

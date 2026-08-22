@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
-import { getDbProducts, saveDbProduct, deleteDbProduct } from "@/app/actions";
+import { getDbProducts, saveDbProduct, deleteDbProduct, getDbCategories, saveDbCategories } from "@/app/actions";
 import { Edit3, Trash2, X, Check, Image as ImageIcon, Plus, Tag, AlertTriangle, ExternalLink } from "lucide-react";
 
 export default function AdminProductsPage() {
@@ -67,22 +67,17 @@ export default function AdminProductsPage() {
     });
   };
 
-  // Load categories from localStorage
+  // Load categories from PostgreSQL database
   const loadCategories = () => {
-    const saved = localStorage.getItem("expert_mobile_categories");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const needsMigration = parsed.some((c: any) => !c.image && c.icon);
-      if (needsMigration) {
-        setCategories(INITIAL_CATEGORIES);
-        localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
+    getDbCategories().then((cats) => {
+      if (Array.isArray(cats) && cats.length > 0) {
+        setCategories(cats);
       } else {
-        setCategories(parsed);
+        setCategories(INITIAL_CATEGORIES);
       }
-    } else {
+    }).catch(() => {
       setCategories(INITIAL_CATEGORIES);
-      localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
-    }
+    });
   };
 
   useEffect(() => {
@@ -91,7 +86,7 @@ export default function AdminProductsPage() {
   }, []);
 
   // Category Handlers
-  const handleAddCategoryDirect = (e: React.FormEvent) => {
+  const handleAddCategoryDirect = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCatName.trim()) return;
     const slug = newCatName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -102,7 +97,7 @@ export default function AdminProductsPage() {
     const newCat = { slug, name: newCatName.trim(), image: newCatImage.trim() };
     const updated = [...categories, newCat];
     setCategories(updated);
-    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    await saveDbCategories(updated);
     window.dispatchEvent(new Event("categories_updated"));
     window.dispatchEvent(new Event("storage"));
     setNewCatName("");
@@ -118,7 +113,7 @@ export default function AdminProductsPage() {
     });
   };
 
-  const handleSaveEditCategory = (e: React.FormEvent) => {
+  const handleSaveEditCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCat || !editingCat.name.trim()) return;
 
@@ -142,16 +137,16 @@ export default function AdminProductsPage() {
     });
 
     setCategories(updated);
-    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    await saveDbCategories(updated);
     window.dispatchEvent(new Event("categories_updated"));
     window.dispatchEvent(new Event("storage"));
     setEditingCat(null);
   };
 
-  const handleConfirmDeleteCategory = (slug: string) => {
+  const handleConfirmDeleteCategory = async (slug: string) => {
     const updated = categories.filter((c) => c.slug !== slug);
     setCategories(updated);
-    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    await saveDbCategories(updated);
     window.dispatchEvent(new Event("categories_updated"));
     window.dispatchEvent(new Event("storage"));
     setDeleteCatModal(null);
@@ -167,7 +162,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleSaveDropdownAddCategory = (e: React.FormEvent) => {
+  const handleSaveDropdownAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dropdownCatName.trim()) return;
     const slug = dropdownCatName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -180,7 +175,7 @@ export default function AdminProductsPage() {
     const newCat = { slug, name: dropdownCatName.trim(), image: dropdownCatImage.trim() };
     const updated = [...categories, newCat];
     setCategories(updated);
-    localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+    await saveDbCategories(updated);
     window.dispatchEvent(new Event("categories_updated"));
     window.dispatchEvent(new Event("storage"));
     setCategory(slug);

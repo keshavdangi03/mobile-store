@@ -8,7 +8,7 @@ import BlockEditorWrapper from "@/components/block-editor-wrapper";
 import EditableImage from "@/components/editable-image";
 import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
 import { useCart } from "@/components/cart-context";
-import { getDbProducts } from "@/app/actions";
+import { getDbProducts, getDbCategories } from "@/app/actions";
 import { 
   Laptop, 
   Smartphone, 
@@ -265,17 +265,17 @@ export default function Home() {
       setProducts(data);
     });
 
-    const savedCats = localStorage.getItem("expert_mobile_categories");
-    if (savedCats) {
-      const parsed = JSON.parse(savedCats);
-      const needsMigration = parsed.some((c: any) => !c.image && c.icon);
-      if (needsMigration) {
-        localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
-        setCategoriesList(INITIAL_CATEGORIES);
-      } else {
-        setCategoriesList(parsed);
-      }
-    }
+    const loadCategories = () => {
+      getDbCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) {
+          setCategoriesList(cats);
+        }
+      });
+    };
+
+    loadCategories();
+    window.addEventListener("categories_updated", loadCategories);
+    window.addEventListener("cms_db_synced", loadCategories);
 
     // Timer countdown loop
     const timer = setInterval(() => {
@@ -293,7 +293,11 @@ export default function Home() {
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      window.removeEventListener("categories_updated", loadCategories);
+      window.removeEventListener("cms_db_synced", loadCategories);
+      clearInterval(timer);
+    };
   }, []);
 
   // Autoplay loop for carousel slide transitions (3s interval)

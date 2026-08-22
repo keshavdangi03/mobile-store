@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getDbCategories } from "@/app/actions";
 import { 
   Laptop, 
   Smartphone, 
@@ -187,27 +188,23 @@ export default function MegaMenu({ initialCategory, onClose }: MegaMenuProps) {
   const [activeCategory, setActiveCategory] = useState(initialCategory?.toLowerCase() || "laptop");
   const [sidebarCategories, setSidebarCategories] = useState(DEFAULT_SIDEBAR_CATEGORIES);
 
-  // Load categories from localStorage and stay in sync with admin changes
+  // Load categories from database and stay in sync with admin changes
   useEffect(() => {
     const loadCats = () => {
-      try {
-        const saved = localStorage.getItem("expert_mobile_categories");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].slug) {
-            setSidebarCategories(parsed.map((c: { slug: string; name: string }) => ({ slug: c.slug, name: c.name })));
-          }
+      getDbCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0 && cats[0].slug) {
+          setSidebarCategories(cats.map((c: { slug: string; name: string }) => ({ slug: c.slug, name: c.name })));
         }
-      } catch {
-        // fallback to defaults on parse error
-      }
+      }).catch(() => {});
     };
     loadCats();
     window.addEventListener("storage", loadCats);
     window.addEventListener("categories_updated", loadCats);
+    window.addEventListener("cms_db_synced", loadCats);
     return () => {
       window.removeEventListener("storage", loadCats);
       window.removeEventListener("categories_updated", loadCats);
+      window.removeEventListener("cms_db_synced", loadCats);
     };
   }, []);
 

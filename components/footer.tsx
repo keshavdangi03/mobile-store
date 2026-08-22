@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useCmsStore } from "@/lib/cms-store";
+import { getDbFooterSettings, saveDbFooterSettings, getDbHeaderSettings } from "@/app/actions";
 import { Pencil, Layers, Plus, ChevronDown } from "lucide-react";
 
 export default function Footer() {
@@ -47,10 +48,8 @@ export default function Footer() {
   ]);
 
   const loadSavedSettings = React.useCallback(() => {
-    try {
-      const saved = localStorage.getItem('cms_footer_settings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
+    getDbFooterSettings().then((parsed) => {
+      if (parsed) {
         if (parsed.footerLayout !== undefined) setFooterLayout(parsed.footerLayout);
         if (parsed.footerPadding !== undefined) setFooterPadding(parsed.footerPadding);
         if (parsed.footerColumnGap !== undefined) setFooterColumnGap(parsed.footerColumnGap);
@@ -64,31 +63,31 @@ export default function Footer() {
         if (parsed.borderColor !== undefined) setBorderColor(parsed.borderColor);
         if (parsed.borderThickness !== undefined) setBorderThickness(parsed.borderThickness);
       }
-    } catch (e) {
-      console.error('Failed to load footer settings', e);
-    }
+    }).catch((e) => console.error('Failed to load footer settings from DB', e));
   }, []);
 
   const [siteTitle, setSiteTitle] = useState("Expert Mobile Solution");
   const [logoImage, setLogoImage] = useState<string | null>("/logo.png");
 
   const syncHeaderSettings = React.useCallback(() => {
-    try {
-      const saved = localStorage.getItem('cms_header_settings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
+    getDbHeaderSettings().then((parsed) => {
+      if (parsed) {
         if (parsed.siteTitle !== undefined) setSiteTitle(parsed.siteTitle);
         if (parsed.logoImage !== undefined) setLogoImage(parsed.logoImage);
       }
-    } catch (e) {
-      console.error('Failed to load header settings in footer', e);
-    }
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
     syncHeaderSettings();
     window.addEventListener('storage', syncHeaderSettings);
-    return () => window.removeEventListener('storage', syncHeaderSettings);
+    window.addEventListener('header_settings_updated', syncHeaderSettings);
+    window.addEventListener('cms_db_synced', syncHeaderSettings);
+    return () => {
+      window.removeEventListener('storage', syncHeaderSettings);
+      window.removeEventListener('header_settings_updated', syncHeaderSettings);
+      window.removeEventListener('cms_db_synced', syncHeaderSettings);
+    };
   }, [syncHeaderSettings]);
 
   useEffect(() => {
@@ -113,7 +112,7 @@ export default function Footer() {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'CMS_SAVE_CHANGES') {
-        localStorage.setItem('cms_footer_settings', JSON.stringify(currentSettingsRef.current));
+        saveDbFooterSettings(currentSettingsRef.current);
       } else if (event.data?.type === 'CMS_DISCARD_CHANGES') {
         loadSavedSettings();
       }
@@ -128,8 +127,15 @@ export default function Footer() {
         loadSavedSettings();
       }
     };
+    const handleCustomUpdate = () => {
+      loadSavedSettings();
+    };
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('cms_db_synced', handleCustomUpdate);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('cms_db_synced', handleCustomUpdate);
+    };
   }, [loadSavedSettings]);
 
   const panelRef = useRef<HTMLDivElement>(null);

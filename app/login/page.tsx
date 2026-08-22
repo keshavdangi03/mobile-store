@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { loginDbUser } from "@/app/actions";
 
 function LoginForm() {
   const router = useRouter();
@@ -82,72 +83,40 @@ function LoginForm() {
     };
   }, [clientId]);
 
-  const handleCredentialsLogin = (e: React.FormEvent) => {
+  const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginInput.trim() || !password.trim()) {
-      setError("Please fill in all fields.");
+      setError("Please enter your email or phone and password.");
       return;
     }
 
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      // Intercept admin credentials and route directly to Admin Dashboard console
-      if (loginInput.toLowerCase() === "admin" && password === "admin") {
-        sessionStorage.setItem("admin_auth", "true");
-        setLoading(false);
-        router.push("/admin");
+    try {
+      const res = await loginDbUser(loginInput, password);
+      setLoading(false);
+
+      if (!res.success || !res.user) {
+        setError(res.error || "Login failed. Please check your credentials.");
         return;
       }
 
-      // Simulate regular customer login
-      if (typeof window !== "undefined") {
-        const registeredUsersRaw = localStorage.getItem("zolpa_users");
-        const registeredUsers = registeredUsersRaw ? JSON.parse(registeredUsersRaw) : [];
-
-        // Find user by email or phone
-        const matchedUser = registeredUsers.find(
-          (u: any) => u.email === loginInput || u.phone === loginInput
-        );
-
-        if (matchedUser) {
-          if (matchedUser.password !== password) {
-            setLoading(false);
-            setError("Incorrect password.");
-            return;
-          }
-
-          const sessionUser = {
-            name: matchedUser.name,
-            email: matchedUser.email,
-            phone: matchedUser.phone,
-            isTrader: matchedUser.isTrader,
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
-          };
-
-          localStorage.setItem("customer_session", JSON.stringify(sessionUser));
-          setLoading(false);
-          router.push(searchParams.get("redirect") || "/");
-          window.dispatchEvent(new Event("storage"));
-          return;
-        } else {
-          // Fallback to guest user auto-registration for quick testing
-          const guestUser = {
-            name: loginInput.split("@")[0] || "Customer",
-            email: loginInput.includes("@") ? loginInput : "user@mobilestore.com",
-            phone: !loginInput.includes("@") ? loginInput : "9800000000",
-            isTrader: false,
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
-          };
-          localStorage.setItem("customer_session", JSON.stringify(guestUser));
-          setLoading(false);
-          router.push(searchParams.get("redirect") || "/");
-          window.dispatchEvent(new Event("storage"));
-          return;
-        }
+      localStorage.setItem("customer_session", JSON.stringify(res.user));
+      if (res.user.role === "admin") {
+        sessionStorage.setItem("admin_auth", "true");
       }
-    }, 1200);
+      window.dispatchEvent(new Event("storage"));
+
+      if (res.user.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push(searchParams.get("redirect") || "/");
+      }
+    } catch (err) {
+      setLoading(false);
+      setError("An unexpected error occurred. Please try again.");
+    }
   };
 
   const handleGoogleLogin = () => {

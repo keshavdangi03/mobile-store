@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "./theme-provider";
 import { useCart } from "./cart-context";
 import { useCmsStore } from "@/lib/cms-store";
-import { getProducts, Product } from "@/lib/db-simulation";
+import { Product } from "@/lib/db-simulation";
+import { getDbProducts, getDbCategories, getDbHeaderSettings, saveDbHeaderSettings, loginDbUser, registerDbUser } from "@/app/actions";
 import MegaMenu from "./mega-menu";
 import { 
   Search, 
@@ -223,34 +224,30 @@ export default function Header() {
     { id: '8', label: "Earbuds", link: "/category/earbuds", categoryKey: "earbuds" },
   ]);
 
-  // Sync navItems with dynamic categories from localStorage
+  // Sync navItems with dynamic categories from database
   useEffect(() => {
-    const syncNavFromStorage = () => {
-      try {
-        const saved = localStorage.getItem("expert_mobile_categories");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].slug) {
-            setNavItems(
-              parsed.map((c: { slug: string; name: string }, i: number) => ({
-                id: String(i + 1),
-                label: c.name,
-                link: `/category/${c.slug}`,
-                categoryKey: c.slug,
-              }))
-            );
-          }
+    const syncNavFromDb = () => {
+      getDbCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0 && cats[0].slug) {
+          setNavItems(
+            cats.map((c: { slug: string; name: string }, i: number) => ({
+              id: String(i + 1),
+              label: c.name,
+              link: `/category/${c.slug}`,
+              categoryKey: c.slug,
+            }))
+          );
         }
-      } catch {
-        // keep defaults on error
-      }
+      }).catch(() => {});
     };
-    syncNavFromStorage();
-    window.addEventListener("storage", syncNavFromStorage);
-    window.addEventListener("categories_updated", syncNavFromStorage);
+    syncNavFromDb();
+    window.addEventListener("storage", syncNavFromDb);
+    window.addEventListener("categories_updated", syncNavFromDb);
+    window.addEventListener("cms_db_synced", syncNavFromDb);
     return () => {
-      window.removeEventListener("storage", syncNavFromStorage);
-      window.removeEventListener("categories_updated", syncNavFromStorage);
+      window.removeEventListener("storage", syncNavFromDb);
+      window.removeEventListener("categories_updated", syncNavFromDb);
+      window.removeEventListener("cms_db_synced", syncNavFromDb);
     };
   }, []);
   const [navFontSize, setNavFontSize] = useState<'sm' | 'base' | 'lg'>('sm');
@@ -371,65 +368,40 @@ export default function Header() {
   const [authError, setAuthError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
 
-  const handleModalLogin = (e: React.FormEvent) => {
+  const handleModalLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginInput.trim() || !loginPassword.trim()) {
-      setAuthError("Please fill in all fields.");
+      setAuthError("Please enter your email/phone and password.");
       return;
     }
+
     setAuthLoading(true);
     setAuthError("");
-    setTimeout(() => {
-      if (loginInput.toLowerCase() === "admin" && loginPassword === "admin") {
-        sessionStorage.setItem("admin_auth", "true");
-        setAuthLoading(false);
-        setIsAuthModalOpen(false);
-        router.push("/admin");
+
+    try {
+      const res = await loginDbUser(loginInput, loginPassword);
+      setAuthLoading(false);
+
+      if (!res.success || !res.user) {
+        setAuthError(res.error || "Login failed. Please check your credentials.");
         return;
       }
-      if (typeof window !== "undefined") {
-        const registeredUsersRaw = localStorage.getItem("zolpa_users");
-        const registeredUsers = registeredUsersRaw ? JSON.parse(registeredUsersRaw) : [];
-        const matchedUser = registeredUsers.find(
-          (u: any) => u.email === loginInput || u.phone === loginInput
-        );
-        if (matchedUser) {
-          if (matchedUser.password !== loginPassword) {
-            setAuthLoading(false);
-            setAuthError("Incorrect password.");
-            return;
-          }
-          const sessionUser = {
-            name: matchedUser.name,
-            email: matchedUser.email,
-            phone: matchedUser.phone,
-            isTrader: matchedUser.isTrader,
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
-          };
-          localStorage.setItem("customer_session", JSON.stringify(sessionUser));
-          setAuthLoading(false);
-          setIsAuthModalOpen(false);
-          window.dispatchEvent(new Event("storage"));
-          loadCustomerSession();
-          return;
-        } else {
-          // Fallback to guest user auto-registration for quick testing
-          const guestUser = {
-            name: loginInput.split("@")[0] || "Customer",
-            email: loginInput.includes("@") ? loginInput : "user@mobilestore.com",
-            phone: !loginInput.includes("@") ? loginInput : "9800000000",
-            isTrader: false,
-            avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
-          };
-          localStorage.setItem("customer_session", JSON.stringify(guestUser));
-          setAuthLoading(false);
-          setIsAuthModalOpen(false);
-          window.dispatchEvent(new Event("storage"));
-          loadCustomerSession();
-          return;
-        }
+
+      localStorage.setItem("customer_session", JSON.stringify(res.user));
+      if (res.user.role === "admin") {
+        sessionStorage.setItem("admin_auth", "true");
       }
-    }, 1000);
+      setIsAuthModalOpen(false);
+      loadCustomerSession();
+      window.dispatchEvent(new Event("storage"));
+
+      if (res.user.role === "admin") {
+        router.push("/admin");
+      }
+    } catch (err) {
+      setAuthLoading(false);
+      setAuthError("An unexpected error occurred during login.");
+    }
   };
 
   const handleModalGoogleLogin = () => {
@@ -440,6 +412,8 @@ export default function Header() {
         name: "Google Guest User",
         email: "google.guest@gmail.com",
         phone: "+977-9800000000",
+        role: "customer",
+        isTrader: false,
         avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
       };
       localStorage.setItem("customer_session", JSON.stringify(mockGoogleUser));
@@ -450,7 +424,7 @@ export default function Header() {
     }, 800);
   };
 
-  const handleModalRegister = (e: React.FormEvent) => {
+  const handleModalRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regName.trim() || !regEmail.trim() || !regPhone.trim() || !regPassword.trim()) {
       setAuthError("Please fill in all required fields.");
@@ -471,29 +445,24 @@ export default function Header() {
     setAuthLoading(true);
     setAuthError("");
     setAuthSuccess("");
-    setTimeout(() => {
-      const newUser = {
+
+    try {
+      const res = await registerDbUser({
         name: regName,
         email: regEmail,
         phone: regPhone,
         password: regPassword,
         isTrader: regIsTrader
-      };
-      if (typeof window !== "undefined") {
-        const existingUsersRaw = localStorage.getItem("zolpa_users");
-        const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
-        const userExists = existingUsers.some((u: any) => u.email === regEmail || u.phone === regPhone);
-        if (userExists) {
-          setAuthLoading(false);
-          setAuthError("An account with this email or phone number already exists.");
-          return;
-        }
-        existingUsers.push(newUser);
-        localStorage.setItem("zolpa_users", JSON.stringify(existingUsers));
-      }
+      });
+
       setAuthLoading(false);
-      setAuthSuccess("Account created successfully!");
-      // Clear register fields
+
+      if (!res.success) {
+        setAuthError(res.error || "An account with this email or phone number already exists.");
+        return;
+      }
+
+      setAuthSuccess("Account created successfully! Redirecting to login...");
       setRegName("");
       setRegEmail("");
       setRegPhone("");
@@ -504,8 +473,11 @@ export default function Header() {
       setTimeout(() => {
         setAuthSuccess("");
         setAuthModalMode('login');
-      }, 1000);
-    }, 1000);
+      }, 1200);
+    } catch (err) {
+      setAuthLoading(false);
+      setAuthError("Failed to register account. Please try again.");
+    }
   };
 
   // Keep a ref of all settings for the save handler to access latest values
@@ -561,10 +533,8 @@ export default function Header() {
   ]);
 
   const loadSavedSettings = React.useCallback(() => {
-    try {
-      const saved = localStorage.getItem('cms_header_settings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
+    getDbHeaderSettings().then((parsed) => {
+      if (parsed) {
         if (parsed.siteTitle !== undefined) setSiteTitle(parsed.siteTitle);
         if (parsed.logoHeight !== undefined) setLogoHeight(parsed.logoHeight);
         if (parsed.mobileLogoHeight !== undefined) setMobileLogoHeight(parsed.mobileLogoHeight);
@@ -608,9 +578,7 @@ export default function Header() {
         if (parsed.announcementAnimation !== undefined) setAnnouncementAnimation(parsed.announcementAnimation);
         if (parsed.announcementShow !== undefined) setAnnouncementShow(parsed.announcementShow);
       }
-    } catch (e) {
-      console.error('Failed to load header settings', e);
-    }
+    }).catch((e) => console.error("Failed to load header settings from DB:", e));
   }, []);
 
   // Load initially
@@ -630,9 +598,11 @@ export default function Header() {
     };
     window.addEventListener('storage', handleStorage);
     window.addEventListener('header_settings_updated', handleCustomUpdate);
+    window.addEventListener('cms_db_synced', handleCustomUpdate);
     return () => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('header_settings_updated', handleCustomUpdate);
+      window.removeEventListener('cms_db_synced', handleCustomUpdate);
     };
   }, [loadSavedSettings]);
 
@@ -682,8 +652,8 @@ export default function Header() {
           setActiveEditorId(null);
         }
       } else if (event.data?.type === 'CMS_SAVE_CHANGES') {
-        localStorage.setItem('cms_header_settings', JSON.stringify(currentSettingsRef.current));
-        window.dispatchEvent(new Event('storage'));
+        saveDbHeaderSettings(currentSettingsRef.current);
+        window.dispatchEvent(new Event('header_settings_updated'));
       } else if (event.data?.type === 'CMS_DISCARD_CHANGES') {
         loadSavedSettings();
       }
@@ -708,20 +678,26 @@ export default function Header() {
 
   // Search logic
   useEffect(() => {
+    let active = true;
     if (searchQuery.trim().length > 1) {
-      const allProducts = getProducts();
-      const filtered = allProducts.filter(
-        (p) =>
-          p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setSearchResults(filtered.slice(0, 5));
-      setShowSearchResults(true);
+      getDbProducts().then((allProducts) => {
+        if (!active) return;
+        const filtered = allProducts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setSearchResults(filtered.slice(0, 5));
+        setShowSearchResults(true);
+      }).catch(() => {
+        if (active) setSearchResults([]);
+      });
     } else {
       setSearchResults([]);
       setShowSearchResults(false);
     }
+    return () => { active = false; };
   }, [searchQuery]);
 
   // Click outside search & profile dismisses dropdown

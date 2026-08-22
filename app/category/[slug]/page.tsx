@@ -4,7 +4,7 @@ import React, { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { INITIAL_CATEGORIES, Product } from "@/lib/db-simulation";
 import { useCart } from "@/components/cart-context";
-import { getDbProducts } from "@/app/actions";
+import { getDbProducts, getDbCategories } from "@/app/actions";
 
 import SectionEditorWrapper from "@/components/section-editor-wrapper";
 
@@ -28,17 +28,20 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [categoriesList, setCategoriesList] = useState<{ slug: string; name: string; image: string }[]>(INITIAL_CATEGORIES);
 
   useEffect(() => {
-    const saved = localStorage.getItem("expert_mobile_categories");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const needsMigration = parsed.some((c: any) => !c.image && c.icon);
-      if (needsMigration) {
-        localStorage.setItem("expert_mobile_categories", JSON.stringify(INITIAL_CATEGORIES));
-        setCategoriesList(INITIAL_CATEGORIES);
-      } else {
-        setCategoriesList(parsed);
-      }
-    }
+    const loadCategories = () => {
+      getDbCategories().then((cats) => {
+        if (Array.isArray(cats) && cats.length > 0) {
+          setCategoriesList(cats);
+        }
+      });
+    };
+    loadCategories();
+    window.addEventListener("categories_updated", loadCategories);
+    window.addEventListener("cms_db_synced", loadCategories);
+    return () => {
+      window.removeEventListener("categories_updated", loadCategories);
+      window.removeEventListener("cms_db_synced", loadCategories);
+    };
   }, []);
 
   const activeCategory = categoriesList.find((c) => c.slug === slug);

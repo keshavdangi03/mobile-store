@@ -11,7 +11,10 @@ import {
   getTraderProducts, 
   saveDbProduct,
   updateRepairPaymentStatus,
-  cancelRepairRequest
+  cancelRepairRequest,
+  getDbUserByEmail,
+  updateDbUserProfile,
+  DbUserSession
 } from "@/app/actions";
 import { 
   ShoppingBag, 
@@ -39,7 +42,7 @@ type Tab = "orders" | "history" | "profile" | "address" | "password" | "courses"
 
 export default function AccountPage() {
   const router = useRouter();
-  const [customer, setCustomer] = useState<{ name: string; email: string; phone?: string; isTrader?: boolean } | null>(null);
+  const [customer, setCustomer] = useState<DbUserSession | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -115,7 +118,23 @@ export default function AccountPage() {
     setCustomer(userObj);
     setNewName(userObj.name || "");
     setNewPhone(userObj.phone || "");
+    if (userObj.address) setDefaultAddress(userObj.address);
+    if (userObj.city) setDefaultCity(userObj.city);
     setPageLoading(false);
+
+    // Refresh from PostgreSQL database if possible
+    if (userObj.email) {
+      getDbUserByEmail(userObj.email).then((dbUser) => {
+        if (dbUser) {
+          setCustomer(dbUser);
+          setNewName(dbUser.name || "");
+          setNewPhone(dbUser.phone || "");
+          if (dbUser.address) setDefaultAddress(dbUser.address);
+          if (dbUser.city) setDefaultCity(dbUser.city);
+          localStorage.setItem("customer_session", JSON.stringify(dbUser));
+        }
+      }).catch(() => {});
+    }
 
     // Check if redirecting from training/repair to open a specific tab
     const requestedTab = localStorage.getItem("active_account_tab") as Tab;
@@ -175,15 +194,31 @@ export default function AccountPage() {
     router.push("/");
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
     
-    const updated = { ...customer, name: newName, phone: newPhone };
+    const updated = { 
+      ...customer, 
+      name: newName, 
+      phone: newPhone,
+      address: defaultAddress,
+      city: defaultCity
+    };
     setCustomer(updated as any);
     localStorage.setItem("customer_session", JSON.stringify(updated));
     window.dispatchEvent(new Event("storage"));
-    alert("Profile details updated successfully!");
+
+    if (customer?.email) {
+      await updateDbUserProfile(customer.email, {
+        name: newName,
+        phone: newPhone,
+        address: defaultAddress,
+        city: defaultCity
+      });
+    }
+
+    alert("Profile details updated successfully in database!");
   };
 
   const handleListProduct = async (e: React.FormEvent) => {

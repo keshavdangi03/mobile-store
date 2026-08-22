@@ -120,14 +120,51 @@ model Page {
   updatedAt   DateTime @updatedAt
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String
+  role      String   @default("customer") // customer, trader, admin
+  isTrader  Boolean  @default(false)
+  avatar    String?
+  address   String?
+  city      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model GlobalSettings {
-  id          String   @id @default("global")
+  id                   String   @id @default("global")
+  
+  // Active Site Theme
+  theme                String   @default("professional-1")
+  
+  // CMS Layout & Sections
+  sectionsByRoute      Json?
+  sectionCustomizations Json?
+  customSectionsData   Json?
+  globalSections       Json?
+  
+  // Header & Footer
+  headerSettings       Json?
+  footerSettings       Json?
+  
+  // Categories
+  categories           Json?
+  
+  // Saved Assets & Overrides
+  savedAssets          Json?
+  imageOverrides       Json?
+  styleOverrides       Json?
   
   // Global SEO defaults
-  siteTitle       String?
-  siteDescription String?
-  defaultOgImage  String?
+  siteTitle            String?
+  siteDescription      String?
+  defaultOgImage       String?
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
+

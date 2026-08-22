@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useCmsStore } from "@/lib/cms-store";
+import { getDbTheme, saveDbTheme } from "@/app/actions";
 
 type Theme = "light" | "dark";
 type DesignTheme = string;
@@ -25,15 +26,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Force light theme
     setTheme("light");
     document.documentElement.classList.remove("dark");
-    localStorage.removeItem("zolpa_theme");
 
-    const savedDesign = localStorage.getItem("zolpa_design_theme") as DesignTheme | null;
-    if (savedDesign) {
-      setDesignThemeState(savedDesign);
-      document.documentElement.classList.add(`theme-${savedDesign}`);
-    } else {
-      document.documentElement.classList.add("theme-professional-1");
-    }
+    // Fetch theme from PostgreSQL database
+    getDbTheme().then((dbTheme) => {
+      const active = dbTheme || "professional-1";
+      setDesignThemeState(active);
+      previewDesignTheme(active);
+    }).catch(() => {
+      previewDesignTheme("professional-1");
+    });
     
     setMounted(true);
     // Apply persisted styles
@@ -86,7 +87,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setDesignTheme = (newTheme: DesignTheme) => {
     previewDesignTheme(newTheme);
     setDesignThemeState(newTheme);
-    localStorage.setItem("zolpa_design_theme", newTheme);
+    saveDbTheme(newTheme).catch((e) => console.error("Error saving theme to DB:", e));
   };
 
   return (

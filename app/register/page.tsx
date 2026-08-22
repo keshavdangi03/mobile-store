@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { registerDbUser } from "@/app/actions";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validations
@@ -46,40 +47,31 @@ export default function RegisterPage() {
     setError("");
     setSuccess("");
 
-    setTimeout(() => {
-      // Simulate registering
-      
-      const newUser = {
+    try {
+      const res = await registerDbUser({
         name,
         email,
         phone,
         password,
         isTrader
-      };
-
-      if (typeof window !== "undefined") {
-        const existingUsersRaw = localStorage.getItem("zolpa_users");
-        const existingUsers = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
-        
-        // Check if user already exists
-        const userExists = existingUsers.some((u: any) => u.email === email || u.phone === phone);
-        if (userExists) {
-          setLoading(false);
-          setError("An account with this email or phone number already exists.");
-          return;
-        }
-
-        existingUsers.push(newUser);
-        localStorage.setItem("zolpa_users", JSON.stringify(existingUsers));
-      }
+      });
 
       setLoading(false);
+
+      if (!res.success) {
+        setError(res.error || "An account with this email or phone number already exists.");
+        return;
+      }
+
       setSuccess("Account created successfully! Redirecting to login...");
 
       setTimeout(() => {
         router.push("/login");
-      }, 1500);
-    }, 1500);
+      }, 1200);
+    } catch (err) {
+      setLoading(false);
+      setError("An unexpected error occurred during registration. Please try again.");
+    }
   };
 
   return (

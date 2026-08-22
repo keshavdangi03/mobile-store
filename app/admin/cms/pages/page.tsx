@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useCmsStore } from "@/lib/cms-store";
 import { INITIAL_CATEGORIES } from "@/lib/db-simulation";
+import { getDbCategories, saveDbCategories, getDbHeaderSettings, saveDbHeaderSettings } from "@/app/actions";
 
 const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 170 170" fill="currentColor" {...props}>
@@ -23,6 +24,8 @@ const BUILTIN_MAIN_PAGES = [
   { slug: "/", name: "Home", icon: Home },
   { slug: "/repair", name: "Repair Services", icon: Wrench },
   { slug: "/training", name: "Training Academy", icon: GraduationCap },
+  { slug: "/account", name: "My Account", icon: Navigation },
+  { slug: "/category/all", name: "All Products", icon: Layers },
 ];
 
 const AVAILABLE_BUTTON_COLORS = [
@@ -50,13 +53,12 @@ const AVAILABLE_BUTTON_ICONS = [
 
 const getCategoryIcon = (slug: string) => {
   const s = slug.toLowerCase();
-  if (s.includes("apple") || s.includes("iphone") || s.includes("macbook") || s.includes("ipad")) return AppleIcon;
-  if (s.includes("laptop") || s.includes("notebook")) return Laptop;
-  if (s.includes("phone") || s.includes("smart") || s.includes("mobile")) return Smartphone;
-  if (s.includes("tab") || s.includes("pad")) return Tablet;
+  if (s.includes("laptop")) return Laptop;
+  if (s.includes("apple") || s.includes("macbook") || s.includes("iphone")) return AppleIcon;
+  if (s.includes("phone") || s.includes("mobile")) return Smartphone;
+  if (s.includes("tablet") || s.includes("ipad")) return Tablet;
   if (s.includes("pc") || s.includes("cpu") || s.includes("component")) return Cpu;
-  if (s.includes("monitor") || s.includes("display") || s.includes("screen") || s.includes("tv")) return Monitor;
-  if (s.includes("projector")) return Monitor;
+  if (s.includes("monitor") || s.includes("screen") || s.includes("display")) return Monitor;
   if (s.includes("earbud") || s.includes("headphone") || s.includes("audio") || s.includes("sound")) return Headphones;
   if (s.includes("drone") || s.includes("camera")) return Compass;
   return Tag;
@@ -71,29 +73,30 @@ interface QuickLinkItem {
   icon: string;
 }
 
-const getHeaderSettings = () => {
-  if (typeof window === "undefined") return { quickLinks: [] };
+let cachedHeaderSettings: any = null;
+
+const getHeaderSettings = async () => {
+  if (cachedHeaderSettings) return cachedHeaderSettings;
   try {
-    const saved = localStorage.getItem("cms_header_settings");
-    if (saved) return JSON.parse(saved);
-  } catch (e) {}
-  return {
-    quickLinks: [
-      { id: '1', label: "Mobile Training", link: "/training", color: "#00AFA2", icon: "GraduationCap" },
-      { id: '2', label: "Repair Services", link: "/repair", color: "#00AFA2", icon: "Wrench" },
-      { id: '3', label: "Stock Clearance", link: "/category/all?clearance=true", color: "#f97316", icon: "Flame" },
-      { id: '4', label: "EMI Products", link: "/category/all?emi=true", color: "#3b82f6", icon: "CreditCard" },
-    ]
-  };
+    const settings = await getDbHeaderSettings();
+    cachedHeaderSettings = settings;
+    return settings;
+  } catch (e) {
+    return { quickLinks: [] };
+  }
 };
 
-const saveHeaderSettings = (settings: any) => {
-  if (typeof window === "undefined") return;
+const saveHeaderSettings = async (settings: any) => {
   try {
-    localStorage.setItem("cms_header_settings", JSON.stringify(settings));
-    window.dispatchEvent(new Event("storage"));
-    window.dispatchEvent(new Event("header_settings_updated"));
-  } catch (e) {}
+    cachedHeaderSettings = settings;
+    await saveDbHeaderSettings(settings);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("header_settings_updated"));
+    }
+  } catch (e) {
+    console.error("Error saving header settings:", e);
+  }
 };
 
 interface AddPageModalProps {
@@ -427,24 +430,21 @@ export default function PagesPanel() {
   // Header quick links tracking
   const [headerQuickLinks, setHeaderQuickLinks] = useState<QuickLinkItem[]>([]);
 
-  const loadHeaderQuickLinks = () => {
-    const settings = getHeaderSettings();
+  const loadHeaderQuickLinks = async () => {
+    const settings = await getHeaderSettings();
     setHeaderQuickLinks(settings.quickLinks || []);
   };
 
   const loadCategories = () => {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = localStorage.getItem("expert_mobile_categories");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCategories(parsed.map((c: any) => ({ slug: c.slug, name: c.name })));
-          return;
-        }
+    getDbCategories().then((cats) => {
+      if (Array.isArray(cats) && cats.length > 0) {
+        setCategories(cats.map((c: any) => ({ slug: c.slug, name: c.name })));
+      } else {
+        setCategories(INITIAL_CATEGORIES.map(c => ({ slug: c.slug, name: c.name })));
       }
-    } catch (e) {}
-    setCategories(INITIAL_CATEGORIES.map(c => ({ slug: c.slug, name: c.name })));
+    }).catch(() => {
+      setCategories(INITIAL_CATEGORIES.map(c => ({ slug: c.slug, name: c.name })));
+    });
   };
 
   useEffect(() => {
@@ -454,11 +454,15 @@ export default function PagesPanel() {
     window.addEventListener("storage", loadHeaderQuickLinks);
     window.addEventListener("categories_updated", loadCategories);
     window.addEventListener("header_settings_updated", loadHeaderQuickLinks);
+    window.addEventListener("cms_db_synced", loadCategories);
+    window.addEventListener("cms_db_synced", loadHeaderQuickLinks);
     return () => {
       window.removeEventListener("storage", loadCategories);
       window.removeEventListener("storage", loadHeaderQuickLinks);
       window.removeEventListener("categories_updated", loadCategories);
       window.removeEventListener("header_settings_updated", loadHeaderQuickLinks);
+      window.removeEventListener("cms_db_synced", loadCategories);
+      window.removeEventListener("cms_db_synced", loadHeaderQuickLinks);
     };
   }, []);
 
@@ -472,9 +476,9 @@ export default function PagesPanel() {
     );
   };
 
-  const toggleQuickLinkForPage = (linkUrl: string, label: string, color = '#00AFA2', icon = 'Sparkles') => {
+  const toggleQuickLinkForPage = async (linkUrl: string, label: string, color = '#00AFA2', icon = 'Sparkles') => {
     const cleanUrl = linkUrl.startsWith('/') ? linkUrl : '/' + linkUrl;
-    const current = getHeaderSettings();
+    const current = await getHeaderSettings();
     let links: QuickLinkItem[] = Array.isArray(current.quickLinks) ? [...current.quickLinks] : [];
     
     const existingIndex = links.findIndex(l => 
@@ -498,7 +502,7 @@ export default function PagesPanel() {
       });
     }
 
-    saveHeaderSettings({ ...current, quickLinks: links });
+    await saveHeaderSettings({ ...current, quickLinks: links });
     setHeaderQuickLinks(links);
   };
 
@@ -525,7 +529,7 @@ export default function PagesPanel() {
     }));
   };
 
-  const handleDeleteCustomPage = (page: { id: string; slug: string; title: string }) => {
+  const handleDeleteCustomPage = async (page: { id: string; slug: string; title: string }) => {
     const cleanSlug = page.slug.replace(/^\//, '').replace(/^p\//, '');
     const pageUrl = `/${cleanSlug}`;
 
@@ -533,11 +537,11 @@ export default function PagesPanel() {
     deleteCustomPage(page.id);
 
     // 2. Remove associated header button from quick links
-    const current = getHeaderSettings();
+    const current = await getHeaderSettings();
     const filteredLinks = (current.quickLinks || []).filter(
       (l: any) => l.link !== pageUrl && l.link !== `/p/${cleanSlug}` && l.link !== cleanSlug && l.label !== page.title
     );
-    saveHeaderSettings({ ...current, quickLinks: filteredLinks });
+    await saveHeaderSettings({ ...current, quickLinks: filteredLinks });
     setHeaderQuickLinks(filteredLinks);
 
     // 3. Close confirmation
@@ -554,22 +558,21 @@ export default function PagesPanel() {
     }
   };
 
-  const handleDeleteCategory = (catSlug: string, catName: string) => {
+  const handleDeleteCategory = async (catSlug: string, catName: string) => {
     try {
-      const saved = localStorage.getItem("expert_mobile_categories");
-      const existing = saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+      const existing = await getDbCategories();
       const updated = existing.filter((c: any) => c.slug !== catSlug);
-      localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+      await saveDbCategories(updated);
       window.dispatchEvent(new Event("categories_updated"));
     } catch (e) {}
 
     // Remove header link if exists
     const categoryUrl = `/category/${catSlug}`;
-    const current = getHeaderSettings();
+    const current = await getHeaderSettings();
     const filteredLinks = (current.quickLinks || []).filter(
       (l: any) => l.link !== categoryUrl && l.link !== catSlug && l.label !== catName
     );
-    saveHeaderSettings({ ...current, quickLinks: filteredLinks });
+    await saveHeaderSettings({ ...current, quickLinks: filteredLinks });
     setHeaderQuickLinks(filteredLinks);
 
     loadCategories();
@@ -581,7 +584,7 @@ export default function PagesPanel() {
     }
   };
 
-  const handleAddPage = (data: { 
+  const handleAddPage = async (data: { 
     type: 'main' | 'category';
     title: string; 
     slug: string; 
@@ -598,8 +601,7 @@ export default function PagesPanel() {
 
     if (data.type === 'category') {
       try {
-        const saved = localStorage.getItem("expert_mobile_categories");
-        const existing = saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+        const existing = await getDbCategories();
         const exists = existing.some((c: any) => c.slug === cleanSlug);
         if (!exists) {
           const newCat = {
@@ -609,13 +611,13 @@ export default function PagesPanel() {
             count: 0
           };
           const updated = [...existing, newCat];
-          localStorage.setItem("expert_mobile_categories", JSON.stringify(updated));
+          await saveDbCategories(updated);
           window.dispatchEvent(new Event("categories_updated"));
         }
       } catch (e) {}
 
       if (data.addHeaderButton) {
-        toggleQuickLinkForPage(`/category/${cleanSlug}`, data.title, data.buttonColor || '#00AFA2', data.buttonIcon || 'ShoppingBag');
+        await toggleQuickLinkForPage(`/category/${cleanSlug}`, data.title, data.buttonColor || '#00AFA2', data.buttonIcon || 'ShoppingBag');
       }
 
       loadCategories();

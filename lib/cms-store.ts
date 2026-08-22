@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { saveDbCmsConfig } from '@/app/actions';
 
 export interface SavedAsset {
   id: string;
@@ -468,6 +469,10 @@ interface CmsStore {
   globalSections: GlobalSections;
   setPromoBar: (config: Partial<PromoBarConfig>) => void;
   setAnnouncementBanner: (config: Partial<AnnouncementBannerConfig>) => void;
+
+  // ─── Database Synchronization ───────────────────────────────────────────
+  initFromDatabase: (data: any) => void;
+  saveToDatabase: () => Promise<boolean>;
 }
 
 // ─── Initial Values ───────────────────────────────────────────────────────────
@@ -1142,6 +1147,34 @@ export const useCmsStore = create<CmsStore>()(
           announcementBanner: { ...state.globalSections.announcementBanner, ...config },
         }
       })),
+
+      // ─── Database Synchronization ─────────────────────────────────────────
+      initFromDatabase: (data: any) => set((state) => ({
+        sectionsByRoute: (data.sectionsByRoute && Object.keys(data.sectionsByRoute).length > 0) ? data.sectionsByRoute : state.sectionsByRoute,
+        sectionCustomizations: { ...state.sectionCustomizations, ...(data.sectionCustomizations || {}) },
+        customSectionsData: { ...state.customSectionsData, ...(data.customSectionsData || {}) },
+        globalSections: data.globalSections || state.globalSections,
+        savedAssets: data.savedAssets || state.savedAssets,
+        imageOverrides: { ...state.imageOverrides, ...(data.imageOverrides || {}) },
+        styleOverrides: { ...state.styleOverrides, ...(data.styleOverrides || {}) },
+        hasUnsavedChanges: false,
+      })),
+      saveToDatabase: async () => {
+        const state = useCmsStore.getState();
+        const success = await saveDbCmsConfig({
+          sectionsByRoute: state.sectionsByRoute,
+          sectionCustomizations: state.sectionCustomizations,
+          customSectionsData: state.customSectionsData,
+          globalSections: state.globalSections,
+          savedAssets: state.savedAssets,
+          imageOverrides: state.imageOverrides,
+          styleOverrides: state.styleOverrides,
+        });
+        if (success) {
+          useCmsStore.setState({ hasUnsavedChanges: false });
+        }
+        return success;
+      },
     }),
     {
       name: 'cms-store',

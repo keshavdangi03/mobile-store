@@ -7,6 +7,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/components/cart-context";
 import LayoutShell from "@/components/layout-shell";
+import CmsSyncProvider from "@/components/cms-sync-provider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -38,11 +39,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider>
-          <CartProvider>
-            <LayoutShell>
-              {children}
-            </LayoutShell>
-          </CartProvider>
+          <CmsSyncProvider>
+            <CartProvider>
+              <LayoutShell>
+                {children}
+              </LayoutShell>
+            </CartProvider>
+          </CmsSyncProvider>
         </ThemeProvider>
       </body>
     </html>
